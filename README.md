@@ -41,12 +41,13 @@ Mọi nội dung của khách nằm trong **`js/config.js`** — đây là file 
 | Tên game, slogan | `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` |
 | Lời thoại, lá thư, các dòng chữ | `TEXT` |
 | Ảnh từng mốc, ngày, tên mốc | `MILESTONES` |
+| Ảnh màn hình mở đầu | `TITLE_PHOTO` |
 | Video | `VIDEO_SRC` |
 | Tên 5 món quà | `GIFTS` |
 
 Các bước thường làm khi giao một bản cá nhân hoá:
 
-1. Chép ảnh vào `assets/photos/` (ảnh vuông hoặc dọc đều được, khung tự co theo tỉ lệ;
+1. Chép ảnh vào `assets/photos/` (gồm cả ảnh cho màn hình mở đầu) (ảnh vuông hoặc dọc đều được, khung tự co theo tỉ lệ;
    nên thu nhỏ còn cạnh dài ~640px cho nhẹ).
 2. Chép video `.mp4` (H.264, nên dưới 15MB) vào `assets/video/`.
 3. Mở `js/config.js`: điền `photo` cho từng mốc, `VIDEO_SRC`, `TEXT.letter`, tên mốc và ngày.

@@ -588,7 +588,6 @@ button { font-family: var(--font-body); cursor: pointer; }
   background-size: 28px 28px;
 }
 
-@media (max-height: 520px) { .title-hero.photo { height: 30vh; margin-bottom: 8px; } }
 
 /* khung ảnh trống ở màn hình start (bản demo) */
 .title-hero.frame {
@@ -608,3 +607,17 @@ button { font-family: var(--font-body); cursor: pointer; }
   border: 3px dashed var(--ink);
   box-shadow: 5px 5px 0 var(--ink);
 }
+
+/* ảnh thật ở màn hình start (bản cá nhân hoá) — khung trắng viền cứng, giữ nguyên tỉ lệ */
+.title-hero.photo {
+  width: fit-content;
+  max-width: 82%;
+  margin: 0 auto 16px;
+  padding: 5px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  filter: none;
+}
+.title-hero.photo img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(34vh, 280px); }
+@media (max-height: 520px) { .title-hero.photo img { max-height: 30vh; } }

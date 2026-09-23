@@ -2,7 +2,7 @@
 // Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
 import {
-  GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES,
+  GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
 } from "./config.js";
 import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
 import {
@@ -543,7 +543,17 @@ function applyBranding() {
   $("title-heading").textContent = GAME_TITLE;
   $("title-subtitle").textContent = GAME_SUBTITLE;
   $("title-window-name").textContent = WINDOW_NAME;
-  $("title-photo-frame").textContent = TEXT.photoPlaceholder;
+  const frame = $("title-photo-frame");
+  if (TITLE_PHOTO) {
+    frame.className = "title-hero photo";
+    frame.innerHTML = "";
+    const img = new Image();
+    img.src = TITLE_PHOTO;
+    img.alt = "";
+    frame.appendChild(img);
+  } else {
+    frame.textContent = TEXT.photoPlaceholder;
+  }
   $("letter-window-name").textContent = TEXT.letterTitle;
   $("video-missing").textContent = TEXT.videoMissing;
 }

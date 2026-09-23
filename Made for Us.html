@@ -243,6 +243,8 @@ const TEXT = {
 // Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.
 // Video: đặt file .mp4 vào assets/video/ rồi điền tên vào đây (nên dưới 15MB).
 const VIDEO_SRC = "";
+// Ảnh ở màn hình mở đầu (ảnh dọc kiểu photobooth rất hợp). Để "" thì hiện khung trống.
+const TITLE_PHOTO = "";
 // true  = luôn vẽ khung ảnh trống kèm chữ hướng dẫn (dùng cho bản demo)
 // false = mốc nào chưa có ảnh thì không treo khung
 const SHOW_EMPTY_PHOTO_FRAMES = true;
@@ -286,7 +288,7 @@ const MILESTONES = [
   { date: "DD.MM", name: "Final stop", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
 ];
 
-return { GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES, GIFTS, MILESTONES };
+return { GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES, GIFTS, MILESTONES };
 })();
 
 const __mod_assets = (() => {
@@ -2215,7 +2217,7 @@ const __mod_main = (() => {
 // ============================================================
 // Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
-const {GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES,} = __mod_config;
+const {GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,} = __mod_config;
 const {IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES} = __mod_assets;
 const {SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,} = __mod_levels;
 const {initAudio, sfx, setMuted, isMuted} = __mod_audio;
@@ -2753,7 +2755,17 @@ function applyBranding() {
   $("title-heading").textContent = GAME_TITLE;
   $("title-subtitle").textContent = GAME_SUBTITLE;
   $("title-window-name").textContent = WINDOW_NAME;
-  $("title-photo-frame").textContent = TEXT.photoPlaceholder;
+  const frame = $("title-photo-frame");
+  if (TITLE_PHOTO) {
+    frame.className = "title-hero photo";
+    frame.innerHTML = "";
+    const img = new Image();
+    img.src = TITLE_PHOTO;
+    img.alt = "";
+    frame.appendChild(img);
+  } else {
+    frame.textContent = TEXT.photoPlaceholder;
+  }
   $("letter-window-name").textContent = TEXT.letterTitle;
   $("video-missing").textContent = TEXT.videoMissing;
 }
