@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""Tạo ảnh preview khi chia sẻ link (Open Graph) và bộ icon cho trình duyệt.
+"""Tạo ảnh preview khi chia sẻ link (Open Graph).
 
-Xuất ra:
-    assets/preview.png            1200×630 — ảnh hiện trong Zalo / Messenger / Facebook
-    assets/icon-512.png           icon vuông (PWA, khi thêm vào màn hình chính)
-    assets/icon-180.png           apple-touch-icon
-    assets/favicon.png            32×32
+Xuất ra assets/preview.png (1200×630) — ảnh hiện trong Zalo / Messenger / Facebook.
+Favicon và app icon lấy sẵn từ bộ nhận diện trong assets/brand/.
 
 Ảnh preview được dựng bằng chính giao diện của game (cửa sổ retro trên nền hồng),
 render bằng Chrome ở chế độ headless nên khớp hệt font và màu trong game.
@@ -26,7 +23,7 @@ TITLE = "MADE FOR US"
 SUBTITLE = "Our love journey"
 TAGLINE = "Your photos, your letter, your story —\nas a little pixel-art game"
 WINDOW_NAME = "MADE_FOR_US.EXE"
-HERO = "assets/characters/Couple-Bike-Side-01.png"
+HERO = "assets/brand/heart-512.png"  # logo trái tim
 
 PREVIEW_HTML = """<!doctype html>
 <html><head><meta charset="utf-8">
@@ -59,7 +56,7 @@ PREVIEW_HTML = """<!doctype html>
   }}
   .sub {{ margin: 0 0 18px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 27px; color: #6b3f52; }}
   .tag {{ margin: 0; font-family: 'Be Vietnam Pro', sans-serif; font-size: 20px; line-height: 1.55; color: #a97a92; white-space: pre-line; }}
-  img {{ width: 300px; image-rendering: pixelated; filter: drop-shadow(6px 6px 0 rgba(43,32,48,0.25)); }}
+  img {{ width: 260px; image-rendering: pixelated; filter: drop-shadow(8px 8px 0 rgba(43,32,48,0.18)); }}
 </style></head>
 <body>
   <div class="card">
@@ -100,21 +97,5 @@ def render_preview():
     print(f"-> {out} ({os.path.getsize(out) // 1024} KB)")
 
 
-def render_icons():
-    from PIL import Image
-
-    heart = Image.open(os.path.join(ASSETS, "ui", "Heart-Full.png")).convert("RGBA")
-    for size, name in [(512, "icon-512.png"), (180, "icon-180.png"), (32, "favicon.png")]:
-        canvas = Image.new("RGBA", (size, size), (255, 111, 160, 255))
-        inner = int(size * 0.72)
-        w = inner
-        h = round(inner * heart.height / heart.width)
-        canvas.alpha_composite(heart.resize((w, h), Image.NEAREST), ((size - w) // 2, (size - h) // 2))
-        out = os.path.join(ASSETS, name)
-        canvas.save(out)
-        print(f"-> {out}")
-
-
 if __name__ == "__main__":
     render_preview()
-    render_icons()

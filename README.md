@@ -64,8 +64,10 @@ js/levels.js        bố cục màn chơi (gai, bục, gạch, vị trí quà)
 js/engine.js        vòng lặp game: vật lý, va chạm, camera, vẽ canvas
 js/main.js          điều phối màn hình, HUD, điều khiển, cắt cảnh
 js/audio.js         hiệu ứng âm thanh chiptune sinh bằng WebAudio (không cần file)
-assets/             characters, elements, props, ui, scenes, photos, video
-tools/              build_standalone.py (gộp 1 file), package.py (đóng gói zip)
+assets/             brand (logo, favicon), characters, elements, props, ui, scenes, photos, video
+assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
+tools/              build_standalone.py (gộp 1 file), package.py (đóng gói zip),
+                    make_preview.py (ảnh preview khi chia sẻ link)
 ```
 
 ## Kỹ thuật
@@ -79,6 +81,15 @@ tools/              build_standalone.py (gộp 1 file), package.py (đóng gói 
 
 Cờ khi thử nghiệm: mở trang với `#autostart` để vào thẳng màn chơi, `#debug` để lấy ván
 chơi hiện tại qua `window.__game` trong console.
+
+## Ảnh preview khi gửi link
+
+`index.html` khai báo thẻ Open Graph trỏ tới `assets/preview.png` (1200×630) và favicon
+lấy từ `assets/brand/`. Sửa chữ trên ảnh thì đổi các hằng đầu file `tools/make_preview.py`
+rồi chạy `python3 tools/make_preview.py`.
+
+Zalo/Messenger/Facebook lưu cache preview theo từng đường dẫn — sau khi đổi ảnh, gửi link
+kèm `?v=2` hoặc dùng <https://developers.facebook.com/tools/debug/> để lấy bản mới.
 
 ## Bản quyền
 
