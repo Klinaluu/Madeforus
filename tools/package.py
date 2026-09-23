@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import build_standalone  # noqa: E402
 
 DIST = os.path.join(ROOT, "dist", "madeforus")
-INCLUDE = ["index.html", "Made for Us.html", "css", "js", "assets"]
+INCLUDE = ["index.html", "Made for Us.html", "manifest.webmanifest", "css", "js", "assets"]
 README = """MADE FOR US
 
 1. Giai nen thu muc nay (giu nguyen cau truc ben trong).

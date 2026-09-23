@@ -83,6 +83,12 @@ tools/              build_standalone.py (gộp 1 file), package.py (đóng gói 
 Cờ khi thử nghiệm: mở trang với `#autostart` để vào thẳng màn chơi, `#debug` để lấy ván
 chơi hiện tại qua `window.__game` trong console.
 
+## Thêm vào màn hình chính (chạy như app)
+
+`manifest.webmanifest` + các thẻ `apple-mobile-web-app-*` giúp game mở toàn màn hình khi
+được thêm vào màn hình chính: iPhone/iPad dùng Safari → nút Chia sẻ → *Thêm vào MH chính*;
+Android dùng Chrome → ⋮ → *Cài ứng dụng*. Icon lấy từ `assets/brand/`.
+
 ## Ảnh preview khi gửi link
 
 `index.html` khai báo thẻ Open Graph trỏ tới `assets/preview.png` (1200×630) và favicon
