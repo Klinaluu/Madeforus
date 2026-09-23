@@ -1,0 +1,9 @@
+MADE FOR US — demo
+
+Ban demo cho thay cau truc game truoc khi ca nhan hoa:
+khung anh, video va la thu deu de trong cho noi dung cua ban.
+
+1. Giai nen thu muc nay (giu nguyen cau truc ben trong).
+2. Mo file  Made for Us.html  bang Google Chrome. Double-click la duoc.
+3. Ban phim: mui ten trai/phai di chuyen, len nhay, nhay 2 lan de nhay cao.
+   Tay cam: analog/D-pad di chuyen, nut A nhay.
