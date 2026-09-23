@@ -41,9 +41,6 @@ const JUMP_KEYS = ["ArrowUp", "w", "W", " ", "Spacebar"];
 function groundMarginFor(ch) {
   return Math.max(60, Math.min(ch * 0.16, 170));
 }
-function terrainHeightFor(groundY) {
-  return Math.max(260, Math.min(groundY * 0.5, 380));
-}
 function ready(img) {
   if (!img) return false;
   if (img instanceof HTMLCanvasElement) return img.width > 0;
@@ -800,17 +797,11 @@ export class JourneyGame {
     ctx.fillStyle = g;
     ctx.fillRect(-20, -20, this.CW + 40, this.CH + 40);
 
-    const isScene = terrain.startsWith("scene:");
-    if (!isScene && terrain !== "sunset-road") drawCelestial(ctx, terrain, this.camX, this.groundY, this.CW);
-    if (!isScene) drawClouds(ctx, img.cloud, this.camX, this.groundY, this.CW);
     drawTerrain(ctx, terrain, img, this.camX, this.groundY, this.CW);
     if (terrain2 && blend > 0) {
       // crossfade sang cảnh kế tiếp
       ctx.save();
       ctx.globalAlpha = blend;
-      const isScene2 = terrain2.startsWith("scene:");
-      if (!isScene2 && terrain2 !== "sunset-road") drawCelestial(ctx, terrain2, this.camX, this.groundY, this.CW);
-      if (!isScene2) drawClouds(ctx, img.cloud, this.camX, this.groundY, this.CW);
       drawTerrain(ctx, terrain2, img, this.camX, this.groundY, this.CW);
       ctx.restore();
     }
@@ -1001,7 +992,6 @@ function lerpColor(a, b, t) {
   const bl = Math.round(ca[2] + (cb[2] - ca[2]) * t);
   return `rgb(${r},${g},${bl})`;
 }
-const isNight = (type) => type === "city-night" || type === "rain";
 
 // màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên
 const topColorCache = new WeakMap();
@@ -1019,54 +1009,8 @@ function topColorOf(image) {
   topColorCache.set(image, color);
   return color;
 }
-const isDusk = (type) => type === "city-dusk" || type === "mountain-mist" || type === "sunset-road";
 
-function tileImage(ctx, image, scrollX, x, w, y, targetH, alpha) {
-  const scale = targetH / image.height;
-  const tileW = image.width * scale;
-  ctx.save();
-  if (alpha !== undefined) ctx.globalAlpha = alpha;
-  let startX = x - (scrollX % tileW) - tileW;
-  for (let dx = startX; dx < x + w + tileW; dx += tileW) {
-    ctx.drawImage(image, dx, y, tileW, targetH);
-  }
-  ctx.restore();
-}
 
-// mặt trời / mặt trăng theo cảnh, trôi chậm cùng camera
-function drawCelestial(ctx, type, camX, groundY, CW) {
-  const night = isNight(type);
-  const dusk = isDusk(type);
-  const x = q(((CW * 0.72 - camX * 0.04) % (CW + 200) + CW + 200) % (CW + 200) - 100);
-  const y = q(dusk ? groundY * 0.42 : 60 + groundY * 0.08);
-  const r = dusk ? 46 : 30;
-  ctx.save();
-  if (night) {
-    ctx.fillStyle = "#f6f1e3";
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "rgba(43,32,48,0.18)";
-    [[-10, -6, 7], [8, 4, 5], [-2, 12, 4]].forEach(([dx, dy, rr]) => {
-      ctx.beginPath();
-      ctx.arc(x + dx, y + dy, rr, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  } else {
-    const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.6);
-    glow.addColorStop(0, dusk ? "rgba(255,190,120,0.55)" : "rgba(255,240,200,0.45)");
-    glow.addColorStop(1, "rgba(255,220,180,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
-    ctx.fillStyle = dusk ? "#ffb070" : "#fff0b8";
-    // mặt trời vẽ bậc thang cho ra chất pixel
-    for (let dy = -r; dy < r; dy += PX) {
-      const half = Math.sqrt(r * r - dy * dy);
-      ctx.fillRect(x - q(half), y + dy, q(half) * 2, PX);
-    }
-  }
-  ctx.restore();
-}
 
 // Tham số CW ở đây là chiều rộng canvas THỰC TẾ của thiết bị.
 // Lặp ảnh kiểu gương (tile → tile lật → tile) để mép nào cũng khớp, không lộ mối nối
@@ -1108,177 +1052,25 @@ function drawScene(ctx, layers, speeds, camX, groundY, CW, sinkScenePx, topColor
 }
 
 function drawTerrain(ctx, type, img, camX, groundY, CW) {
-  // Cảnh 5 lớp parallax (Backgrounds.html): trời + 4 lớp trong suốt, gần dần
-  if (type.startsWith("scene:")) {
-    const layers = img.scenes && img.scenes[type.slice(6)];
-    if (layers && layers.every(ready)) {
-      const id = type.slice(6);
-      const sink = (img.sceneSink && img.sceneSink[id]) ?? 40;
-      const top = img.sceneTop && img.sceneTop[id];
-      drawScene(ctx, layers, img.sceneSpeeds || [0.04, 0.12, 0.25, 0.45, 0.75], camX, groundY, CW, sink, top);
-      return;
-    }
-  }
-  // Cảnh hoàng hôn: ảnh Nature-Sunset có sẵn cả trời + mặt trời → neo đáy ở cỡ vừa
-  // phải, phần trời phía trên tô đúng màu mép trên của ảnh để không lộ mối nối
-  if (type === "sunset-road" && ready(img.terrainSunset)) {
-    const h = Math.min(groundY + 10, terrainHeightFor(groundY) * 1.1);
-    ctx.fillStyle = topColorOf(img.terrainSunset);
-    ctx.fillRect(0, 0, CW, groundY + 10 - h + 2);
-    tileImage(ctx, img.terrainSunset, camX * 0.15, 0, CW, groundY + 10 - h, h, 1);
-    return;
-  }
-  // Ruộng lúa (Sóc Sơn): đồi xa vẽ tay + dải ruộng Nature-RiceField sát mặt đường
-  if (type === "ricefield" && ready(img.terrainRiceField)) {
-    const k = terrainHeightFor(groundY) / 310;
-    drawStepHills(ctx, camX * 0.12, groundY - 100, CW, 320, 120 * k, "rgba(120,150,110,0.45)");
-    drawStepHills(ctx, camX * 0.22, groundY - 96, CW, 240, 80 * k, "#8fb27a");
-    tileImage(ctx, img.terrainRiceField, camX * 0.4, 0, CW, groundY + 10 - 110, 110, 1);
-    return;
-  }
-
-  const natureImg = {
-    mountain: img.terrainHills,
-    "mountain-mist": img.terrainHills,
-    karst: img.terrainRiverLake,
-  }[type];
-
-  if (ready(natureImg)) {
-    const terrainH = terrainHeightFor(groundY);
-    // lớp xa: nhỏ hơn, mờ hơn, trôi chậm hơn → có chiều sâu
-    tileImage(ctx, natureImg, camX * 0.12 + 300, 0, CW, groundY + 10 - terrainH * 0.7 - 40, terrainH * 0.7, 0.38);
-    tileImage(ctx, natureImg, camX * 0.3, 0, CW, groundY + 10 - terrainH, terrainH, 1);
-    if (type === "mountain-mist") {
-      const mist = ctx.createLinearGradient(0, groundY - 90, 0, groundY);
-      mist.addColorStop(0, "rgba(255,255,255,0)");
-      mist.addColorStop(1, "rgba(255,255,255,0.55)");
-      ctx.fillStyle = mist;
-      ctx.fillRect(0, groundY - 90, CW, 90);
-    }
-    return;
-  }
-
-  const k = terrainHeightFor(groundY) / 310;
-  switch (type) {
-    case "city":
-    case "city-night":
-    case "city-dusk":
-      drawSkyline(ctx, camX * 0.12, groundY, CW, k * 1.25, isNight(type) ? "rgba(70,45,80,0.45)" : "rgba(199,140,170,0.32)", false, false);
-      drawSkyline(ctx, camX * 0.35, groundY, CW, k, isNight(type) ? "#3a2a46" : "#c48db0", true, isNight(type));
-      break;
-    case "cloud-sea":
-      drawStepHills(ctx, camX * 0.15, groundY - 30, CW, 260, 150 * k, "rgba(120,90,140,0.45)");
-      drawStepHills(ctx, camX * 0.3, groundY - 20, CW, 200, 110 * k, "#8d6fa4");
-      drawCloudSea(ctx, camX * 0.45, groundY, CW);
-      break;
-    case "rain":
-      drawStepHills(ctx, camX * 0.15, groundY, CW, 300, 130 * k, "rgba(90,80,120,0.5)");
-      drawStepHills(ctx, camX * 0.3, groundY, CW, 260, 100 * k, "#6d6488");
-      drawRain(ctx, camX, groundY, CW);
-      break;
-    default:
-      drawStepHills(ctx, camX * 0.15, groundY, CW, 300, 120 * k, "rgba(199,140,170,0.35)");
-      drawStepHills(ctx, camX * 0.3, groundY, CW, 260, 90 * k, "#c48db0");
-  }
+  const id = type.startsWith("scene:") ? type.slice(6) : "";
+  const layers = id && img.scenes && img.scenes[id];
+  if (!layers || !layers.every(ready)) return; // ảnh chưa tải xong: để nguyên nền trời
+  drawScene(
+    ctx,
+    layers,
+    img.sceneSpeeds || [0.25, 1],
+    camX,
+    groundY,
+    CW,
+    (img.sceneSink && img.sceneSink[id]) ?? 160,
+    img.sceneTop && img.sceneTop[id]
+  );
 }
 
-// Skyline thành phố kiểu pixel: nhà bậc thang, cửa sổ vuông, viền tối
-function drawSkyline(ctx, scroll, groundY, CW, k, color, outline, lit) {
-  const span = CW + 120;
-  ctx.save();
-  ctx.fillStyle = color;
-  for (let i = 0; i < 16; i++) {
-    let bx = ((i * 84 - scroll) % span) - 60;
-    if (bx < -60) bx += span;
-    bx = q(bx);
-    const w = 48 + ((i * 29) % 3) * 12;
-    const h = q((70 + ((i * 53) % 110)) * k);
-    ctx.fillRect(bx, groundY - h, w, h);
-    // mái bậc thang / ăng-ten
-    if (i % 3 === 0) ctx.fillRect(bx + 8, groundY - h - 12, w - 16, 12);
-    if (i % 4 === 1) ctx.fillRect(bx + w / 2 - 2, groundY - h - 22, 4, 22);
-    if (outline) {
-      ctx.strokeStyle = "rgba(43,32,48,0.55)";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(bx + 1.5, groundY - h + 1.5, w - 3, h);
-      ctx.fillStyle = lit ? "#ffe9a8" : "rgba(255,255,255,0.35)";
-      for (let wy = groundY - h + 12; wy < groundY - 14; wy += 16) {
-        for (let wx = bx + 8; wx < bx + w - 8; wx += 14) {
-          if ((wx * 7 + wy * 13 + i) % 5 !== 0) ctx.fillRect(wx, wy, 6, 8);
-        }
-      }
-      ctx.fillStyle = color;
-    }
-  }
-  ctx.restore();
-}
 
-// Đồi/núi vẽ bậc thang 4px cho ra chất pixel
-function drawStepHills(ctx, scroll, baseY, CW, spacing, height, color) {
-  const span = CW + spacing;
-  ctx.save();
-  ctx.fillStyle = color;
-  for (let i = 0; i < Math.ceil(span / spacing) + 1; i++) {
-    let bx = ((i * spacing - scroll) % span) - spacing / 2;
-    if (bx < -spacing / 2) bx += span;
-    const r = spacing * 0.55;
-    for (let dx = -r; dx < r; dx += PX) {
-      const h = q(Math.sqrt(Math.max(0, 1 - (dx / r) * (dx / r))) * height);
-      if (h > 0) ctx.fillRect(q(bx + dx), baseY - h, PX, h);
-    }
-  }
-  ctx.restore();
-}
 
-function drawCloudSea(ctx, scroll, groundY, CW) {
-  const span = CW + 90;
-  ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
-  for (let i = 0; i < 18; i++) {
-    let bx = ((i * 85 - scroll) % span) - 45;
-    if (bx < -45) bx += span;
-    const by = groundY - 30 + Math.sin(i) * 6;
-    [[0, 0, 30], [26, 6, 22], [-24, 8, 20]].forEach(([ox, oy, r]) => {
-      for (let dy = -r; dy < 0; dy += PX) {
-        const half = q(Math.sqrt(r * r - dy * dy));
-        ctx.fillRect(q(bx + ox) - half, q(by + oy + dy), half * 2, PX);
-      }
-    });
-  }
-  ctx.restore();
-}
 
-function drawRain(ctx, camX, groundY, CW) {
-  ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
-  const span = CW + 60;
-  for (let i = 0; i < 28; i++) {
-    const rx = (i * 63 - camX * 1.1) % span;
-    const x0 = q(rx < 0 ? rx + span : rx);
-    const y0 = (i * 97 + camX * 2) % groundY;
-    ctx.fillRect(x0, y0, 2, 14);
-  }
-  ctx.restore();
-}
 
-function drawClouds(ctx, cloudImg, camX, groundY, CW) {
-  if (!ready(cloudImg)) return;
-  const h = 46;
-  const scale = h / cloudImg.height;
-  const w = cloudImg.width * scale;
-  const skyBand = Math.max(100, Math.min(groundY - terrainHeightFor(groundY) * 0.6, 420));
-  ctx.save();
-  for (let i = 0; i < 7; i++) {
-    const far = i % 2 === 0;
-    let bx = ((i * 250 - camX * (far ? 0.06 : 0.12)) % (CW + 260)) - 130;
-    if (bx < -130) bx += CW + 260;
-    const by = 24 + ((i * 37) % skyBand);
-    const s = far ? 0.6 : 1;
-    ctx.globalAlpha = far ? 0.6 : 0.95;
-    ctx.drawImage(cloudImg, q(bx), q(by), w * s, h * s);
-  }
-  ctx.restore();
-}
 
 // dải đất dưới mặt đường: tối, có vân ngang
 function drawGroundStrip(ctx, camX, groundY, CW, CH) {

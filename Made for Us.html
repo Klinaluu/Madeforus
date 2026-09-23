@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ride to Us">
 <meta name="theme-color" content="#2b2030">
-<!-- Ban chay truc tiep (double-click). Nguon: index.html + js/*.js — build lai bang tools/build_standalone.py -->
 <title>Made for Us</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,13 +17,13 @@
   <!-- ============ TITLE ============ -->
   <section id="screen-title" class="screen active pink-bg">
     <div class="win title-win">
-      <div class="win-bar"><span>MADE_FOR_US.EXE</span><i class="win-x">✕</i></div>
+      <div class="win-bar"><span id="title-window-name">MADE_FOR_US.EXE</span><i class="win-x">✕</i></div>
       <div class="win-body title-card">
-        <h1 class="game-title">MADE FOR US</h1>
-        <p class="game-subtitle">Our love journey</p>
-        <div class="title-hero frame">(insert pictures here)</div>
+        <h1 id="title-heading" class="game-title">MADE FOR US</h1>
+        <p id="title-subtitle" class="game-subtitle">Our love journey</p>
+        <div id="title-photo-frame" class="title-hero frame">(insert pictures here)</div>
         <button id="btn-start" class="pixel-btn primary">▶ Start the journey</button>
-        <div class="title-tip"><img class="tip-icon" src="Assets2/4x/Item-Key-Helmet-01.png" alt="">◀ ▶ move · ▲ jump · ▲▲ double jump · F full screen</div>
+        <div class="title-tip"><img class="tip-icon" src="assets/characters/Item-Key-Helmet-01.png" alt="">◀ ▶ move · ▲ jump · ▲▲ double jump · F full screen</div>
         <div class="title-tip">🎮 gamepad: stick / D-pad to move · A to jump</div>
         <div class="title-tip touch-only">best on iPad, landscape · add to Home Screen for full screen</div>
       </div>
@@ -42,8 +41,8 @@
         <div id="hud-items" class="hud-items"></div>
         <div id="hud-milestone" class="hud-milestone hidden"></div>
         <div id="hud-stats" class="hud-stats"><span id="hud-score">00000</span><span id="hud-time">0:00</span></div>
-        <img id="hud-portrait" class="hud-portrait hidden" src="Assets2/4x/Portrait-Woman-01.png" alt="">
-        <img id="hud-bar" class="hud-bar" src="Assets2/UI-Pixel/4x/Bar-0.png" alt="">
+        <img id="hud-portrait" class="hud-portrait hidden" src="assets/characters/Portrait-Woman-01.png" alt="">
+        <img id="hud-bar" class="hud-bar" src="assets/ui/Bar-0.png" alt="">
       </header>
     </div>
     <div id="hud-hint" class="hud-hint hidden"></div>
@@ -69,7 +68,7 @@
     <div class="shooting b"></div>
     <div class="shooting c"></div>
     <div class="meet-content">
-      <img class="meet-couple" src="Assets2/4x/Couple-Pose-Happy-01.png" alt="">
+      <img class="meet-couple" src="assets/characters/Couple-Pose-Happy-01.png" alt="">
       <p id="meet-text" class="meet-text"></p>
       <div id="meet-stats" class="meet-stats"></div>
       <button id="btn-meet-continue" class="pixel-btn primary">Continue ▸</button>
@@ -94,7 +93,7 @@
     <div class="win ending-win">
       <div class="win-bar"><span>Completed</span><i class="win-x">✕</i></div>
       <div class="win-body ending-content">
-        <img class="ending-couple" src="Assets2/4x/Scene-Terrace-Bike-Iso-01.png" alt="">
+        <img class="ending-couple" src="assets/characters/Scene-Terrace-Bike-Iso-01.png" alt="">
         <button id="btn-play-again" class="pixel-btn primary">▶ Play again</button>
         <div class="ending-sub">— or watch again —</div>
         <div class="ending-row">
@@ -165,9 +164,9 @@
 
 <div id="modal-letter" class="modal hidden">
   <div class="win letter-win">
-    <div class="win-bar"><span>Your love letter</span><button id="letter-close" class="win-x btn hidden">✕</button></div>
+    <div class="win-bar"><span id="letter-window-name">Your love letter</span><button id="letter-close" class="win-x btn hidden">✕</button></div>
     <div class="win-body letter-body">
-      <img class="letter-scene" src="Assets2/4x/Scene-Terrace-Sitting-Iso-01.png" alt="">
+      <img class="letter-scene" src="assets/characters/Scene-Terrace-Sitting-Iso-01.png" alt="">
       <pre id="letter-text" class="letter-text"></pre>
       <button id="btn-watch-video" class="pixel-btn primary">🎬 Watch the little movie</button>
     </div>
@@ -186,124 +185,220 @@
 </div>
 
 <script>
-const __mod_content = (() => {
+const __mod_config = (() => {
 // ============================================================
-// RIDE TO US — nội dung game
-// Phần bạn cần tự thay: MAN_LINE, LETTER_TEXT, VIDEO_SRC, ảnh polaroid.
+// CẤU HÌNH — đây là file duy nhất cần sửa khi cá nhân hoá game
+// Ảnh, video, lời thư, tên các mốc… đều nằm ở đây.
+// (Bố cục màn chơi ở levels.js, danh sách ảnh dùng chung ở assets.js.)
 // ============================================================
 
-const CH = "Assets2/4x/";
-const E = "Assets2/Elements-Pixel/4x/";
-const UI = "Assets2/UI-Pixel/4x/";
-
-// ---------- Bộ cảnh nền (dùng bằng terrain: "scene:<tên>") ----------
-const SCENE_DIR = "Assets2/Scenes-2L/";
-// Bộ nền 2 lớp parallax (Vietnam BG 2 Layer): L1 = trời + cảnh xa (đục), L2 = cảnh gần
-// (trong suốt), render 3840×1080. Mặt đất của cảnh ở y = 380/540 → sink 160.
-// Chỉ dùng 2 cảnh: Hồ Gươm cho cả đoạn trước khi gặp, Hồ Tây hoàng hôn cho đoạn đi đôi.
-const L2 = (id) => [`${SCENE_DIR}${id}/L1.png`, `${SCENE_DIR}${id}/L2.png`];
-const SCENES = {
-  "ho-guom": L2("ho-guom"),
-  "ho-tay": L2("ho-tay"),
-};
-const SCENE_IDS = Object.keys(SCENES);
-const SCENE_SPEEDS = [0.25, 1.0];
-// Cảnh có bục cỏ / prop thiên nhiên (cảnh phố dùng gạch + prop đô thị)
-const GRASS_SCENES = ["ho-guom"];
-// Màu mép trên lớp trời của từng cảnh — tô liền phần trời phía trên ảnh (dự phòng khi
-// không đọc được pixel, ví dụ chạy trực tiếp từ file://)
-const SCENE_TOP = { "ho-guom": "#bfe0e2", "ho-tay": "#e2620a" };
-// Phần đáy cảnh (theo hệ 540px) chìm dưới mặt đường
-const SCENE_SINK = Object.fromEntries(SCENE_IDS.map((id) => [id, 160]));
-
+// ---------- thương hiệu ----------
 const GAME_TITLE = "MADE FOR US";
 const GAME_SUBTITLE = "Our love journey";
-// Bản demo (madeforus) bật hai cờ này để hiện khung ảnh trống có chữ hướng dẫn
-const EMPTY_POLAROIDS = true;
-const PHOTO_PLACEHOLDER = "(insert pictures here)";
+const WINDOW_NAME = "MADE_FOR_US.EXE"; // chữ trên thanh tiêu đề cửa sổ
 
-// ---------- ảnh dùng chung ----------
+// ---------- lời thoại & văn bản ----------
+const TEXT = {
+  // câu nhân vật nam nói khi tìm thấy cô ấy
+  manLine: "Found you.",
+  // dòng chữ trên màn hình bầu trời sao sau khi gặp nhau
+  meetText: "I'm on my solo mission but the stars guide me to you",
+  // hộp thoại "System Message" ở chiếc hòm hồng
+  systemMessage: "The next level is not unlocked yet.\nWould you like to continue the journey?",
+  envelopeLabel: "Highly confidential document",
+  // lá thư: thay bằng lời của bạn (xuống dòng bằng \n hoặc dùng chuỗi nhiều dòng)
+  letterTitle: "Your love letter",
+  letter: "Write your love letter",
+  // hiện khi chưa có file video
+  videoMissing: "Wait for your video 🎬",
+  // chữ trong khung ảnh còn trống
+  photoPlaceholder: "(insert pictures here)",
+};
+
+// ---------- ảnh & video của khách ----------
+// Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.
+// Video: đặt file .mp4 vào assets/video/ rồi điền tên vào đây (nên dưới 15MB).
+const VIDEO_SRC = "";
+// true  = luôn vẽ khung ảnh trống kèm chữ hướng dẫn (dùng cho bản demo)
+// false = mốc nào chưa có ảnh thì không treo khung
+const SHOW_EMPTY_PHOTO_FRAMES = true;
+
+// ---------- 5 món quà của chặng solo ----------
+// icon: để trống ("") thì game tự vẽ hình thay thế.
+const GIFTS = [
+  { id: "matcha", label: "Matcha", icon: "assets/elements/Item-MatchaCup.png" },
+  { id: "chocolate", label: "Chocolate", icon: "assets/elements/Item-Chocolate.png" },
+  { id: "flower", label: "Flowers", icon: "assets/elements/Item-RoseBouquet.png" },
+  { id: "lipstick", label: "Lipstick", icon: "" },
+  { id: "letter", label: "Letter", icon: "assets/elements/Item-Envelope.png" },
+];
+
+// ---------- các mốc của chặng đi đôi ----------
+// Mỗi mốc là một khung polaroid treo trên nền, theo thứ tự thời gian.
+//   date, name : chú thích in dưới khung ảnh
+//   photo      : đường dẫn ảnh (để "" nếu chưa có)
+//   sky        : hai màu gradient bầu trời [trên, dưới]
+//   event      : "rain"  → trời mưa, nhảy chướng ngại để nhặt ô rồi mới đi tiếp
+//                "chest" → hòm hồng: System Message → Level Unlocked → lá thư
+//                "gift"  → hòm quà rơi từ trời → video
+// Ba mốc có event là phần kịch bản, nên giữ nguyên thứ tự ở cuối danh sách.
+const MILESTONES = [
+  { date: "DD.MM", name: "Your milestone 1", sky: ["#dfe9ff", "#f6c7d8"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 2", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 3", sky: ["#bcd7ff", "#ffd9e8"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 4", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 5", sky: ["#e3d3dc", "#b391a6"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 6", sky: ["#ffe6c9", "#ffd9e8"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 7", sky: ["#cfe6ff", "#ffe6c9"], photo: "" },
+  { date: "DD.MM", name: "Your milestone 8", sky: ["#ffd9c4", "#ffe7ef"], photo: "" },
+  {
+    date: "DD.MM", name: "Rainy stop", sky: ["#7fb7d9", "#cfe7f2"], photo: "",
+    event: "rain",
+    blocks: [{ x: 300 }, { x: 520, h: 2 }],
+    platforms: [{ x: 640, w: 2, y: 110 }],
+    itemAt: { x: 664, y: 166 },
+  },
+  { date: "DD.MM", name: "Letter stop", sky: ["#ffd9c4", "#ffe7ef"], photo: "", event: "chest" },
+  { date: "DD.MM", name: "Final stop", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
+];
+
+return { GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES, GIFTS, MILESTONES };
+})();
+
+const __mod_assets = (() => {
+// ============================================================
+// DANH SÁCH ẢNH — đường dẫn tới sprite, nền và cảnh vật.
+// Chỉ sửa khi thay bộ đồ hoạ; nội dung của khách nằm ở config.js.
+// ============================================================
+
+const CHAR = "assets/characters/";
+const EL = "assets/elements/";
+const PROP = "assets/props/";
+const UI = "assets/ui/";
+const SCENE = "assets/scenes/";
+
+// ---------- sprite & giao diện ----------
 const IMG = {
-  playerSolo: CH + "Man-Bike-Side-01.png",
-  walkFrames: [CH + "Man-Walk-Side-01.png", CH + "Man-Walk-Side-02.png", CH + "Man-Walk-Side-03.png", CH + "Man-Walk-Side-04.png"],
-  key: CH + "Item-Key-01.png",
-  helmet: CH + "Item-Helmet-01.png",
-  coupleFrames: [CH + "Couple-Bike-Side-01.png", CH + "Couple-Bike-Side-02.png", CH + "Couple-Bike-Side-Motion-01.png", CH + "Couple-Bike-Side-03.png"],
-  woman: CH + "Woman-Stand-Side-01.png",
-  womanCheer: [CH + "Woman-Cheer-01.png", CH + "Woman-Cheer-02.png"],
-  couplePose: CH + "Couple-Pose-Happy-01.png",
-  portraitWoman: CH + "Portrait-Woman-01.png",
-  sceneTerraceBike: CH + "Scene-Terrace-Bike-Iso-01.png",
-  sceneTerraceSitting: CH + "Scene-Terrace-Sitting-Iso-01.png",
-  keyHelmet: CH + "Item-Key-Helmet-01.png",
+  playerSolo: CHAR + "Man-Bike-Side-01.png",
+  walkFrames: [1, 2, 3, 4].map((n) => `${CHAR}Man-Walk-Side-0${n}.png`),
+  key: CHAR + "Item-Key-01.png",
+  helmet: CHAR + "Item-Helmet-01.png",
+  keyHelmet: CHAR + "Item-Key-Helmet-01.png",
+  coupleFrames: [
+    CHAR + "Couple-Bike-Side-01.png",
+    CHAR + "Couple-Bike-Side-02.png",
+    CHAR + "Couple-Bike-Side-Motion-01.png",
+    CHAR + "Couple-Bike-Side-03.png",
+  ],
+  woman: CHAR + "Woman-Stand-Side-01.png",
+  womanCheer: [CHAR + "Woman-Cheer-01.png", CHAR + "Woman-Cheer-02.png"],
+  couplePose: CHAR + "Couple-Pose-Happy-01.png",
+  portraitWoman: CHAR + "Portrait-Woman-01.png",
+  sceneTerraceBike: CHAR + "Scene-Terrace-Bike-Iso-01.png",
+  sceneTerraceSitting: CHAR + "Scene-Terrace-Sitting-Iso-01.png",
   heartFull: UI + "Heart-Full.png",
   heartEmpty: UI + "Heart-Empty.png",
-  bars: [UI + "Bar-0.png", UI + "Bar-25.png", UI + "Bar-50.png", UI + "Bar-75.png", UI + "Bar-100.png"],
-  cloud: E + "Nature-Cloud.png",
-  road: E + "Road-Straight.png",
-  roadHorizon: E + "Road-Horizon.png",
-  brick: E + "Block-Brick.png",
-  brickRow: E + "Block-BrickRow.png",
-  blockSurprise: E + "Block-Surprise.png",
-  blockUsed: E + "Block-Used.png",
-  itemHeart: E + "Item-Heart.png",
-  terrainHills: E + "Nature-Hills.png",
-  terrainRiverLake: E + "Nature-RiverLake.png",
-  terrainRiceField: E + "Nature-RiceField.png",
-  terrainSunset: E + "Nature-Sunset.png",
-  bgSunset: E + "BG-Sunset.png",
-  bgSea: E + "BG-Sea.png",
-  grassFloat: E + "Props/Platform-Grass-Float.png",
-  grassGround: E + "Props/Ground-Grass-Short.png",
-  egg: E + "Props/Egg-Gold.png",
+  bars: [0, 25, 50, 75, 100].map((n) => `${UI}Bar-${n}.png`),
+  cloud: EL + "Nature-Cloud.png", // cũng dùng vẽ boss "DOUBT"
+  road: EL + "Road-Straight.png",
+  brick: EL + "Block-Brick.png",
+  brickRow: EL + "Block-BrickRow.png",
+  blockSurprise: EL + "Block-Surprise.png",
+  blockUsed: EL + "Block-Used.png",
+  itemHeart: EL + "Item-Heart.png",
+  grassFloat: PROP + "Platform-Grass-Float.png",
+  grassGround: PROP + "Ground-Grass-Short.png",
+  egg: PROP + "Egg-Gold.png",
 };
-// Cảnh vật ven đường (tách từ sprite sheet), rải tự động theo từng đoạn
-const PR = E + "Props/";
+
+// ---------- cảnh vật ven đường (rải tự động) ----------
 const PROPS = {
-  treeRound: PR + "Tree-Round.png", treePine: PR + "Tree-Pine.png", bushSmall: PR + "Bush-Small.png", bushWide: PR + "Bush-Wide.png",
-  bushRound: PR + "Bush-Round.png", mushroom: PR + "Mushroom-Blue.png", grass: PR + "Grass-Tuft.png", log: PR + "Log.png",
-  flowerBlue: PR + "Flower-Blue.png", flowerWhite: PR + "Flower-White.png", flowers: PR + "Flowers-White.png", sprout: PR + "Sprout.png", rabbit: PR + "Rabbit.png",
+  treeRound: PROP + "Tree-Round.png",
+  treePine: PROP + "Tree-Pine.png",
+  bushSmall: PROP + "Bush-Small.png",
+  bushWide: PROP + "Bush-Wide.png",
+  bushRound: PROP + "Bush-Round.png",
+  mushroom: PROP + "Mushroom-Blue.png",
+  grass: PROP + "Grass-Tuft.png",
+  log: PROP + "Log.png",
+  flowerBlue: PROP + "Flower-Blue.png",
+  flowerWhite: PROP + "Flower-White.png",
+  flowers: PROP + "Flowers-White.png",
+  sprout: PROP + "Sprout.png",
+  rabbit: PROP + "Rabbit.png",
 };
-// bộ cảnh vật theo loại cảnh: [tên, chiều cao (px thế giới)]
+
+// bộ cảnh vật theo loại cảnh: [tên prop, chiều cao tính bằng px thế giới]
 const PROP_SETS = {
-  nature: [["treeRound", 120], ["treePine", 104], ["bushWide", 46], ["bushSmall", 40], ["bushRound", 36], ["mushroom", 34], ["grass", 30], ["log", 26], ["flowerBlue", 30], ["flowerWhite", 30], ["flowers", 32], ["sprout", 30], ["rabbit", 30]],
+  nature: [
+    ["treeRound", 120], ["treePine", 104], ["bushWide", 46], ["bushSmall", 40], ["bushRound", 36],
+    ["mushroom", 34], ["grass", 30], ["log", 26], ["flowerBlue", 30], ["flowerWhite", 30],
+    ["flowers", 32], ["sprout", 30], ["rabbit", 30],
+  ],
   city: [["grass", 26], ["flowerBlue", 28], ["bushSmall", 34], ["sprout", 26], ["flowers", 28]],
 };
 
-// ---------- CHƯƠNG 1: solo mission — thu thập 5 món quà ----------
-// Ảnh "lipstick" chưa có: game tự vẽ tạm, khi nào có file thì đặt vào
-// Assets2/Elements-Pixel/4x/Item-Lipstick.png.
-const ITEMS = [
-  { id: "matcha", label: "Matcha", icon: E + "Item-MatchaCup.png" },
-  { id: "chocolate", label: "Chocolate", icon: E + "Item-Chocolate.png" },
-  { id: "flower", label: "Flowers", icon: E + "Item-RoseBouquet.png" },
-  { id: "lipstick", label: "Lipstick", icon: E + "Item-Lipstick.png" },
-  { id: "letter", label: "Letter", icon: E + "Item-Envelope.png" },
-];
+// ---------- nền parallax 2 lớp ----------
+// L1 = trời + cảnh xa (ảnh đục), L2 = cảnh gần (nền trong suốt). Ảnh 3840×1080,
+// mặt đất của cảnh nằm ở y = 380 trong hệ quy chiếu cao 540 → chìm 160px dưới mặt đường.
+const scene = (id) => [`${SCENE}${id}/L1.png`, `${SCENE}${id}/L2.png`];
+const SCENES = {
+  "ho-guom": scene("ho-guom"), // ban ngày — chặng solo
+  "ho-tay": scene("ho-tay"), // hoàng hôn — chặng đi đôi
+};
+const SCENE_IDS = Object.keys(SCENES);
+const SCENE_SPEEDS = [0.25, 1.0]; // hệ số trôi của từng lớp so với camera
+const SCENE_SINK = Object.fromEntries(SCENE_IDS.map((id) => [id, 160]));
+// Màu mép trên của lớp trời: dùng tô phần trời phía trên ảnh. Ghi sẵn ở đây vì khi
+// chạy trực tiếp từ file:// trình duyệt không cho đọc pixel của ảnh.
+const SCENE_TOP = { "ho-guom": "#bfe0e2", "ho-tay": "#e2620a" };
+// Cảnh thiên nhiên: bục lơ lửng vẽ bằng bục cỏ, ven đường rải cây cối
+const GRASS_SCENES = ["ho-guom"];
 
-// Bố cục từng đoạn (tính từ đầu đoạn, đơn vị px thế giới; 1 viên gạch = 44px; mỗi đoạn dài SOLO_SEG_W).
+return { IMG, PROPS, PROP_SETS, SCENES, SCENE_IDS, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES };
+})();
+
+const __mod_levels = (() => {
+// ============================================================
+// BỐ CỤC MÀN CHƠI — thiết kế gameplay, thường không cần sửa khi cá nhân hoá.
+//
+// Đơn vị: px thế giới, tính từ đầu mỗi đoạn. Một viên gạch = 44px.
 // Vật lý: nhảy đơn cao ~116px, nhảy đôi (bấm lần 2 lúc lên tới đỉnh) cao ~206px.
-//   blocks:     [{ x, w?, h? }]      — chồng gạch trên mặt đường (w, h tính bằng viên), khối đặc
-//   platforms:  [{ x, w, y, move?, breakable? }] — bục gạch lơ lửng, y = độ cao mặt bục so với mặt đường
-//                 move: { dx, dy, speed } — bục di chuyển qua lại (dx) / lên xuống (dy)
-//                 breakable: true         — gạch vỡ: đội đầu từ dưới là tan
-//   spikes:     [{ x, n, y? }]       — dãy n gai (mỗi gai 22px), y = đặt trên bục (mặc định mặt đường)
-//   itemAt:     { x, y }             — món quà, y = độ cao đáy món quà so với mặt đường
-//   heartBlock: { x }                — ô "?" nhảy đội từ dưới lên để nhận thêm 1 tim
-const SOLO_SEG_W = 1300;
-const WALK_TERRAIN = "scene:ho-guom";
-const BOSS_TERRAIN = "scene:ho-guom";
-const MEET_TERRAIN = "scene:ho-guom";
+//
+//   blocks     [{ x, w?, h? }]                 chồng gạch đặc trên mặt đường (w, h tính bằng viên)
+//   platforms  [{ x, w, y, move?, breakable? }] bục lơ lửng, y = độ cao mặt bục so với mặt đường
+//                move { dx, dy, speed }         bục chạy qua lại (dx) hoặc lên xuống (dy)
+//                breakable true                 gạch vỡ khi đội đầu từ dưới lên
+//   spikes     [{ x, n, y? }]                  dãy n gai (mỗi gai 22px), y = đặt trên bục
+//   itemAt     { x, y }                        vị trí món quà của đoạn
+//   heartBlock { x }                           ô "?" đội từ dưới lên để nhận thêm 1 tim
+// ============================================================
+
+const MAX_HEARTS = 3;
+const SOLO_SEG_W = 1300; // chiều dài mỗi đoạn solo
+
+// Nền dùng cho từng chặng (khớp id trong assets.js → SCENES)
+const WALK_TERRAIN = "scene:ho-guom"; // đoạn đi bộ lấy chìa khoá + mũ
+const BOSS_TERRAIN = "scene:ho-guom"; // đấu mây "DOUBT"
+const MEET_TERRAIN = "scene:ho-guom"; // lúc gặp nhau
+const COUPLE_TERRAIN = "scene:ho-tay"; // toàn bộ chặng đi đôi
+
+const SOLO_TERRAIN = "scene:ho-guom";
+const SKY_DAY = ["#bfe0f2", "#e8f3ee"];
+const SKY_NOON = ["#cfe2f3", "#e9f0f5"];
+const SKY_DUSK = ["#f7b46a", "#f08a3c"];
+
+// 5 đoạn solo, mỗi đoạn kết thúc bằng một món quà (thứ tự khớp GIFTS trong config.js)
 const SOLO_SEGMENTS = [
   {
-    item: "matcha", terrain: "scene:ho-guom", sky: ["#bfe0f2", "#e8f3ee"],
+    item: "matcha", terrain: SOLO_TERRAIN, sky: SKY_DAY,
     platforms: [{ x: 160, w: 1, y: 140, breakable: true }, { x: 720, w: 2, y: 96 }],
     blocks: [{ x: 300 }, { x: 960, w: 2 }],
     spikes: [{ x: 480, n: 3 }, { x: 860, n: 2 }],
     itemAt: { x: 1120, y: 100 },
   },
   {
-    item: "chocolate", terrain: "scene:ho-guom", sky: ["#cfe2f3", "#e9f0f5"],
+    item: "chocolate", terrain: SOLO_TERRAIN, sky: SKY_NOON,
     blocks: [{ x: 180, h: 2 }, { x: 1120 }],
     spikes: [{ x: 460, n: 3 }, { x: 980, n: 3 }],
     platforms: [{ x: 580, w: 3, y: 140 }],
@@ -311,75 +406,38 @@ const SOLO_SEGMENTS = [
     heartBlock: { x: 820 },
   },
   {
-    item: "flower", terrain: "scene:ho-guom", sky: ["#cfe2f3", "#e9f0f5"],
+    item: "flower", terrain: SOLO_TERRAIN, sky: SKY_NOON,
     blocks: [{ x: 120, w: 2 }, { x: 208, w: 2, h: 2 }, { x: 296, w: 2, h: 3 }],
     platforms: [{ x: 420, w: 2, y: 190, move: { dx: 70, dy: 0, speed: 1.4 } }, { x: 1100, w: 2, y: 100 }],
     spikes: [{ x: 400, n: 4 }, { x: 780, n: 3 }, { x: 960, n: 4 }],
     itemAt: { x: 1122, y: 156 },
   },
   {
-    item: "lipstick", terrain: "scene:ho-guom", sky: ["#f7b46a", "#f08a3c"],
+    item: "lipstick", terrain: SOLO_TERRAIN, sky: SKY_DUSK,
     spikes: [{ x: 160, n: 3 }, { x: 420, n: 4 }, { x: 700, n: 2 }, { x: 1040, n: 2 }],
-    platforms: [{ x: 300, w: 2, y: 100 }, { x: 520, w: 3, y: 100, move: { dx: 0, dy: 50, speed: 1.3 } }, { x: 760, w: 2, y: 150 }, { x: 940, w: 2, y: 100 }],
+    platforms: [
+      { x: 300, w: 2, y: 100 },
+      { x: 520, w: 3, y: 100, move: { dx: 0, dy: 50, speed: 1.3 } },
+      { x: 760, w: 2, y: 150 },
+      { x: 940, w: 2, y: 100 },
+    ],
     itemAt: { x: 1150, y: 100 },
   },
   {
-    item: "letter", terrain: "scene:ho-guom", sky: ["#f7b46a", "#f08a3c"],
+    item: "letter", terrain: SOLO_TERRAIN, sky: SKY_DUSK,
     blocks: [{ x: 150, h: 2 }],
     spikes: [{ x: 380, n: 3 }, { x: 560, n: 3 }, { x: 950, n: 2 }, { x: 1100, n: 2 }],
-    platforms: [{ x: 640, w: 3, y: 110 }, { x: 640, w: 2, y: 250, breakable: true }, { x: 860, w: 2, y: 175 }, { x: 1000, w: 2, y: 120 }],
+    platforms: [
+      { x: 640, w: 3, y: 110 },
+      { x: 640, w: 2, y: 250, breakable: true },
+      { x: 860, w: 2, y: 175 },
+      { x: 1000, w: 2, y: 120 },
+    ],
     itemAt: { x: 1200, y: 100 },
   },
 ];
 
-const MAX_HEARTS = 3;
-
-// ---------- CHƯƠNG 2: gặp nhau ----------
-const MAN_LINE = "Found you."; // câu thoại của nhân vật nam — bạn sửa tuỳ ý
-const MEET_TEXT = "I'm on my solo mission but the stars guide me to you";
-
-// ---------- CHƯƠNG 3: đi cùng nhau ----------
-// Mỗi mốc: biển báo ở đầu đoạn + khung polaroid trên trời (photo để trống,
-// sau này bạn điền đường dẫn ảnh vào là tự hiện).
-//   event: "rain"  → trời mưa, phải nhảy qua chướng ngại (blocks/platforms) để nhặt ô (itemAt), tạnh mưa rồi đi tiếp
-//   event: "chest" → chiếc hòm hồng: System Message → Level Unlocked → thư
-//   event: "gift"  → hòm quà rơi từ trời → video
-// Mốc đi đôi: không còn biển báo địa điểm — chỉ polaroid ảnh thật treo trên nền.
-// Ảnh gốc ở Assets2/photos/<tên>.jpg → tools/photos.py thu nhỏ (không crop) vào Assets2/photos/p/.
-const PH = "Assets2/photos/p/";
-const MILESTONES = [
-  { date: "DD.MM", name: "Your milestone 1", terrain: "scene:ho-tay", sky: ["#dfe9ff", "#f6c7d8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 2", terrain: "scene:ho-tay", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 3", terrain: "scene:ho-tay", sky: ["#bcd7ff", "#ffd9e8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 4", terrain: "scene:ho-tay", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 5", terrain: "scene:ho-tay", sky: ["#e3d3dc", "#b391a6"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 6", terrain: "scene:ho-tay", sky: ["#ffe6c9", "#ffd9e8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 7", terrain: "scene:ho-tay", sky: ["#cfe6ff", "#ffe6c9"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 8", terrain: "scene:ho-tay", sky: ["#ffd9c4", "#ffe7ef"], photo: "" },
-  {
-    date: "DD.MM", name: "Rainy stop", terrain: "scene:ho-tay", sky: ["#7fb7d9", "#cfe7f2"], photo: "",
-    event: "rain",
-    blocks: [{ x: 300 }, { x: 520, h: 2 }],
-    platforms: [{ x: 640, w: 2, y: 110 }],
-    itemAt: { x: 664, y: 166 },
-  },
-  { date: "DD.MM", name: "Letter stop", terrain: "scene:ho-tay", sky: ["#ffd9c4", "#ffe7ef"], photo: "", event: "chest" },
-  { date: "DD.MM", name: "Final stop", terrain: "scene:ho-tay", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
-];
-
-// ---------- CHƯƠNG 4: hòm quà ----------
-const SYSTEM_MESSAGE = "The next level is not unlocked yet.\nWould you like to continue the journey?";
-const ENVELOPE_LABEL = "Highly confidential document";
-
-// Nội dung thư
-const LETTER_TEXT = "Write your love letter";
-
-// Video ngắn: đặt file .mp4 vào Assets2/video/ rồi sửa tên ở đây (tối đa ~15MB).
-const VIDEO_SRC = "";
-
-const ENDING_TEXT = "Happy our 1 year anniversary, cheers to our next chapter together";
-
-return { SCENES, SCENE_IDS, SCENE_SPEEDS, GRASS_SCENES, SCENE_TOP, SCENE_SINK, GAME_TITLE, GAME_SUBTITLE, EMPTY_POLAROIDS, PHOTO_PLACEHOLDER, IMG, PROPS, PROP_SETS, ITEMS, SOLO_SEG_W, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, SOLO_SEGMENTS, MAX_HEARTS, MAN_LINE, MEET_TEXT, MILESTONES, SYSTEM_MESSAGE, ENVELOPE_LABEL, LETTER_TEXT, VIDEO_SRC, ENDING_TEXT };
+return { MAX_HEARTS, SOLO_SEG_W, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN, SOLO_SEGMENTS };
 })();
 
 const __mod_audio = (() => {
@@ -522,9 +580,6 @@ const JUMP_KEYS = ["ArrowUp", "w", "W", " ", "Spacebar"];
 
 function groundMarginFor(ch) {
   return Math.max(60, Math.min(ch * 0.16, 170));
-}
-function terrainHeightFor(groundY) {
-  return Math.max(260, Math.min(groundY * 0.5, 380));
 }
 function ready(img) {
   if (!img) return false;
@@ -1282,17 +1337,11 @@ class JourneyGame {
     ctx.fillStyle = g;
     ctx.fillRect(-20, -20, this.CW + 40, this.CH + 40);
 
-    const isScene = terrain.startsWith("scene:");
-    if (!isScene && terrain !== "sunset-road") drawCelestial(ctx, terrain, this.camX, this.groundY, this.CW);
-    if (!isScene) drawClouds(ctx, img.cloud, this.camX, this.groundY, this.CW);
     drawTerrain(ctx, terrain, img, this.camX, this.groundY, this.CW);
     if (terrain2 && blend > 0) {
       // crossfade sang cảnh kế tiếp
       ctx.save();
       ctx.globalAlpha = blend;
-      const isScene2 = terrain2.startsWith("scene:");
-      if (!isScene2 && terrain2 !== "sunset-road") drawCelestial(ctx, terrain2, this.camX, this.groundY, this.CW);
-      if (!isScene2) drawClouds(ctx, img.cloud, this.camX, this.groundY, this.CW);
       drawTerrain(ctx, terrain2, img, this.camX, this.groundY, this.CW);
       ctx.restore();
     }
@@ -1483,7 +1532,6 @@ function lerpColor(a, b, t) {
   const bl = Math.round(ca[2] + (cb[2] - ca[2]) * t);
   return `rgb(${r},${g},${bl})`;
 }
-const isNight = (type) => type === "city-night" || type === "rain";
 
 // màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên
 const topColorCache = new WeakMap();
@@ -1501,54 +1549,8 @@ function topColorOf(image) {
   topColorCache.set(image, color);
   return color;
 }
-const isDusk = (type) => type === "city-dusk" || type === "mountain-mist" || type === "sunset-road";
 
-function tileImage(ctx, image, scrollX, x, w, y, targetH, alpha) {
-  const scale = targetH / image.height;
-  const tileW = image.width * scale;
-  ctx.save();
-  if (alpha !== undefined) ctx.globalAlpha = alpha;
-  let startX = x - (scrollX % tileW) - tileW;
-  for (let dx = startX; dx < x + w + tileW; dx += tileW) {
-    ctx.drawImage(image, dx, y, tileW, targetH);
-  }
-  ctx.restore();
-}
 
-// mặt trời / mặt trăng theo cảnh, trôi chậm cùng camera
-function drawCelestial(ctx, type, camX, groundY, CW) {
-  const night = isNight(type);
-  const dusk = isDusk(type);
-  const x = q(((CW * 0.72 - camX * 0.04) % (CW + 200) + CW + 200) % (CW + 200) - 100);
-  const y = q(dusk ? groundY * 0.42 : 60 + groundY * 0.08);
-  const r = dusk ? 46 : 30;
-  ctx.save();
-  if (night) {
-    ctx.fillStyle = "#f6f1e3";
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "rgba(43,32,48,0.18)";
-    [[-10, -6, 7], [8, 4, 5], [-2, 12, 4]].forEach(([dx, dy, rr]) => {
-      ctx.beginPath();
-      ctx.arc(x + dx, y + dy, rr, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  } else {
-    const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.6);
-    glow.addColorStop(0, dusk ? "rgba(255,190,120,0.55)" : "rgba(255,240,200,0.45)");
-    glow.addColorStop(1, "rgba(255,220,180,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
-    ctx.fillStyle = dusk ? "#ffb070" : "#fff0b8";
-    // mặt trời vẽ bậc thang cho ra chất pixel
-    for (let dy = -r; dy < r; dy += PX) {
-      const half = Math.sqrt(r * r - dy * dy);
-      ctx.fillRect(x - q(half), y + dy, q(half) * 2, PX);
-    }
-  }
-  ctx.restore();
-}
 
 // Tham số CW ở đây là chiều rộng canvas THỰC TẾ của thiết bị.
 // Lặp ảnh kiểu gương (tile → tile lật → tile) để mép nào cũng khớp, không lộ mối nối
@@ -1590,177 +1592,25 @@ function drawScene(ctx, layers, speeds, camX, groundY, CW, sinkScenePx, topColor
 }
 
 function drawTerrain(ctx, type, img, camX, groundY, CW) {
-  // Cảnh 5 lớp parallax (Backgrounds.html): trời + 4 lớp trong suốt, gần dần
-  if (type.startsWith("scene:")) {
-    const layers = img.scenes && img.scenes[type.slice(6)];
-    if (layers && layers.every(ready)) {
-      const id = type.slice(6);
-      const sink = (img.sceneSink && img.sceneSink[id]) ?? 40;
-      const top = img.sceneTop && img.sceneTop[id];
-      drawScene(ctx, layers, img.sceneSpeeds || [0.04, 0.12, 0.25, 0.45, 0.75], camX, groundY, CW, sink, top);
-      return;
-    }
-  }
-  // Cảnh hoàng hôn: ảnh Nature-Sunset có sẵn cả trời + mặt trời → neo đáy ở cỡ vừa
-  // phải, phần trời phía trên tô đúng màu mép trên của ảnh để không lộ mối nối
-  if (type === "sunset-road" && ready(img.terrainSunset)) {
-    const h = Math.min(groundY + 10, terrainHeightFor(groundY) * 1.1);
-    ctx.fillStyle = topColorOf(img.terrainSunset);
-    ctx.fillRect(0, 0, CW, groundY + 10 - h + 2);
-    tileImage(ctx, img.terrainSunset, camX * 0.15, 0, CW, groundY + 10 - h, h, 1);
-    return;
-  }
-  // Ruộng lúa (Sóc Sơn): đồi xa vẽ tay + dải ruộng Nature-RiceField sát mặt đường
-  if (type === "ricefield" && ready(img.terrainRiceField)) {
-    const k = terrainHeightFor(groundY) / 310;
-    drawStepHills(ctx, camX * 0.12, groundY - 100, CW, 320, 120 * k, "rgba(120,150,110,0.45)");
-    drawStepHills(ctx, camX * 0.22, groundY - 96, CW, 240, 80 * k, "#8fb27a");
-    tileImage(ctx, img.terrainRiceField, camX * 0.4, 0, CW, groundY + 10 - 110, 110, 1);
-    return;
-  }
-
-  const natureImg = {
-    mountain: img.terrainHills,
-    "mountain-mist": img.terrainHills,
-    karst: img.terrainRiverLake,
-  }[type];
-
-  if (ready(natureImg)) {
-    const terrainH = terrainHeightFor(groundY);
-    // lớp xa: nhỏ hơn, mờ hơn, trôi chậm hơn → có chiều sâu
-    tileImage(ctx, natureImg, camX * 0.12 + 300, 0, CW, groundY + 10 - terrainH * 0.7 - 40, terrainH * 0.7, 0.38);
-    tileImage(ctx, natureImg, camX * 0.3, 0, CW, groundY + 10 - terrainH, terrainH, 1);
-    if (type === "mountain-mist") {
-      const mist = ctx.createLinearGradient(0, groundY - 90, 0, groundY);
-      mist.addColorStop(0, "rgba(255,255,255,0)");
-      mist.addColorStop(1, "rgba(255,255,255,0.55)");
-      ctx.fillStyle = mist;
-      ctx.fillRect(0, groundY - 90, CW, 90);
-    }
-    return;
-  }
-
-  const k = terrainHeightFor(groundY) / 310;
-  switch (type) {
-    case "city":
-    case "city-night":
-    case "city-dusk":
-      drawSkyline(ctx, camX * 0.12, groundY, CW, k * 1.25, isNight(type) ? "rgba(70,45,80,0.45)" : "rgba(199,140,170,0.32)", false, false);
-      drawSkyline(ctx, camX * 0.35, groundY, CW, k, isNight(type) ? "#3a2a46" : "#c48db0", true, isNight(type));
-      break;
-    case "cloud-sea":
-      drawStepHills(ctx, camX * 0.15, groundY - 30, CW, 260, 150 * k, "rgba(120,90,140,0.45)");
-      drawStepHills(ctx, camX * 0.3, groundY - 20, CW, 200, 110 * k, "#8d6fa4");
-      drawCloudSea(ctx, camX * 0.45, groundY, CW);
-      break;
-    case "rain":
-      drawStepHills(ctx, camX * 0.15, groundY, CW, 300, 130 * k, "rgba(90,80,120,0.5)");
-      drawStepHills(ctx, camX * 0.3, groundY, CW, 260, 100 * k, "#6d6488");
-      drawRain(ctx, camX, groundY, CW);
-      break;
-    default:
-      drawStepHills(ctx, camX * 0.15, groundY, CW, 300, 120 * k, "rgba(199,140,170,0.35)");
-      drawStepHills(ctx, camX * 0.3, groundY, CW, 260, 90 * k, "#c48db0");
-  }
+  const id = type.startsWith("scene:") ? type.slice(6) : "";
+  const layers = id && img.scenes && img.scenes[id];
+  if (!layers || !layers.every(ready)) return; // ảnh chưa tải xong: để nguyên nền trời
+  drawScene(
+    ctx,
+    layers,
+    img.sceneSpeeds || [0.25, 1],
+    camX,
+    groundY,
+    CW,
+    (img.sceneSink && img.sceneSink[id]) ?? 160,
+    img.sceneTop && img.sceneTop[id]
+  );
 }
 
-// Skyline thành phố kiểu pixel: nhà bậc thang, cửa sổ vuông, viền tối
-function drawSkyline(ctx, scroll, groundY, CW, k, color, outline, lit) {
-  const span = CW + 120;
-  ctx.save();
-  ctx.fillStyle = color;
-  for (let i = 0; i < 16; i++) {
-    let bx = ((i * 84 - scroll) % span) - 60;
-    if (bx < -60) bx += span;
-    bx = q(bx);
-    const w = 48 + ((i * 29) % 3) * 12;
-    const h = q((70 + ((i * 53) % 110)) * k);
-    ctx.fillRect(bx, groundY - h, w, h);
-    // mái bậc thang / ăng-ten
-    if (i % 3 === 0) ctx.fillRect(bx + 8, groundY - h - 12, w - 16, 12);
-    if (i % 4 === 1) ctx.fillRect(bx + w / 2 - 2, groundY - h - 22, 4, 22);
-    if (outline) {
-      ctx.strokeStyle = "rgba(43,32,48,0.55)";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(bx + 1.5, groundY - h + 1.5, w - 3, h);
-      ctx.fillStyle = lit ? "#ffe9a8" : "rgba(255,255,255,0.35)";
-      for (let wy = groundY - h + 12; wy < groundY - 14; wy += 16) {
-        for (let wx = bx + 8; wx < bx + w - 8; wx += 14) {
-          if ((wx * 7 + wy * 13 + i) % 5 !== 0) ctx.fillRect(wx, wy, 6, 8);
-        }
-      }
-      ctx.fillStyle = color;
-    }
-  }
-  ctx.restore();
-}
 
-// Đồi/núi vẽ bậc thang 4px cho ra chất pixel
-function drawStepHills(ctx, scroll, baseY, CW, spacing, height, color) {
-  const span = CW + spacing;
-  ctx.save();
-  ctx.fillStyle = color;
-  for (let i = 0; i < Math.ceil(span / spacing) + 1; i++) {
-    let bx = ((i * spacing - scroll) % span) - spacing / 2;
-    if (bx < -spacing / 2) bx += span;
-    const r = spacing * 0.55;
-    for (let dx = -r; dx < r; dx += PX) {
-      const h = q(Math.sqrt(Math.max(0, 1 - (dx / r) * (dx / r))) * height);
-      if (h > 0) ctx.fillRect(q(bx + dx), baseY - h, PX, h);
-    }
-  }
-  ctx.restore();
-}
 
-function drawCloudSea(ctx, scroll, groundY, CW) {
-  const span = CW + 90;
-  ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
-  for (let i = 0; i < 18; i++) {
-    let bx = ((i * 85 - scroll) % span) - 45;
-    if (bx < -45) bx += span;
-    const by = groundY - 30 + Math.sin(i) * 6;
-    [[0, 0, 30], [26, 6, 22], [-24, 8, 20]].forEach(([ox, oy, r]) => {
-      for (let dy = -r; dy < 0; dy += PX) {
-        const half = q(Math.sqrt(r * r - dy * dy));
-        ctx.fillRect(q(bx + ox) - half, q(by + oy + dy), half * 2, PX);
-      }
-    });
-  }
-  ctx.restore();
-}
 
-function drawRain(ctx, camX, groundY, CW) {
-  ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
-  const span = CW + 60;
-  for (let i = 0; i < 28; i++) {
-    const rx = (i * 63 - camX * 1.1) % span;
-    const x0 = q(rx < 0 ? rx + span : rx);
-    const y0 = (i * 97 + camX * 2) % groundY;
-    ctx.fillRect(x0, y0, 2, 14);
-  }
-  ctx.restore();
-}
 
-function drawClouds(ctx, cloudImg, camX, groundY, CW) {
-  if (!ready(cloudImg)) return;
-  const h = 46;
-  const scale = h / cloudImg.height;
-  const w = cloudImg.width * scale;
-  const skyBand = Math.max(100, Math.min(groundY - terrainHeightFor(groundY) * 0.6, 420));
-  ctx.save();
-  for (let i = 0; i < 7; i++) {
-    const far = i % 2 === 0;
-    let bx = ((i * 250 - camX * (far ? 0.06 : 0.12)) % (CW + 260)) - 130;
-    if (bx < -130) bx += CW + 260;
-    const by = 24 + ((i * 37) % skyBand);
-    const s = far ? 0.6 : 1;
-    ctx.globalAlpha = far ? 0.6 : 0.95;
-    ctx.drawImage(cloudImg, q(bx), q(by), w * s, h * s);
-  }
-  ctx.restore();
-}
 
 // dải đất dưới mặt đường: tối, có vân ngang
 function drawGroundStrip(ctx, camX, groundY, CW, CH) {
@@ -2339,11 +2189,16 @@ return { CW, CH, JourneyGame };
 
 const __mod_main = (() => {
 // ============================================================
-// RIDE TO US — điều phối màn hình, HUD, các đoạn cắt cảnh
+// Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
-const {IMG, ITEMS, SOLO_SEGMENTS, SOLO_SEG_W, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, MAX_HEARTS, MAN_LINE, MEET_TEXT, MILESTONES, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES, PROPS, PROP_SETS, SYSTEM_MESSAGE, ENVELOPE_LABEL, LETTER_TEXT, VIDEO_SRC, GAME_TITLE, EMPTY_POLAROIDS, PHOTO_PLACEHOLDER,} = __mod_content;
+const {GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES,} = __mod_config;
+const {IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES} = __mod_assets;
+const {SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,} = __mod_levels;
 const {initAudio, sfx, setMuted, isMuted} = __mod_audio;
 const {JourneyGame} = __mod_engine;
+
+// Mốc đi đôi dùng chung một nền; config.js chỉ khai báo phần nội dung.
+const COUPLE_MILESTONES = MILESTONES.map((ms) => ({ ...ms, terrain: COUPLE_TERRAIN }));
 
 let currentGame = null;
 let timeTimer = null;
@@ -2386,8 +2241,8 @@ function normalizeGrain(img, worldHeight) {
 }
 async function preloadAll() {
   const srcs = new Set([...Object.values(IMG).flat(), ...Object.values(SCENES).flat(), ...Object.values(PROPS)]);
-  ITEMS.forEach((it) => srcs.add(it.icon));
-  MILESTONES.forEach((ms) => {
+  GIFTS.forEach((g) => g.icon && srcs.add(g.icon));
+  COUPLE_MILESTONES.forEach((ms) => {
     if (ms.photo) srcs.add(ms.photo);
   });
   await Promise.all([...srcs].map(preload));
@@ -2428,11 +2283,11 @@ function renderHearts(n) {
 function renderItemSlots(collectedIds) {
   const wrap = $("hud-items");
   wrap.innerHTML = "";
-  ITEMS.forEach((it) => {
+  GIFTS.forEach((it) => {
     const slot = document.createElement("div");
     slot.className = "hud-slot" + (collectedIds.has(it.id) ? " got" : "");
     slot.title = it.label;
-    const icon = getImg(it.icon);
+    const icon = it.icon ? getImg(it.icon) : null;
     if (loaded(icon)) {
       const img = document.createElement("img");
       img.src = it.icon;
@@ -2513,10 +2368,6 @@ function startJourney() {
     blockSurprise: getImg(IMG.blockSurprise),
     blockUsed: getImg(IMG.blockUsed),
     itemHeart: getImg(IMG.itemHeart),
-    terrainHills: getImg(IMG.terrainHills),
-    terrainRiverLake: getImg(IMG.terrainRiverLake),
-    terrainRiceField: getImg(IMG.terrainRiceField),
-    terrainSunset: getImg(IMG.terrainSunset),
     scenes: Object.fromEntries(Object.entries(SCENES).map(([id, layers]) => [id, layers.map(getImg)])),
     sceneSpeeds: SCENE_SPEEDS,
     sceneSink: SCENE_SINK,
@@ -2525,15 +2376,15 @@ function startJourney() {
     grassGround: getImg(IMG.grassGround),
     egg: getImg(IMG.egg),
     props: Object.fromEntries(Object.entries(PROPS).map(([k, v]) => [k, getImg(v)])),
-    pickup: Object.fromEntries(ITEMS.map((it) => [it.id, getImg(it.icon)])),
-    polaroids: MILESTONES.map((ms) => (ms.photo ? getImg(ms.photo) : null)),
+    pickup: Object.fromEntries(GIFTS.map((g) => [g.id, g.icon ? getImg(g.icon) : null])),
+    polaroids: COUPLE_MILESTONES.map((ms) => (ms.photo ? getImg(ms.photo) : null)),
   };
 
   const collected = new Set();
   if (currentGame) currentGame.destroy();
   currentGame = new JourneyGame(
     canvas,
-    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: ITEMS, milestones: MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, emptyPolaroids: EMPTY_POLAROIDS, photoPlaceholder: PHOTO_PLACEHOLDER },
+    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: GIFTS, milestones: COUPLE_MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: TEXT.photoPlaceholder },
     images,
     {
       onItem: (item, count, total) => {
@@ -2551,7 +2402,7 @@ function startJourney() {
           return;
         }
         $("hud-milestone").innerHTML = `<b>${ms.date}</b>${ms.name}`;
-        renderBar((j / MILESTONES.length) * 100);
+        renderBar((j / COUPLE_MILESTONES.length) * 100);
         if (ms.event === "rain") showHint("It's raining! Jump the walls and grab the umbrella ☂", 3600);
       },
       onExtra: (ex) => { if (ex.id === "umbrella") showHint("Rain's over — let's keep going ♥", 2600); },
@@ -2580,7 +2431,7 @@ function startJourney() {
 // --- chương 2: gặp nhau ---
 function playMeeting() {
   const bubble = $("bubble-man");
-  bubble.textContent = MAN_LINE;
+  bubble.textContent = TEXT.manLine;
   // đặt bong bóng ngay trên đầu nhân vật (đổi toạ độ canvas → % màn hình)
   const g = currentGame;
   bubble.style.left = ((g.player.x + g.player.w * 0.5 - g.camX) / g.CW) * 100 + "%";
@@ -2588,7 +2439,7 @@ function playMeeting() {
   bubble.classList.remove("hidden");
   setTimeout(() => {
     bubble.classList.add("hidden");
-    $("meet-text").textContent = MEET_TEXT;
+    $("meet-text").textContent = TEXT.meetText;
     $("meet-stats").innerHTML =
       `MISSION COMPLETE<br>score <b>${g.score}</b> · time <b>${fmtTime(g.timeSolo)}</b> · hearts lost <b>${g.heartsLost}</b>`;
     showScreen("screen-meet");
@@ -2597,18 +2448,18 @@ function playMeeting() {
 
 // --- chương 4: hòm hồng → System Message ---
 function openSystemMessage() {
-  $("system-text").textContent = SYSTEM_MESSAGE;
+  $("system-text").textContent = TEXT.systemMessage;
   $("system-reply").textContent = "";
   showModal("modal-system");
 }
 
 // --- hòm quà → thư → video ---
 function openEnvelope() {
-  $("envelope-label").textContent = ENVELOPE_LABEL;
+  $("envelope-label").textContent = TEXT.envelopeLabel;
   showModal("modal-envelope");
 }
 function openLetter(fromEnding) {
-  $("letter-text").textContent = LETTER_TEXT;
+  $("letter-text").textContent = TEXT.letter;
   $("letter-close").classList.toggle("hidden", !fromEnding);
   $("btn-watch-video").classList.toggle("hidden", fromEnding);
   $("btn-watch-video").textContent = "Continue the journey ▸";
@@ -2870,8 +2721,19 @@ function wireGamepad() {
   requestAnimationFrame(poll);
 }
 
-async function init() {
+// Đổ nội dung từ config.js vào giao diện (một nguồn duy nhất để cá nhân hoá)
+function applyBranding() {
   document.title = GAME_TITLE;
+  $("title-heading").textContent = GAME_TITLE;
+  $("title-subtitle").textContent = GAME_SUBTITLE;
+  $("title-window-name").textContent = WINDOW_NAME;
+  $("title-photo-frame").textContent = TEXT.photoPlaceholder;
+  $("letter-window-name").textContent = TEXT.letterTitle;
+  $("video-missing").textContent = TEXT.videoMissing;
+}
+
+async function init() {
+  applyBranding();
   wireUI();
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";

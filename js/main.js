@@ -1,12 +1,18 @@
 // ============================================================
-// RIDE TO US — điều phối màn hình, HUD, các đoạn cắt cảnh
+// Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
 import {
-  IMG, ITEMS, SOLO_SEGMENTS, SOLO_SEG_W, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, MAX_HEARTS, MAN_LINE, MEET_TEXT, MILESTONES, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES, PROPS, PROP_SETS,
-  SYSTEM_MESSAGE, ENVELOPE_LABEL, LETTER_TEXT, VIDEO_SRC, GAME_TITLE, EMPTY_POLAROIDS, PHOTO_PLACEHOLDER,
-} from "./content.js";
+  GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, SHOW_EMPTY_PHOTO_FRAMES,
+} from "./config.js";
+import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
+import {
+  SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,
+} from "./levels.js";
 import { initAudio, sfx, setMuted, isMuted } from "./audio.js";
 import { JourneyGame } from "./engine.js";
+
+// Mốc đi đôi dùng chung một nền; config.js chỉ khai báo phần nội dung.
+const COUPLE_MILESTONES = MILESTONES.map((ms) => ({ ...ms, terrain: COUPLE_TERRAIN }));
 
 let currentGame = null;
 let timeTimer = null;
@@ -49,8 +55,8 @@ function normalizeGrain(img, worldHeight) {
 }
 async function preloadAll() {
   const srcs = new Set([...Object.values(IMG).flat(), ...Object.values(SCENES).flat(), ...Object.values(PROPS)]);
-  ITEMS.forEach((it) => srcs.add(it.icon));
-  MILESTONES.forEach((ms) => {
+  GIFTS.forEach((g) => g.icon && srcs.add(g.icon));
+  COUPLE_MILESTONES.forEach((ms) => {
     if (ms.photo) srcs.add(ms.photo);
   });
   await Promise.all([...srcs].map(preload));
@@ -91,11 +97,11 @@ function renderHearts(n) {
 function renderItemSlots(collectedIds) {
   const wrap = $("hud-items");
   wrap.innerHTML = "";
-  ITEMS.forEach((it) => {
+  GIFTS.forEach((it) => {
     const slot = document.createElement("div");
     slot.className = "hud-slot" + (collectedIds.has(it.id) ? " got" : "");
     slot.title = it.label;
-    const icon = getImg(it.icon);
+    const icon = it.icon ? getImg(it.icon) : null;
     if (loaded(icon)) {
       const img = document.createElement("img");
       img.src = it.icon;
@@ -176,10 +182,6 @@ function startJourney() {
     blockSurprise: getImg(IMG.blockSurprise),
     blockUsed: getImg(IMG.blockUsed),
     itemHeart: getImg(IMG.itemHeart),
-    terrainHills: getImg(IMG.terrainHills),
-    terrainRiverLake: getImg(IMG.terrainRiverLake),
-    terrainRiceField: getImg(IMG.terrainRiceField),
-    terrainSunset: getImg(IMG.terrainSunset),
     scenes: Object.fromEntries(Object.entries(SCENES).map(([id, layers]) => [id, layers.map(getImg)])),
     sceneSpeeds: SCENE_SPEEDS,
     sceneSink: SCENE_SINK,
@@ -188,15 +190,15 @@ function startJourney() {
     grassGround: getImg(IMG.grassGround),
     egg: getImg(IMG.egg),
     props: Object.fromEntries(Object.entries(PROPS).map(([k, v]) => [k, getImg(v)])),
-    pickup: Object.fromEntries(ITEMS.map((it) => [it.id, getImg(it.icon)])),
-    polaroids: MILESTONES.map((ms) => (ms.photo ? getImg(ms.photo) : null)),
+    pickup: Object.fromEntries(GIFTS.map((g) => [g.id, g.icon ? getImg(g.icon) : null])),
+    polaroids: COUPLE_MILESTONES.map((ms) => (ms.photo ? getImg(ms.photo) : null)),
   };
 
   const collected = new Set();
   if (currentGame) currentGame.destroy();
   currentGame = new JourneyGame(
     canvas,
-    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: ITEMS, milestones: MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, emptyPolaroids: EMPTY_POLAROIDS, photoPlaceholder: PHOTO_PLACEHOLDER },
+    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: GIFTS, milestones: COUPLE_MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: TEXT.photoPlaceholder },
     images,
     {
       onItem: (item, count, total) => {
@@ -214,7 +216,7 @@ function startJourney() {
           return;
         }
         $("hud-milestone").innerHTML = `<b>${ms.date}</b>${ms.name}`;
-        renderBar((j / MILESTONES.length) * 100);
+        renderBar((j / COUPLE_MILESTONES.length) * 100);
         if (ms.event === "rain") showHint("It's raining! Jump the walls and grab the umbrella ☂", 3600);
       },
       onExtra: (ex) => { if (ex.id === "umbrella") showHint("Rain's over — let's keep going ♥", 2600); },
@@ -232,6 +234,8 @@ function startJourney() {
     }
   );
   currentGame.start();
+  // Cờ gỡ lỗi: mở trang với #debug để truy cập ván chơi từ console (window.__game)
+  if (location.hash.includes("debug")) window.__game = currentGame;
   initAudio();
   clearInterval(timeTimer);
   timeTimer = setInterval(() => {
@@ -243,7 +247,7 @@ function startJourney() {
 // --- chương 2: gặp nhau ---
 function playMeeting() {
   const bubble = $("bubble-man");
-  bubble.textContent = MAN_LINE;
+  bubble.textContent = TEXT.manLine;
   // đặt bong bóng ngay trên đầu nhân vật (đổi toạ độ canvas → % màn hình)
   const g = currentGame;
   bubble.style.left = ((g.player.x + g.player.w * 0.5 - g.camX) / g.CW) * 100 + "%";
@@ -251,7 +255,7 @@ function playMeeting() {
   bubble.classList.remove("hidden");
   setTimeout(() => {
     bubble.classList.add("hidden");
-    $("meet-text").textContent = MEET_TEXT;
+    $("meet-text").textContent = TEXT.meetText;
     $("meet-stats").innerHTML =
       `MISSION COMPLETE<br>score <b>${g.score}</b> · time <b>${fmtTime(g.timeSolo)}</b> · hearts lost <b>${g.heartsLost}</b>`;
     showScreen("screen-meet");
@@ -260,18 +264,18 @@ function playMeeting() {
 
 // --- chương 4: hòm hồng → System Message ---
 function openSystemMessage() {
-  $("system-text").textContent = SYSTEM_MESSAGE;
+  $("system-text").textContent = TEXT.systemMessage;
   $("system-reply").textContent = "";
   showModal("modal-system");
 }
 
 // --- hòm quà → thư → video ---
 function openEnvelope() {
-  $("envelope-label").textContent = ENVELOPE_LABEL;
+  $("envelope-label").textContent = TEXT.envelopeLabel;
   showModal("modal-envelope");
 }
 function openLetter(fromEnding) {
-  $("letter-text").textContent = LETTER_TEXT;
+  $("letter-text").textContent = TEXT.letter;
   $("letter-close").classList.toggle("hidden", !fromEnding);
   $("btn-watch-video").classList.toggle("hidden", fromEnding);
   $("btn-watch-video").textContent = "Continue the journey ▸";
@@ -533,8 +537,19 @@ function wireGamepad() {
   requestAnimationFrame(poll);
 }
 
-async function init() {
+// Đổ nội dung từ config.js vào giao diện (một nguồn duy nhất để cá nhân hoá)
+function applyBranding() {
   document.title = GAME_TITLE;
+  $("title-heading").textContent = GAME_TITLE;
+  $("title-subtitle").textContent = GAME_SUBTITLE;
+  $("title-window-name").textContent = WINDOW_NAME;
+  $("title-photo-frame").textContent = TEXT.photoPlaceholder;
+  $("letter-window-name").textContent = TEXT.letterTitle;
+  $("video-missing").textContent = TEXT.videoMissing;
+}
+
+async function init() {
+  applyBranding();
   wireUI();
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";
@@ -542,7 +557,8 @@ async function init() {
   await preloadAll();
   startBtn.disabled = false;
   startBtn.textContent = "Start the journey";
-  if (location.hash === "#autostart") startBtn.click(); // mở thẳng vào game (dùng để test)
+  // #autostart: vào thẳng màn chơi, bỏ qua màn hình tiêu đề (dùng khi thử nghiệm)
+  if (location.hash.includes("autostart")) startBtn.click();
 }
 
 init();
