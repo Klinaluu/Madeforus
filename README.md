@@ -54,6 +54,31 @@ Các bước thường làm khi giao một bản cá nhân hoá:
 4. Đặt `SHOW_EMPTY_PHOTO_FRAMES = false` để mốc chưa có ảnh thì không treo khung trống.
 5. Chạy `python3 tools/package.py` → `dist/madeforus.zip` để gửi cho khách.
 
+## Làm bản riêng cho từng khách
+
+Không nhân bản code cho mỗi khách — chỉ nhân bản **nội dung**. Mỗi khách là một thư mục
+trong `customers/` (đã nằm trong `.gitignore` nên ảnh, thư, video của khách không bao giờ
+lên GitHub). Khi build, script lấy code mới nhất + nội dung của khách, nên mọi cải tiến về
+sau đều đến được với các bản đã giao chỉ bằng một lệnh build lại.
+
+```bash
+python3 tools/new_customer.py linh-tung      # tạo customers/linh-tung/{brief.md, config.js, assets/}
+# → điền brief.md, bỏ ảnh vào assets/photos, video vào assets/video, sửa config.js
+python3 tools/build_customer.py linh-tung    # thu nhỏ ảnh, build, đóng gói
+# → dist/linh-tung/ (đưa lên Netlify / GitHub Pages) + dist/linh-tung.zip (gửi khách)
+```
+
+Thêm `--url https://linh-tung.netlify.app` khi build để thẻ chia sẻ (ảnh preview khi gửi
+link) trỏ đúng tên miền của bản đó.
+
+Script tự: thu nhỏ ảnh về cạnh dài 640px (giữ nguyên tỉ lệ, xoay đúng chiều, HEIC→JPG),
+đổi tên game trong manifest và thẻ chia sẻ, xuất bản một file HTML chơi offline, đồng thời
+cảnh báo nếu video quá nặng, ảnh trong config bị thiếu hoặc ảnh thừa chưa dùng.
+
+Phiếu tư vấn khách: [docs/intake.md](docs/intake.md).
+Mẹo: mỗi khách nên làm trong một khung chat riêng, còn việc sửa engine thì làm ở chat
+của repo này để mọi bản đều được hưởng.
+
 ## Cấu trúc thư mục
 
 ```
@@ -67,8 +92,11 @@ js/main.js          điều phối màn hình, HUD, điều khiển, cắt cản
 js/audio.js         hiệu ứng âm thanh chiptune sinh bằng WebAudio (không cần file)
 assets/             brand (logo, favicon), characters, elements, props, ui, scenes, photos, video
 assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
-tools/              build_standalone.py (gộp 1 file), package.py (đóng gói zip),
+tools/              new_customer.py, build_customer.py (quy trình từng khách),
+                    build_standalone.py (gộp 1 file), package.py (đóng gói zip demo),
                     make_preview.py (ảnh preview khi chia sẻ link)
+customers/          tư liệu từng khách — KHÔNG đưa lên GitHub
+docs/intake.md      phiếu tư vấn khách
 ```
 
 ## Kỹ thuật
