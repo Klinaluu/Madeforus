@@ -9,6 +9,7 @@ import {
   SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,
 } from "./levels.js";
 import { initAudio, sfx, setMuted, isMuted } from "./audio.js";
+import { initInstallHint, maybeShowInstallHint, detectPlatform, isInstalled } from "./install.js";
 import { JourneyGame } from "./engine.js";
 
 // Mốc đi đôi dùng chung một nền; config.js chỉ khai báo phần nội dung.
@@ -364,6 +365,11 @@ function wireUI() {
     true
   );
   // bật / tắt âm thanh
+  // dòng gợi ý dưới nút Start: bấm để mở lại hướng dẫn thêm vào màn hình chính
+  const installTip = $("title-install-tip");
+  if (detectPlatform() === "desktop" || isInstalled()) installTip.classList.add("hidden");
+  installTip.addEventListener("click", () => maybeShowInstallHint({ text: TEXT.install, force: true }));
+
   const soundBtn = $("btn-sound");
   const renderSound = () => {
     soundBtn.textContent = isMuted() ? "🔇" : "🔊";
@@ -561,6 +567,7 @@ function applyBranding() {
 async function init() {
   applyBranding();
   wireUI();
+  initInstallHint({ text: TEXT.install });
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";
   startBtn.disabled = true;

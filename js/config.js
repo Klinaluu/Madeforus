@@ -25,6 +25,9 @@ export const TEXT = {
   videoMissing: "Wait for your video 🎬",
   // chữ trong khung ảnh còn trống
   photoPlaceholder: "(insert pictures here)",
+  // Hướng dẫn thêm vào màn hình chính (chỉ hiện trên điện thoại / máy tính bảng).
+  // Để trống thì dùng chuỗi mặc định tiếng Anh trong js/install.js.
+  install: {},
 };
 
 // ---------- ảnh & video của khách ----------

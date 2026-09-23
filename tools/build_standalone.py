@@ -10,7 +10,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODULES = ["config", "assets", "levels", "audio", "engine", "main"]  # theo thứ tự phụ thuộc
+MODULES = ["config", "assets", "levels", "audio", "install", "engine", "main"]  # theo thứ tự phụ thuộc
 ENTRY_TAG = '<script type="module" src="js/main.js"></script>'
 
 
