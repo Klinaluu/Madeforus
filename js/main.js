@@ -561,6 +561,9 @@ function applyBranding() {
     frame.textContent = TEXT.photoPlaceholder;
   }
   $("letter-window-name").textContent = TEXT.letterTitle;
+  $("rotate-title").textContent = TEXT.rotateTitle;
+  $("rotate-text").textContent = TEXT.rotateText;
+  $("title-rotate-tip").textContent = TEXT.rotateTip;
   $("video-missing").textContent = TEXT.videoMissing;
 }
 

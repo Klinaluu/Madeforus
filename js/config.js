@@ -25,6 +25,10 @@ export const TEXT = {
   videoMissing: "Wait for your video 🎬",
   // chữ trong khung ảnh còn trống
   photoPlaceholder: "(insert pictures here)",
+  // nhắc xoay ngang trên điện thoại / máy tính bảng
+  rotateTitle: "Please rotate to landscape",
+  rotateText: "This journey is made for a sideways screen.",
+  rotateTip: "⟳ Hold your device sideways to play",
   // Hướng dẫn thêm vào màn hình chính (chỉ hiện trên điện thoại / máy tính bảng).
   // Để trống thì dùng chuỗi mặc định tiếng Anh trong js/install.js.
   install: {},
