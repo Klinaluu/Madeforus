@@ -1,5 +1,9 @@
 # Ba gói dịch vụ — tư liệu, phạm vi và tình trạng code
 
+> **Phạm vi khung chat này: chỉ Madeforus.love.** Các mục thuộc gói plus/custom (2
+> background riêng, 2–3 thử thách/câu hỏi, gameplay/cốt truyện riêng) không xử lý ở đây —
+> mở khung chat khác khi cần làm gói đó.
+
 Nguồn: trang báo giá trên Notion (Made For Us). Bảng này đối chiếu **lời hứa với khách**
 và **những gì code hiện làm được**, để lúc tư vấn không hứa quá.
 
@@ -20,23 +24,28 @@ và **những gì code hiện làm được**, để lúc tư vấn không hứa
 | 1–2 câu thoại nhân vật | `TEXT.manLine`, `TEXT.meetText` | ✅ |
 | Tên game + slogan (gói plus) | `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` | ✅ |
 | 5 vật phẩm gắn với hai bạn | `GIFTS` | ⚠️ **đổi được tên, chưa đổi được hình** — icon phải vẽ pixel mới |
-| 2 ảnh chân dung → nhân vật trong game | sprite trong `assets/characters/` | ⚠️ **chưa có quy trình** — hiện dùng bộ sprite cố định |
+| 2 ảnh chân dung → nhân vật trong game | sprite trong `assets/characters/` | 🔧 **quy trình riêng, ngoài code này** — build đã có chỗ để nhận kết quả (xem dưới) |
 | 2 background riêng (gói plus) | `assets/scenes/` + `assets.js` | ⚠️ **làm được nhưng thủ công** — dựng SVG 2 lớp rồi render PNG 3840×1080 |
 | 2–3 thử thách/câu hỏi (gói plus) | — | ❌ **chưa có tính năng** trong game |
 | Link chơi trên điện thoại/iPad/laptop | GitHub Pages | ✅ xem phần dưới |
 
-## Ba việc cần quyết trước khi nhận đơn đầu tiên
+## Nhân vật cá nhân hoá (gói love)
 
-1. **Nhân vật giống khách.** Một bộ sprite gồm 14 hình (nam đi bộ 4 khung, nam đi xe,
-   đôi đi xe 4 khung, cô gái đứng, cô gái reo hò 2 khung, ảnh đôi, ảnh chân dung, 2 cảnh
-   iso). Ba mức khả thi:
-   - *Đổi màu* (rẻ nhất): giữ nguyên hình, đổi màu tóc / áo / da bằng code → hợp gói love.
-   - *Vẽ lại đầu & trang phục* trên khung có sẵn → hợp gói plus.
-   - *Vẽ mới hoàn toàn* → gói custom.
-   Nên ghi rõ trong báo giá để khách không kỳ vọng "giống hệt ảnh" ở gói 499K.
-2. **Vật phẩm riêng.** Tương tự: gói love đổi tên gọi, gói plus mới vẽ icon mới.
-3. **Thử thách/câu hỏi của gói plus.** Cần thêm tính năng vào engine (hộp thoại câu hỏi
-   chặn đường cho tới khi trả lời đúng). Chưa có thì chưa nên bán gói plus.
+Quyết định: **quy trình tạo sprite từ ảnh chân dung được xây riêng, ngoài codebase này**
+(không phải palette-swap tự động trong repo). Phần build đã chuẩn bị sẵn chỗ nhận kết quả:
+
+- Bỏ sprite đã cá nhân hoá vào `customers/<slug>/assets/characters/`, **đặt đúng tên file**
+  như trong `assets/characters/` ở gốc repo (vd `Man-Walk-Side-01.png`, `Woman-Stand-Side-01.png`…).
+- `build_customer.py` tự đè các file cùng tên lên bộ mặc định; file nào không cung cấp thì
+  giữ nguyên sprite gốc — nên có thể chỉ thay một vài file (vd chỉ đổi 2 khuôn mặt) mà
+  không cần làm lại cả bộ 14 hình.
+- Danh sách đầy đủ tên file cần khớp: xem `assets/characters/` ở gốc repo.
+
+Vật phẩm riêng (5 vật phẩm gắn với hai bạn): gói love chỉ đổi **tên gọi** trong `GIFTS`
+(`config.js`), chưa đổi hình — icon mới không thuộc phạm vi love.
+
+Câu hỏi/thử thách riêng và 2 background riêng là tính năng của gói **plus**, không xử lý
+trong khung chat này (xem ghi chú phạm vi ở đầu trang).
 
 ## Quy trình giao một bản
 

@@ -89,7 +89,8 @@ Script tự: thu nhỏ ảnh về cạnh dài 640px (giữ nguyên tỉ lệ, xo
 cảnh báo nếu video quá nặng, ảnh trong config bị thiếu hoặc ảnh thừa chưa dùng.
 
 Phiếu tư vấn khách: [docs/intake.md](docs/intake.md) · Ba gói dịch vụ và phạm vi:
-[docs/packages.md](docs/packages.md).
+[docs/packages.md](docs/packages.md) · **Quan trọng — mở khung chat mới cho mỗi khách**:
+[docs/new-customer-chat.md](docs/new-customer-chat.md) (kèm prompt copy-paste sẵn).
 Mẹo: mỗi khách nên làm trong một khung chat riêng, còn việc sửa engine thì làm ở chat
 của repo này để mọi bản đều được hưởng.
 
@@ -110,7 +111,8 @@ tools/              new_customer.py, build_customer.py, deploy_customer.py (quy 
                     build_standalone.py (gộp 1 file), package.py (đóng gói zip demo),
                     make_preview.py (ảnh preview khi chia sẻ link)
 customers/          tư liệu từng khách — KHÔNG đưa lên GitHub
-docs/               intake.md (phiếu tư vấn), packages.md (3 gói dịch vụ)
+docs/               intake.md (phiếu tư vấn), packages.md (3 gói dịch vụ),
+                    new-customer-chat.md (vì sao mỗi khách 1 khung chat + prompt mẫu)
 ```
 
 ## Kỹ thuật

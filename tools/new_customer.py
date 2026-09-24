@@ -6,8 +6,10 @@
 Sinh ra customers/<slug>/ gồm:
     brief.md      phiếu nhận tư liệu — điền cùng khách
     config.js     bản sao cấu hình để điền nội dung của khách
-    assets/photos ảnh gốc khách gửi (bỏ thẳng vào đây, không cần cắt)
-    assets/video  video .mp4
+    assets/photos     ảnh gốc khách gửi (bỏ thẳng vào đây, không cần cắt)
+    assets/video      video .mp4
+    assets/characters (tuỳ chọn) sprite nhân vật đã cá nhân hoá bằng quy trình riêng —
+                       cùng tên file với assets/characters/ ở gốc repo thì build sẽ đè lên
 
 Thư mục customers/ nằm trong .gitignore nên tư liệu của khách không lên GitHub.
 """
@@ -92,6 +94,7 @@ def main():
         sys.exit(f"Da co thu muc {base}")
     os.makedirs(os.path.join(base, "assets", "photos"))
     os.makedirs(os.path.join(base, "assets", "video"))
+    os.makedirs(os.path.join(base, "assets", "characters"))
 
     config = open(os.path.join(ROOT, "js", "config.js"), encoding="utf-8").read()
     config = config[config.index("// ---------- thương hiệu ----------"):]
@@ -107,6 +110,7 @@ def main():
     print("  config.js          <- dien noi dung cua khach")
     print("  assets/photos/     <- bo anh goc vao day")
     print("  assets/video/      <- bo video vao day")
+    print("  assets/characters/ <- (neu co) sprite da ca nhan hoa, cung ten se de len mac dinh")
     print(f"\nKhi xong:  python3 tools/build_customer.py {slug}")
 
 

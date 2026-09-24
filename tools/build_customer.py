@@ -8,8 +8,10 @@ Các bước script tự làm:
     1. Thu nhỏ ảnh trong customers/<slug>/assets/photos (giữ nguyên tỉ lệ, cạnh dài 640px)
     2. Chép video sang bản build, cảnh báo nếu nặng
     3. Chép toàn bộ code hiện tại + config.js của khách
-    4. Đổi tên game trong manifest / thẻ chia sẻ theo GAME_TITLE của khách
-    5. Xuất bản một file (double-click là chơi) và nén dist/<slug>.zip
+    4. Nếu có customers/<slug>/assets/characters/ (sprite nhân vật đã cá nhân hoá bằng quy
+       trình riêng) → đè lên bộ sprite mặc định, cùng tên file thì thay, tên mới thì thêm
+    5. Đổi tên game trong manifest / thẻ chia sẻ theo GAME_TITLE của khách
+    6. Xuất bản một file (double-click là chơi) và nén dist/<slug>.zip
 
 Kết quả: dist/<slug>/ (đưa lên Netlify / GitHub Pages) và dist/<slug>.zip (gửi khách).
 """
@@ -94,6 +96,18 @@ def main():
     config = open(config_path, encoding="utf-8").read()
     open(os.path.join(dist, "js", "config.js"), "w", encoding="utf-8").write(config)
 
+    # ---------- sprite nhân vật đã cá nhân hoá (quy trình riêng, ngoài script này) ----------
+    custom_chars = os.path.join(src, "assets", "characters")
+    custom_char_files = []
+    if os.path.isdir(custom_chars):
+        dst_chars = os.path.join(dist, "assets", "characters")
+        for name in sorted(os.listdir(custom_chars)):
+            path = os.path.join(custom_chars, name)
+            if name.startswith(".") or not os.path.isfile(path):
+                continue
+            shutil.copy2(path, os.path.join(dst_chars, name))
+            custom_char_files.append(name)
+
     # ---------- ảnh & video của khách ----------
     photos = copy_photos(os.path.join(src, "assets", "photos"), os.path.join(dist, "assets", "photos"))
     videos = []
@@ -144,6 +158,8 @@ def main():
         print(f"  video: {name} {mb:.1f}MB{flag}")
     if not videos:
         print("  video: chua co (game se hien dong 'Wait for your video')")
+    if custom_char_files:
+        print("  sprite nhan vat rieng (de len mac dinh): " + ", ".join(custom_char_files))
     missing = [p for p in re.findall(r'photo: "(assets/photos/[^"]+)"', config) if not os.path.isfile(os.path.join(dist, p))]
     if missing:
         print("  THIEU ANH (config tro toi file khong co): " + ", ".join(missing))
