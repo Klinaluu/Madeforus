@@ -56,43 +56,20 @@ Các bước thường làm khi giao một bản cá nhân hoá:
 
 ## Làm bản riêng cho từng khách
 
-Không nhân bản code cho mỗi khách — chỉ nhân bản **nội dung**. Mỗi khách là một thư mục
-trong `customers/` (đã nằm trong `.gitignore` nên ảnh, thư, video của khách không bao giờ
-lên GitHub). Khi build, script lấy code mới nhất + nội dung của khách, nên mọi cải tiến về
-sau đều đến được với các bản đã giao chỉ bằng một lệnh build lại.
+**→ [docs/workflow.md](docs/workflow.md) — quy trình đầy đủ, mở file này mỗi khi có khách mới.**
+
+Tóm tắt: không nhân bản code cho mỗi khách, chỉ nhân bản **nội dung**. Mỗi khách là một
+thư mục trong `customers/` (nằm trong `.gitignore`, không lên GitHub). Ba lệnh chính:
 
 ```bash
 python3 tools/new_customer.py linh-tung      # tạo customers/linh-tung/{brief.md, config.js, assets/}
-# → điền brief.md, bỏ ảnh vào assets/photos, video vào assets/video, sửa config.js
-python3 tools/build_customer.py linh-tung    # thu nhỏ ảnh, build, đóng gói
-# → dist/linh-tung/ (đưa lên Netlify / GitHub Pages) + dist/linh-tung.zip (gửi khách)
-```
-
-Giao hàng qua GitHub Pages (khách chơi được trên laptop, iPhone, iPad và thêm vào màn
-hình chính như app):
-
-```bash
-# tạo sẵn một repo TRỐNG, public trên github.com, vd Klinaluu/linh-tung
+python3 tools/build_customer.py linh-tung    # thu nhỏ ảnh, build, đóng gói, cảnh báo thiếu/thừa
 python3 tools/deploy_customer.py linh-tung https://github.com/Klinaluu/linh-tung.git
-# lần đầu: Settings → Pages → Deploy from a branch → main / (root)
-# → https://klinaluu.github.io/linh-tung/
 ```
 
-Script tự build lại với đúng đường dẫn Pages (để ảnh preview khi gửi link hiện đúng),
-commit và push. Lần sau chỉ cần chạy lại một lệnh đó.
-
-Nếu dùng Netlify thay GitHub, build kèm `--url https://linh-tung.netlify.app` rồi kéo thả
-thư mục `dist/linh-tung/`.
-
-Script tự: thu nhỏ ảnh về cạnh dài 640px (giữ nguyên tỉ lệ, xoay đúng chiều, HEIC→JPG),
-đổi tên game trong manifest và thẻ chia sẻ, xuất bản một file HTML chơi offline, đồng thời
-cảnh báo nếu video quá nặng, ảnh trong config bị thiếu hoặc ảnh thừa chưa dùng.
-
-Phiếu tư vấn khách: [docs/intake.md](docs/intake.md) · Ba gói dịch vụ và phạm vi:
-[docs/packages.md](docs/packages.md) · **Quan trọng — mở khung chat mới cho mỗi khách**:
-[docs/new-customer-chat.md](docs/new-customer-chat.md) (kèm prompt copy-paste sẵn).
-Mẹo: mỗi khách nên làm trong một khung chat riêng, còn việc sửa engine thì làm ở chat
-của repo này để mọi bản đều được hưởng.
+Tài liệu liên quan: [docs/intake.md](docs/intake.md) (tư liệu cần xin khách),
+[docs/packages.md](docs/packages.md) (phạm vi 3 gói), [docs/new-customer-chat.md](docs/new-customer-chat.md)
+(vì sao mỗi khách mở một khung chat mới, kèm prompt copy-paste).
 
 ## Cấu trúc thư mục
 
@@ -111,7 +88,8 @@ tools/              new_customer.py, build_customer.py, deploy_customer.py (quy 
                     build_standalone.py (gộp 1 file), package.py (đóng gói zip demo),
                     make_preview.py (ảnh preview khi chia sẻ link)
 customers/          tư liệu từng khách — KHÔNG đưa lên GitHub
-docs/               intake.md (phiếu tư vấn), packages.md (3 gói dịch vụ),
+docs/               workflow.md (quy trình đầy đủ mỗi khi có khách mới — mở file này trước),
+                    intake.md (phiếu tư vấn), packages.md (3 gói dịch vụ),
                     new-customer-chat.md (vì sao mỗi khách 1 khung chat + prompt mẫu)
 ```
 
