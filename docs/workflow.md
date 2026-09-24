@@ -1,14 +1,13 @@
 # Quy trình mỗi khi có khách mới (gói Madeforus.love)
 
 Đây là trang duy nhất cần mở khi có khách mới — các bước theo đúng thứ tự làm.
-Chi tiết từng phần nằm ở [intake.md](intake.md) (tư liệu cần xin), [packages.md](packages.md)
-(phạm vi gói) và [new-customer-chat.md](new-customer-chat.md) (vì sao mở khung chat mới).
+Phần tư vấn/báo giá khách đã lưu ở Notion, không lặp lại ở đây. Cách mở khung chat mới
+và thao tác với Claude Code: [new-customer-chat.md](new-customer-chat.md).
 
 ## Bước 0 — Nhận đơn
 
-Khách chọn gói love trên Notion → nhắn đoạn tư vấn trong
-[intake.md § Đoạn gửi khách](intake.md#đoạn-gửi-khách) → khách gửi tư liệu vào 1 folder
-Google Drive (ảnh, video, lá thư, tên game/slogan, ngày kỷ niệm).
+Khách chọn gói love trên Notion, gửi tư liệu vào 1 folder Google Drive theo checklist đã
+lưu ngoài (ảnh, video, lá thư, tên game/slogan, ngày kỷ niệm).
 
 ## Bước 1 — Mở khung chat MỚI cho khách này
 
