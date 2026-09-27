@@ -3,6 +3,7 @@
 // ============================================================
 import {
   GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
+  SCENE_LAYERS,
 } from "./config.js";
 import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
 import {
@@ -14,6 +15,19 @@ import { JourneyGame } from "./engine.js";
 
 // Mốc đi đôi dùng chung một nền; config.js chỉ khai báo phần nội dung.
 const COUPLE_MILESTONES = MILESTONES.map((ms) => ({ ...ms, terrain: COUPLE_TERRAIN }));
+
+// Nền parallax: khách có thể khai báo số lớp + tốc độ riêng từng cảnh trong config.js
+// (SCENE_LAYERS), không khai báo thì dùng bộ 2 lớp mặc định của assets.js.
+const CUSTOM_SCENES = SCENE_LAYERS || {};
+const SCENE_PATHS = Object.fromEntries(
+  Object.keys(SCENES).map((id) => {
+    const custom = CUSTOM_SCENES[id];
+    return [id, custom && custom.layers ? custom.layers.map((f) => `assets/scenes/${id}/${f}`) : SCENES[id]];
+  })
+);
+const SCENE_SPEEDS_BY_ID = Object.fromEntries(
+  Object.keys(SCENES).map((id) => [id, (CUSTOM_SCENES[id] && CUSTOM_SCENES[id].speeds) || SCENE_SPEEDS])
+);
 
 let currentGame = null;
 let timeTimer = null;
@@ -55,7 +69,7 @@ function normalizeGrain(img, worldHeight) {
   return c;
 }
 async function preloadAll() {
-  const srcs = new Set([...Object.values(IMG).flat(), ...Object.values(SCENES).flat(), ...Object.values(PROPS)]);
+  const srcs = new Set([...Object.values(IMG).flat(), ...Object.values(SCENE_PATHS).flat(), ...Object.values(PROPS)]);
   GIFTS.forEach((g) => g.icon && srcs.add(g.icon));
   COUPLE_MILESTONES.forEach((ms) => {
     if (ms.photo) srcs.add(ms.photo);
@@ -181,6 +195,7 @@ function startJourney() {
 
   const images = {
     playerSolo: normalizeGrain(getImg(IMG.playerSolo), 74),
+    bikeIdle: getImg(IMG.bikeIdle),
     walkFrames: IMG.walkFrames.map(getImg),
     gear: { key: getImg(IMG.key), helmet: getImg(IMG.helmet) },
     coupleFrames: IMG.coupleFrames.map(getImg),
@@ -193,8 +208,8 @@ function startJourney() {
     blockSurprise: getImg(IMG.blockSurprise),
     blockUsed: getImg(IMG.blockUsed),
     itemHeart: getImg(IMG.itemHeart),
-    scenes: Object.fromEntries(Object.entries(SCENES).map(([id, layers]) => [id, layers.map(getImg)])),
-    sceneSpeeds: SCENE_SPEEDS,
+    scenes: Object.fromEntries(Object.entries(SCENE_PATHS).map(([id, layers]) => [id, layers.map(getImg)])),
+    sceneSpeeds: SCENE_SPEEDS_BY_ID,
     sceneSink: SCENE_SINK,
     sceneTop: SCENE_TOP,
     grassFloat: getImg(IMG.grassFloat),

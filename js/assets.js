@@ -12,6 +12,7 @@ const SCENE = "assets/scenes/";
 // ---------- sprite & giao diện ----------
 export const IMG = {
   playerSolo: CHAR + "Man-Bike-Side-01.png",
+  bikeIdle: CHAR + "Bike-Idle-01.png",
   walkFrames: [1, 2, 3, 4].map((n) => `${CHAR}Man-Walk-Side-0${n}.png`),
   key: CHAR + "Item-Key-01.png",
   helmet: CHAR + "Item-Helmet-01.png",

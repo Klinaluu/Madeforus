@@ -861,7 +861,7 @@ export class JourneyGame {
       drawItem(ctx, img.pickup[it.id], it.id, it.x, this.groundY - it.gap, ITEM_SIZE, this.t, this.groundY);
     }
     if (this.phase === "walk") {
-      drawCoveredBike(ctx, this.bikeX, this.groundY, this.t, this.gearReady());
+      drawCoveredBike(ctx, img.bikeIdle, this.bikeX, this.groundY, this.t, this.gearReady());
       for (const ge of this.gear) {
         if (ge.collected) continue;
         drawItem(ctx, img.gear[ge.id], ge.id, ge.x, this.groundY - ge.gap, ITEM_SIZE, this.t, this.groundY, ge.id === "key" ? 0.6 : 0.9);
@@ -893,13 +893,14 @@ export class JourneyGame {
       const frames = img.walkFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused && this.player.onGround;
       sprite = frames[moving ? Math.floor(this.player.animT * 7) % frames.length : 0] || frames[0];
-      drawWalker(ctx, this.player, sprite, frames, blink, this.groundY);
     } else if (!solo) {
       const frames = img.coupleFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused;
       sprite = frames[moving ? Math.floor(this.player.animT * 8) % frames.length : 0] || frames[0];
     }
-    if (this.phase !== "walk") drawPlayer(ctx, this.player, sprite, solo ? this.player.w : 0, blink, this.groundY);
+    // Cảnh có xe máy (một mình hoặc đi đôi) vẽ to hơn nhân vật đi bộ, vẫn neo bánh xe xuống đất
+    const bikeScene = this.phase !== "walk";
+    drawPlayer(ctx, this.player, sprite, 0, blink, this.groundY, bikeScene ? 100 : undefined, bikeScene ? 16 : 0);
 
     for (const pt of this.particles) {
       ctx.globalAlpha = Math.max(0, Math.min(1, pt.life / 0.3));
@@ -998,11 +999,13 @@ function lerpColor(a, b, t) {
   return `rgb(${r},${g},${bl})`;
 }
 
-// màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên
+// màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên.
+// Luôn thử đọc màu THẬT từ chính ảnh trước (đúng với mọi bộ nền, kể cả nền riêng của khách);
+// fallback là màu đoán sẵn theo cảnh (chỉ dùng khi chạy qua file:// không đọc được pixel).
 const topColorCache = new WeakMap();
-function topColorOf(image) {
+function topColorOf(image, fallback) {
   if (topColorCache.has(image)) return topColorCache.get(image);
-  let color = "#f6d5a8";
+  let color = fallback || "#f6d5a8";
   try {
     const c = document.createElement("canvas");
     c.width = 1;
@@ -1041,14 +1044,23 @@ function tileMirrored(ctx, image, scrollX, y, targetH, CW) {
 // Vẽ cảnh 5 lớp: đáy cảnh chìm dưới mặt đường ~56px để phần đất/đường riêng của
 // cảnh nằm khuất dưới đường nhựa + gạch của game, tránh "hai con đường".
 // Cảnh vẽ ở tỉ lệ cố định SCENE_ZOOM (1 px của ảnh 540 cao = SCENE_ZOOM đơn vị thế giới)
-// thay vì kéo cho vừa khung — nền không bị phóng to; phần trời phía trên tô bằng màu mép
-// trên của lớp 1. sink tính theo hệ 540px.
+// thay vì kéo cho vừa khung — nền không bị phóng to trên màn hình thường; phần trời phía
+// trên tô bằng màu mép trên của lớp 1. sink tính theo hệ 540px.
+// Màn hình dọc/cao hơn 540+sink thì phóng lớn thêm vừa đủ để ảnh nền (mây, trời) luôn phủ
+// kín tới mép trên, không lộ mảng màu đặc phía trên nữa.
 const SCENE_ZOOM = 1;
 function drawScene(ctx, layers, speeds, camX, groundY, CW, sinkScenePx, topColor) {
-  const h = 540 * SCENE_ZOOM;
-  const y = groundY + sinkScenePx * SCENE_ZOOM - h;
+  const minH = 540 * SCENE_ZOOM;
+  const sink0 = sinkScenePx * SCENE_ZOOM;
+  // Không bao giờ để hở khoảng trống phía trên: nếu 540 chưa đủ phủ tới mép trên canvas
+  // (màn hình dọc/cao) thì phóng to thêm đúng bằng phần thiếu. sink phải phóng theo cùng tỉ lệ
+  // (luôn = sinkScenePx/540 so với chiều cao đang vẽ), không thì phần bờ/đất của cảnh vốn phải
+  // nằm khuất dưới đường của game sẽ lộ thêm ra, làm nhân vật trông như đứng cao hơn mặt đường.
+  const h = Math.max(minH, (groundY * minH) / (minH - sink0));
+  const sink = sink0 * (h / minH);
+  const y = groundY + sink - h;
   if (y > 0) {
-    ctx.fillStyle = topColor || topColorOf(layers[0]);
+    ctx.fillStyle = topColorOf(layers[0], topColor);
     ctx.fillRect(0, 0, CW, y + 1);
   }
   layers.forEach((layer, i) => {
@@ -1060,10 +1072,12 @@ function drawTerrain(ctx, type, img, camX, groundY, CW) {
   const id = type.startsWith("scene:") ? type.slice(6) : "";
   const layers = id && img.scenes && img.scenes[id];
   if (!layers || !layers.every(ready)) return; // ảnh chưa tải xong: để nguyên nền trời
+  // sceneSpeeds: mảng dùng chung cho mọi cảnh, hoặc bảng theo từng cảnh { id: [tốc độ từng lớp] }
+  const speeds = Array.isArray(img.sceneSpeeds) ? img.sceneSpeeds : (img.sceneSpeeds && img.sceneSpeeds[id]) || [0.25, 1];
   drawScene(
     ctx,
     layers,
-    img.sceneSpeeds || [0.25, 1],
+    speeds,
     camX,
     groundY,
     CW,
@@ -1150,17 +1164,18 @@ function drawBricks(ctx, brick, x, bottomY, w, h) {
   }
 }
 
-// dãy gai pixel: tam giác bậc thang, thân xám, viền tối, chân đế
+// dãy gai pixel: tam giác bậc thang, thân xám, viền tối, chân đế.
+// Đáy rộng nằm sát mặt đất (baseY), đầu nhọn hướng lên trên.
 function drawSpikes(ctx, x, baseY, w) {
   ctx.save();
   for (let sx = x; sx < x + w; sx += SPIKE_W) {
     const cx = sx + SPIKE_W / 2;
     for (let dy = 0; dy < SPIKE_H; dy += PX) {
-      const half = q(((SPIKE_H - dy) / SPIKE_H) * (SPIKE_W / 2));
+      const half = q(((dy + PX) / SPIKE_H) * (SPIKE_W / 2));
       const y = baseY - SPIKE_H + dy;
       ctx.fillStyle = OUTLINE;
       ctx.fillRect(cx - half - 2, y, half * 2 + 4, PX);
-      ctx.fillStyle = dy < 8 ? "#f4f0f6" : "#b9b3c4";
+      ctx.fillStyle = dy > SPIKE_H - 8 ? "#f4f0f6" : "#b9b3c4";
       if (half > 2) ctx.fillRect(cx - half + 2, y, half * 2 - 4, PX);
     }
   }
@@ -1240,33 +1255,43 @@ function drawBoss(ctx, cloudImg, b, groundY, t) {
 }
 
 // xe máy trùm bạt hồng chờ ở cuối đoạn đi bộ
-function drawCoveredBike(ctx, x, groundY, t, ready_) {
-  const w = 120;
-  const h = 58;
-  const y = groundY - h;
+function drawCoveredBike(ctx, image, x, groundY, t, ready_) {
   ctx.save();
-  ctx.fillStyle = "rgba(43,32,48,0.3)";
-  ctx.fillRect(x + 6, groundY - 6, w - 12, 6);
-  // thân bạt: bậc thang 4px, hai bướu bánh xe
-  ctx.fillStyle = "#ffb6cf";
-  const rows = [[16, 88], [8, 104], [4, 112], [0, 120], [0, 120], [0, 120], [4, 112], [4, 112], [10, 100]];
-  rows.forEach(([ox, ww], i) => ctx.fillRect(x + ox, y + i * 6, ww, 6));
-  ctx.fillRect(x + 4, y + h - 6, 30, 6);
-  ctx.fillRect(x + w - 34, y + h - 6, 30, 6);
-  ctx.strokeStyle = OUTLINE;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x + 1.5, y + 13.5, w - 3, h - 15);
-  // dây buộc + nếp bạt
-  ctx.fillStyle = "#e0538a";
-  ctx.fillRect(x + 30, y + 14, 4, h - 16);
-  ctx.fillRect(x + w - 34, y + 14, 4, h - 16);
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(x + 44, y + 22, 24, 4);
-  // nhãn nhỏ nhấp nháy
-  ctx.font = "8px 'Press Start 2P', monospace";
-  ctx.textAlign = "center";
-  ctx.fillStyle = ready_ && Math.floor(t * 3) % 2 === 0 ? "#f2c94c" : "#fff";
-  ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, y - 8);
+  const label = () => {
+    ctx.font = "8px 'Press Start 2P', monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = ready_ && Math.floor(t * 3) % 2 === 0 ? "#f2c94c" : "#fff";
+  };
+  if (ready(image)) {
+    const h = 74;
+    const w = h * (image.width / image.height);
+    drawShadow(ctx, x + w / 2, groundY, w * 0.85, 0.22);
+    ctx.drawImage(image, x, groundY - h, w, h);
+    label();
+    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, groundY - h - 8);
+  } else {
+    // bạt phủ vẽ tay: dùng khi chưa có ảnh xe riêng của khách
+    const w = 120;
+    const h = 58;
+    const y = groundY - h;
+    ctx.fillStyle = "rgba(43,32,48,0.3)";
+    ctx.fillRect(x + 6, groundY - 6, w - 12, 6);
+    ctx.fillStyle = "#ffb6cf";
+    const rows = [[16, 88], [8, 104], [4, 112], [0, 120], [0, 120], [0, 120], [4, 112], [4, 112], [10, 100]];
+    rows.forEach(([ox, ww], i) => ctx.fillRect(x + ox, y + i * 6, ww, 6));
+    ctx.fillRect(x + 4, y + h - 6, 30, 6);
+    ctx.fillRect(x + w - 34, y + h - 6, 30, 6);
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x + 1.5, y + 13.5, w - 3, h - 15);
+    ctx.fillStyle = "#e0538a";
+    ctx.fillRect(x + 30, y + 14, 4, h - 16);
+    ctx.fillRect(x + w - 34, y + 14, 4, h - 16);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(x + 44, y + 22, 24, 4);
+    label();
+    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, y - 8);
+  }
   ctx.restore();
 }
 
@@ -1427,7 +1452,7 @@ function drawWoman(ctx, image, x, groundY, t, cheer) {
 // Khung polaroid: viền pixel, bóng cứng lệch, dây treo
 function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
   // Khung ôm theo tỉ lệ ảnh thật (không crop): ảnh vừa trong hộp MAX×MAX, viền 8, đáy 44 cho chữ
-  const MAX = 150;
+  const MAX = 190;
   const PAD = 8;
   const FOOT = 44;
   let iw = 130;
@@ -1502,22 +1527,6 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
       ctx.fillText("♡", 0, py + ih / 2 + 9);
     }
   }
-  // chú thích: ngày (to) + tên (nhỏ); không có ngày thì tên đứng một mình
-  ctx.textAlign = "center";
-  // Font pixel không có dấu tiếng Việt: chữ nào ngoài bảng ASCII thì dùng font thường.
-  const fontFor = (txt, px) =>
-    /^[\x20-\x7E]*$/.test(txt) ? `${px}px 'Press Start 2P', monospace` : `600 ${px + 4}px 'Be Vietnam Pro', sans-serif`;
-  const lines = [];
-  if (date) lines.push([date, 10, "#6b3f52"]);
-  if (name) lines.push([name, date ? 8 : 10, date ? "#a97a92" : "#6b3f52"]);
-  let ly = h / 2 - (lines.length === 2 ? 22 : 15);
-  for (const [txt, px, color] of lines) {
-    ctx.font = fontFor(txt, px);
-    if (ctx.measureText(txt).width > w - 12) ctx.font = fontFor(txt, px - 2);
-    ctx.fillStyle = color;
-    ctx.fillText(txt, 0, ly);
-    ly += 13;
-  }
   ctx.restore();
 }
 
@@ -1583,71 +1592,22 @@ function drawPrompt(ctx, x, y, text, t) {
   ctx.restore();
 }
 
-// Đi bộ: bộ ảnh chỉ có MỘT tư thế sải chân, nên dựng chu kỳ bước bằng cách tách
-// sprite thành thân trên + chân. Phần chân được co/giãn ngang theo cos(pha):
-// +1 = sải chân như ảnh gốc, 0 = hai chân khép, -1 = lật thành sải chân bên kia.
-// Thân nhún nhẹ khi chân khép, hơi đổ về trước khi đi.
-const WALK_LEG_SPLIT = 0.715; // tỉ lệ chiều cao ảnh tính từ đỉnh xuống chỗ bắt đầu ống quần
-function drawWalker(ctx, p, sprite, frames, hit, groundY) {
-  const base = frames && ready(frames[0]) ? frames[0] : sprite;
-  if (!ready(base)) return;
-  const scale = p.h / base.height;
-  const w = base.width * scale;
-  const h = base.height * scale;
-  const splitY = Math.round(base.height * WALK_LEG_SPLIT);
-  const legH = base.height - splitY;
-
-  const moving = Math.abs(p.vx) > 1 && p.onGround;
-  const phase = p.animT * 3.6; // ~3.6 bước/giây
-  let sx; // hệ số co ngang của chân
-  let bob = 0;
-  let lean = 0;
-  if (!p.onGround) {
-    sx = 0.75;
-    lean = -p.vy * 0.00025;
-  } else if (moving) {
-    sx = Math.cos(phase * Math.PI * 2);
-    bob = -Math.abs(Math.sin(phase * Math.PI * 2)) * 2.5;
-    lean = 0.05;
-  } else {
-    sx = 0.5;
-  }
-  // không co quá mỏng: chân khép vẫn phải ra hình đôi chân
-  if (Math.abs(sx) < 0.45) sx = sx < 0 ? -0.45 : 0.45;
-
-  drawShadow(ctx, p.x + p.w / 2, groundY, w * (0.7 + Math.abs(sx) * 0.5), p.onGround ? 0.25 : 0.12);
-  ctx.save();
-  ctx.translate(p.x + p.w / 2, p.y + p.h);
-  if (p.facing < 0) ctx.scale(-1, 1);
-  if (hit) ctx.globalAlpha = 0.5;
-
-  // chân: co/giãn quanh trục giữa, neo đáy xuống đất
-  ctx.save();
-  ctx.scale(sx, 1);
-  ctx.drawImage(base, 0, splitY, base.width, legH, -w / 2, -legH * scale, w, legH * scale);
-  ctx.restore();
-
-  // thân trên: nhún + hơi đổ về trước, phủ lên mép trên của chân
-  ctx.save();
-  ctx.translate(0, -legH * scale + 2 + bob);
-  ctx.rotate(lean);
-  ctx.drawImage(base, 0, 0, base.width, splitY + 4, -w / 2, -(splitY + 4) * scale, w, (splitY + 4) * scale);
-  ctx.restore();
-
-  ctx.restore();
-}
-
-// drawW = 0 → giữ đúng tỉ lệ ảnh gốc theo chiều cao (dùng cho các khung animation xe đôi)
-function drawPlayer(ctx, p, playerImg, drawW, hit, groundY) {
-  const w = drawW || (ready(playerImg) ? p.h * (playerImg.width / playerImg.height) : p.w);
+// drawW = 0 → giữ đúng tỉ lệ ảnh gốc theo chiều cao (dùng cho các khung animation xe đôi).
+// drawH  → chiều cao hiển thị (khác hitbox vật lý p.h) khi ảnh cần to hơn, ví dụ cảnh đi xe;
+// luôn neo đáy ảnh xuống đúng mặt đất (p.y + p.h) bất kể drawH lớn hơn hay bằng p.h.
+// yOffset → đẩy ảnh xuống thêm so với mặt đất (p.y + p.h), dùng cho xe máy để bánh xe
+// lún vào mặt đường một chút, trông thật hơn là lơ lửng đúng mép.
+function drawPlayer(ctx, p, playerImg, drawW, hit, groundY, drawH, yOffset) {
+  const h = drawH || p.h;
+  const w = drawW || (ready(playerImg) ? h * (playerImg.width / playerImg.height) : p.w);
   drawShadow(ctx, p.x + p.w / 2, groundY, w * 0.9, p.onGround ? 0.25 : 0.12);
   ctx.save();
   const bob = p.onGround ? Math.sin(p.animT * 5) * 2.2 : 0;
   const lean = p.onGround ? Math.sin(p.animT * 5) * 0.02 : -p.vy * 0.00025;
-  ctx.translate(p.x + p.w / 2, p.y + p.h / 2 + bob);
+  ctx.translate(p.x + p.w / 2, p.y + p.h + bob + (yOffset || 0));
   if (p.facing < 0) ctx.scale(-1, 1);
   ctx.rotate(lean);
   if (hit) ctx.globalAlpha = 0.5;
-  if (ready(playerImg)) ctx.drawImage(playerImg, -w / 2, -p.h / 2, w, p.h);
+  if (ready(playerImg)) ctx.drawImage(playerImg, -w / 2, -h, w, h);
   ctx.restore();
 }

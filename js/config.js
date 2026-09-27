@@ -82,3 +82,15 @@ export const MILESTONES = [
   { date: "DD.MM", name: "Letter stop", sky: ["#ffd9c4", "#ffe7ef"], photo: "", event: "chest" },
   { date: "DD.MM", name: "Final stop", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
 ];
+
+// ---------- nền parallax riêng (tuỳ chọn) ----------
+// Để trống = dùng bộ nền 2 lớp mặc định. Muốn nền riêng: bỏ ảnh vào
+// customers/<slug>/assets/scenes/<id>/ rồi khai báo lớp (xa → gần) + tốc độ trôi (0 = đứng yên,
+// 1 = trôi cùng tốc độ đường). id: "ho-guom" (đi bộ, solo, gặp nhau), "ho-tay" (đi đôi).
+//   "ho-guom": { layers: ["L1.png", "L2.png", "L3.png"], speeds: [0.06, 0.18, 0.45] },
+export const SCENE_LAYERS = {
+  // Hồ Gươm: trời + mây → dãy nhà + hàng cây (sau tháp) → mặt hồ + Tháp Rùa
+  "ho-guom": { layers: ["L1.png", "L2.png", "L3.png"], speeds: [0.05, 0.16, 0.4] },
+  // Hoàng hôn: trời + mặt trời → skyline + mặt nước → vệt nắng (khoá theo mặt trời)
+  "ho-tay": { layers: ["L1.png", "L2.png", "L3.png"], speeds: [0.02, 0.3, 0.02] },
+};

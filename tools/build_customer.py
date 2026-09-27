@@ -94,19 +94,47 @@ def main():
     for f in JS_FILES:
         shutil.copy2(os.path.join(ROOT, "js", f), os.path.join(dist, "js", f))
     config = open(config_path, encoding="utf-8").read()
+    # config của khách làm trước khi có trường này vẫn build được
+    if not re.search(r"^export const SCENE_LAYERS\b", config, flags=re.M):
+        config += "\nexport const SCENE_LAYERS = {};\n"
     open(os.path.join(dist, "js", "config.js"), "w", encoding="utf-8").write(config)
 
-    # ---------- sprite nhân vật đã cá nhân hoá (quy trình riêng, ngoài script này) ----------
-    custom_chars = os.path.join(src, "assets", "characters")
-    custom_char_files = []
-    if os.path.isdir(custom_chars):
-        dst_chars = os.path.join(dist, "assets", "characters")
-        for name in sorted(os.listdir(custom_chars)):
-            path = os.path.join(custom_chars, name)
-            if name.startswith(".") or not os.path.isfile(path):
+    # ---------- ảnh riêng đè lên bộ mặc định: cùng tên file thì thay, tên khác thì thêm.
+    # customers/<slug>/assets/<characters|elements|props|ui>/<tên file giống gốc repo> ----------
+    def copy_overrides(folder):
+        custom_dir = os.path.join(src, "assets", folder)
+        done = []
+        if os.path.isdir(custom_dir):
+            dst_dir = os.path.join(dist, "assets", folder)
+            os.makedirs(dst_dir, exist_ok=True)
+            for name in sorted(os.listdir(custom_dir)):
+                path = os.path.join(custom_dir, name)
+                if name.startswith(".") or not os.path.isfile(path):
+                    continue
+                shutil.copy2(path, os.path.join(dst_dir, name))
+                done.append(name)
+        return done
+
+    custom_char_files = copy_overrides("characters")
+    custom_element_files = copy_overrides("elements")
+    custom_prop_files = copy_overrides("props")
+
+    # ---------- nền parallax riêng của khách (customers/<slug>/assets/scenes/<id>/L1.png, L2.png) ----------
+    custom_scenes = os.path.join(src, "assets", "scenes")
+    custom_scene_ids = []
+    if os.path.isdir(custom_scenes):
+        for scene_id in sorted(os.listdir(custom_scenes)):
+            scene_src = os.path.join(custom_scenes, scene_id)
+            if scene_id.startswith(".") or scene_id == "_source" or not os.path.isdir(scene_src):
                 continue
-            shutil.copy2(path, os.path.join(dst_chars, name))
-            custom_char_files.append(name)
+            scene_dst = os.path.join(dist, "assets", "scenes", scene_id)
+            os.makedirs(scene_dst, exist_ok=True)
+            for name in sorted(os.listdir(scene_src)):
+                path = os.path.join(scene_src, name)
+                if name.startswith(".") or not os.path.isfile(path):
+                    continue
+                shutil.copy2(path, os.path.join(scene_dst, name))
+            custom_scene_ids.append(scene_id)
 
     # ---------- ảnh & video của khách ----------
     photos = copy_photos(os.path.join(src, "assets", "photos"), os.path.join(dist, "assets", "photos"))
@@ -160,6 +188,12 @@ def main():
         print("  video: chua co (game se hien dong 'Wait for your video')")
     if custom_char_files:
         print("  sprite nhan vat rieng (de len mac dinh): " + ", ".join(custom_char_files))
+    if custom_element_files:
+        print("  icon/element rieng (de len mac dinh): " + ", ".join(custom_element_files))
+    if custom_prop_files:
+        print("  prop rieng (de len mac dinh): " + ", ".join(custom_prop_files))
+    if custom_scene_ids:
+        print("  nen parallax rieng (de len mac dinh): " + ", ".join(custom_scene_ids))
     missing = [p for p in re.findall(r'photo: "(assets/photos/[^"]+)"', config) if not os.path.isfile(os.path.join(dist, p))]
     if missing:
         print("  THIEU ANH (config tro toi file khong co): " + ", ".join(missing))
