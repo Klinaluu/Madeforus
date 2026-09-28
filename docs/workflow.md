@@ -26,18 +26,37 @@ Sinh ra `customers/linh-tung/{brief.md, config.js, assets/{photos,video,characte
 
 ## Bước 3 — Đổ tư liệu vào
 
+Mọi thứ của khách chỉ nằm trong `customers/linh-tung/` — **không sửa file gốc của repo**.
+Mẫu tham khảo đầy đủ: `customers/thaobe/` (khách đầu tiên làm theo quy trình này).
+
 - Tải ảnh/video từ Drive của khách → bỏ vào `customers/linh-tung/assets/photos/` và `assets/video/`
+  - Video iPhone đuôi `.MOV` → đổi sang `.mp4` cho mọi trình duyệt phát được (có sẵn trên macOS):
+    `avconvert -s video.MOV -p PresetHighestQuality -o video.mp4 --replace`
 - Điền `customers/linh-tung/brief.md` (bảng mốc, lá thư, ghi chú) — dùng để đối chiếu, không
   ảnh hưởng game
 - Điền `customers/linh-tung/config.js`:
   - `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME`
   - `TEXT.letter`, `TEXT.manLine`, `TEXT.meetText`
-  - `TITLE_PHOTO` — ảnh mở đầu
-  - `MILESTONES[].date/name/photo` — theo đúng thứ tự ảnh khách gửi
-  - `VIDEO_SRC` — tên file trong `assets/video/`
-  - `GIFTS[].label` — đổi tên gọi nếu khách muốn (gói love không đổi hình)
-- (Tuỳ chọn) nếu đã có sprite cá nhân hoá từ quy trình riêng: bỏ vào
-  `customers/linh-tung/assets/characters/`, đúng tên file như `assets/characters/` gốc repo
+  - `TITLE_PHOTO` — ảnh mở đầu (ảnh chụp, hoặc sprite 2 nhân vật nếu có)
+  - `MILESTONES[].date/name/photo` — theo đúng thứ tự ảnh khách gửi. Khách không muốn chữ dưới
+    khung ảnh thì để `date: "", name: ""` (kể cả 3 mốc mưa / hòm thư / quà cuối)
+  - `SHOW_EMPTY_PHOTO_FRAMES = false` — bản khách không treo khung trống
+  - `VIDEO_SRC` — `"assets/video/<tên file>.mp4"` (nhớ có `assets/video/` phía trước)
+  - `MUSIC_SRC` — để mặc định = nhạc nền chung; khách có nhạc riêng thì bỏ vào `assets/audio/`
+  - `GIFTS[].label` / `icon` — tên và hình 5 món quà (giữ nguyên `id`)
+  - `COUPLE_FRAMES` — chỉ có 1 ảnh xe chở đôi thì ghi 1 file; để `[]` = bộ 4 khung mặc định
+- (Tuỳ chọn) ảnh riêng thay ảnh mặc định: bỏ vào đúng thư mục, **đúng tên file** như gốc repo
+  (cùng tên thì thay, tên mới thì thêm):
+
+  | Thư mục của khách | Thay cho | Ví dụ ở bản Thảo Bé |
+  | --- | --- | --- |
+  | `assets/characters/` | nhân vật, xe, icon quà, chìa khoá, ảnh kết | `Man-Walk-Side-01..04`, `Man-Bike-Side-01`, `Couple-Bike-Side-01`, `Item-Key-01` |
+  | `assets/elements/` | vật phẩm, khối, UI trong game | — |
+  | `assets/props/` | vật trang trí / điểm thưởng | `Egg-Gold.png` = hình trái tim thay trứng vàng |
+  | `assets/scenes/<id>/` | nền parallax (`L1.png` xa → `L3.png` gần) + khai báo `SCENE_LAYERS` | — (nền mới đã thành mặc định) |
+
+  - Ảnh gốc/nháp để trong thư mục con `_source/` — script build bỏ qua, không chép vào bản giao
+  - Sprite nhân vật/xe phải **quay mặt sang phải** (game tự lật khi đi sang trái)
 
 ## Bước 4 — Build thử
 
@@ -60,7 +79,10 @@ Mở `dist/linh-tung/index.html` bằng server cục bộ hoặc double-click
 - [ ] Lá thư hiện đủ, không tràn khung
 - [ ] Video chạy được
 - [ ] Màn hình kết thúc
-- [ ] Thử trên điện thoại nằm ngang + iPad (Chrome DevTools responsive hoặc máy thật)
+- [ ] Xe, cây, gai, khối gạch đứng đúng trên vạch kẻ đường (không lơ lửng)
+- [ ] Nhạc nền + tiếng nhảy, tắt/mở bằng nút 🔊
+- [ ] Điện thoại cầm dọc: thấy màn mở đầu + hộp "Add to Home Screen"; cầm ngang: chơi được
+- [ ] Thử trên điện thoại nằm ngang + iPad (Chrome DevTools responsive, iPhone Simulator hoặc máy thật)
 
 ## Bước 6 — Tạo repo & deploy
 
@@ -69,8 +91,14 @@ Mở `dist/linh-tung/index.html` bằng server cục bộ hoặc double-click
 python3 tools/deploy_customer.py linh-tung https://github.com/Klinaluu/linh-tung.git
 ```
 
-**Lần đầu tiên của repo đó**, vào `https://github.com/Klinaluu/linh-tung/settings/pages` →
-Source: *Deploy from a branch* → Branch **main** / **(root)** → Save. Đợi ~1 phút.
+**Lần đầu tiên của repo đó**, bật GitHub Pages (hoặc làm tay trong Settings → Pages →
+*Deploy from a branch* → **main** / **(root)**):
+
+```bash
+gh api -X POST repos/Klinaluu/linh-tung/pages -f "source[branch]=main" -f "source[path]=/"
+```
+
+Đợi ~1 phút.
 
 Link cuối: `https://klinaluu.github.io/linh-tung/`
 
@@ -82,7 +110,8 @@ Gửi 3 thứ:
 2. **File**: `dist/linh-tung.zip` (bản offline giữ làm kỷ niệm, giải nén rồi mở file `.html`)
 3. **Hướng dẫn thêm vào màn hình chính** (game tự hiện khi khách mở bằng điện thoại, nhưng
    nhắc thêm cho chắc):
-   - iPhone/iPad: mở bằng **Safari** → nút Chia sẻ → *Thêm vào MH chính*
+   - iPhone/iPad: mở bằng **Safari** → nút Chia sẻ (iPhone đời mới: nằm trong menu ≡ / •••
+     cạnh thanh địa chỉ) → *Thêm vào MH chính*
    - Android: mở bằng **Chrome** → menu ⋮ → *Cài ứng dụng*
 
 Nhắc khách: link không cần mật khẩu, ai có link đều xem được.
