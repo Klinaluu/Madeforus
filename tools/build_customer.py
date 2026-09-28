@@ -179,8 +179,11 @@ def main():
     zip_path = os.path.join(ROOT, "dist", f"{slug}.zip")
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         for dirpath, dirs, files in os.walk(dist):
-            dirs[:] = [d for d in dirs if d != ".git"]
+            # bỏ .git, file ẩn (.DS_Store…) và thư mục "… 2" do iCloud Drive sinh ra
+            dirs[:] = [d for d in dirs if not d.startswith(".") and not d.endswith(" 2")]
             for f in files:
+                if f.startswith("."):
+                    continue
                 full = os.path.join(dirpath, f)
                 z.write(full, os.path.join(slug, os.path.relpath(full, dist)))
 

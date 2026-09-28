@@ -61,10 +61,17 @@ def main():
     else:
         run(["git", "remote", "set-url", "origin", repo_url], dist)
 
+    # File rác không được lên repo công khai: .DS_Store của Finder, bản "… 2" do iCloud Drive
+    # sinh ra khi thư mục dist bị xoá/tạo lại (dự án nằm trong Documents đồng bộ iCloud)
+    with open(os.path.join(dist, ".gitignore"), "w", encoding="utf-8") as f:
+        f.write(".DS_Store\n* 2/\n")
+
     # repo da co noi dung thi noi tiep lich su, chua co thi commit dau tien
     fetched = run(["git", "fetch", "-q", "origin", "main"], dist, check=False).returncode == 0
     if fetched:
         run(["git", "reset", "-q", "--mixed", "FETCH_HEAD"], dist)
+    # dựng lại chỉ mục theo đúng thư mục hiện tại + .gitignore (gỡ cả file rác lỡ push trước đây)
+    run(["git", "rm", "-r", "-q", "--cached", "--ignore-unmatch", "."], dist)
     run(["git", "add", "-A"], dist)
     status = run(["git", "status", "--porcelain"], dist).stdout.strip()
     if status:
