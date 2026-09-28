@@ -30,9 +30,11 @@ Liên hệ:           …
 
 Khách gửi:
 
-- [ ] 8–12 ảnh kỷ niệm (ảnh gốc, không cần cắt) → `assets/photos/`
-- [ ] 1 ảnh cho màn hình mở đầu → `assets/photos/` (hoặc dùng sprite `Couple-Pose-Happy-01`)
-- [ ] Video 15–60 giây, dưới ~25MB → `assets/video/` (.MOV thì đổi sang .mp4, xem docs/workflow.md)
+- [ ] 10 ảnh polaroid (8–12 đều được, mỗi ảnh = 1 mốc, theo thứ tự thời gian; ảnh gốc, dọc
+      hay ngang đều được) → `assets/photos/`
+- [ ] 1 ảnh màn hình mở đầu, nên ảnh dọc kiểu photobooth → `assets/photos/`
+      (không có thì dùng sprite `Couple-Pose-Happy-01`)
+- [ ] 1 video 15–60 giây, dưới ~25MB → `assets/video/` (.MOV thì đổi sang .mp4, xem docs/workflow.md)
 - [ ] Lá thư (dạng chữ)
 - [ ] Tên game + slogan (không có thì giữ mặc định)
 - [ ] Tên 5 món quà (+ ảnh món quà nếu muốn icon riêng)
