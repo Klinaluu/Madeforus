@@ -47,6 +47,11 @@ export const TITLE_PHOTO = "";
 // false = mốc nào chưa có ảnh thì không treo khung
 export const SHOW_EMPTY_PHOTO_FRAMES = true;
 
+// Ảnh xe chở đôi. Để [] = dùng bộ 4 khung chạy xe mặc định. Chỉ có 1 ảnh thì ghi 1 file —
+// game tự thêm hiệu ứng chạy (rung máy, khói, bụi, vệt gió) nên xe vẫn trông đang chạy.
+//   export const COUPLE_FRAMES = ["assets/characters/Couple-Bike-Side-01.png"];
+export const COUPLE_FRAMES = [];
+
 // ---------- 5 món quà của chặng solo ----------
 // icon: để trống ("") thì game tự vẽ hình thay thế.
 export const GIFTS = [
