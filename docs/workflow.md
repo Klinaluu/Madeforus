@@ -1,20 +1,86 @@
 # Quy trình mỗi khi có khách mới (gói Madeforus.love)
 
-Đây là trang duy nhất cần mở khi có khách mới — các bước theo đúng thứ tự làm.
-Phần tư vấn/báo giá khách đã lưu ở Notion, không lặp lại ở đây. Cách mở khung chat mới
-và thao tác với Claude Code: [new-customer-chat.md](new-customer-chat.md).
+Trang duy nhất cần mở khi có khách mới — làm theo đúng thứ tự bên dưới.
+**Bản mẫu:** `customers/thaobe/` (khách đầu tiên làm trọn quy trình này) — khi phân vân
+một mục trong `config.js` hay tên file sprite, mở thư mục đó ra xem.
+Phần tư vấn/báo giá đã lưu ở Notion. Cách mở khung chat mới và thao tác với Claude Code:
+[new-customer-chat.md](new-customer-chat.md).
 
-## Bước 0 — Nhận đơn
+Nguyên tắc: **không sửa file gốc của repo cho một khách.** Mọi thứ của khách chỉ nằm trong
+`customers/<slug>/` (không lên GitHub). Code dùng chung chỉ sửa ở khung chat gốc.
 
-Khách chọn gói love trên Notion, gửi tư liệu vào 1 folder Google Drive theo checklist đã
-lưu ngoài (ảnh, video, lá thư, tên game/slogan, ngày kỷ niệm).
+---
+
+## Tổng hợp: cái gì thay cho mỗi khách mới
+
+### A. Khách gửi
+
+| # | Thứ | Quy cách | Vào đâu |
+| - | --- | --- | --- |
+| 1 | 10 ảnh polaroid (8–12 cũng được) | Ảnh gốc, dọc hay ngang đều được, xếp theo thứ tự thời gian | `assets/photos/` |
+| 2 | 1 ảnh màn hình mở đầu (tuỳ chọn) | Nên ảnh dọc kiểu photobooth. Không có → dùng sprite 2 người ôm nhau | `assets/photos/` |
+| 3 | 1 video | 15–60 giây, dưới ~25MB, nên quay ngang. `.MOV` cũng được (đổi sang `.mp4` ở Bước 3) | `assets/video/` |
+| 4 | Lá thư | Dạng chữ, giữ nguyên văn khách viết | `TEXT.letter` |
+| 5 | Tên 5 món quà | + ảnh món quà nếu muốn icon riêng | `GIFTS` |
+| 6 | Ảnh 2 người + ảnh chiếc xe máy | Chân dung + toàn thân, trang phục muốn vẽ | làm mẫu vẽ sprite |
+| 7 | Tên game + slogan (tuỳ chọn) | Không có → giữ "MADE FOR US / Our love journey" | `GAME_TITLE`, `GAME_SUBTITLE` |
+| 8 | Có muốn chữ dưới khung ảnh không | Có → ngày + tên từng mốc. Không → để trống như bản Thảo Bé | `MILESTONES[].date/name` |
+
+### B. Bạn tạo (vẽ theo mặt khách)
+
+Quy cách chung: **PNG nền trong suốt · nhân vật/xe quay mặt sang PHẢI · cắt sát, đáy ảnh
+chính là bàn chân / bánh xe** (game neo đáy ảnh xuống mặt đường — thừa khoảng trống ở đáy
+thì nhân vật sẽ lơ lửng) · cao khoảng 480–800px · đặt **đúng tên file** vào `assets/characters/`.
+
+| # | Tên file | Dùng ở đâu | Cỡ ở bản Thảo Bé |
+| - | --- | --- | --- |
+| 1–4 | `Man-Walk-Side-01` … `-04` | Anh đi bộ đoạn mở màn — 4 khung bước chân nối tiếp | 206×480 |
+| 5 | `Bike-Idle-01` | Xe dựng chờ ("MY BIKE"), chưa có người | 453×556 |
+| 6 | `Man-Bike-Side-01` | Anh chạy xe một mình (chặng solo) | 738×763 |
+| 7 | `Woman-Stand-Side-01` | Em đứng chờ ở điểm hẹn | 174×521 |
+| 8–9 | `Woman-Cheer-01`, `-02` | Em nhảy mừng khi gặp (2 khung) | 227×574 |
+| 10 | `Couple-Pose-Happy-01` | 2 người ôm nhau — màn bầu trời sao (+ làm ảnh mở đầu nếu khách không gửi) | 326×578 |
+| 11 | `Couple-Bike-Side-01` | 2 người chở nhau. 1 ảnh là đủ (game tự thêm khói, bụi, vệt gió) — khai báo `COUPLE_FRAMES` | 725×729 |
+| 12 | `Portrait-Woman-01` | Ô chân dung trên thanh HUD, gần vuông, cắt mặt | 204×222 |
+| 13 | `Scene-Terrace-Sitting-Iso-01` | Tranh minh hoạ trong lá thư | 356×587 |
+| 14 | `Scene-Terrace-Bike-Iso-01` | Tranh minh hoạ màn kết thúc | 450×582 |
+| + | icon 5 món quà (tuỳ chọn) | Tên tuỳ ý, vd `Item-Coffee-01.png`, khai báo ở `GIFTS[].icon` | 80×116 |
+
+Ảnh gốc khách gửi và bản nháp để trong `assets/characters/_source/` — build bỏ qua.
+
+### C. Cố định — không cần làm gì
+
+Nền Hồ Gươm ban ngày + hoàng hôn (3 lớp), đường, gạch, gai, cây cỏ, mây, trái tim điểm
+thưởng, chìa khoá, mũ bảo hiểm, chiếc ô, hòm quà, thanh HUD, nhạc nền, hiệu ứng âm thanh,
+hướng dẫn cài app trên điện thoại. (Muốn thay cho riêng một khách: xem cuối Bước 5.)
+
+---
+
+## Bước 0 — Nhận đơn & xin tư liệu
+
+Khách chọn gói trên Notion. Gửi khách tin nhắn dưới đây (copy nguyên), khách gửi tư liệu
+vào 1 folder Google Drive:
+
+```
+Để làm game cho hai bạn, bạn gửi mình giúp vào 1 folder Google Drive nhé:
+
+1. 10 ảnh kỷ niệm của hai bạn (8–12 ảnh cũng được), xếp theo thứ tự thời gian.
+   Ảnh gốc là được, không cần chỉnh.
+2. 1 video 15–60 giây (dưới 25MB), nên quay ngang.
+3. Lá thư muốn gửi (gõ chữ là được).
+4. Tên 5 món quà nhân vật sẽ nhặt trong game (vd: cà phê, máy ảnh, con mèo…).
+   Có ảnh món quà thì gửi kèm.
+5. Vài ảnh chân dung + toàn thân của hai bạn, và ảnh chiếc xe máy — để mình vẽ nhân vật.
+6. (Tuỳ chọn) 1 ảnh dọc cho màn hình mở đầu, tên game/câu slogan riêng,
+   và ngày + tên cho từng ảnh nếu muốn hiện chữ dưới khung ảnh.
+```
 
 ## Bước 1 — Mở khung chat MỚI cho khách này
 
-**Không làm trong khung chat này hay khung khách trước.** Mở khung mới, dán prompt trong
+**Không làm trong khung chat gốc hay khung khách trước.** Mở khung mới, dán prompt trong
 [new-customer-chat.md](new-customer-chat.md), đổi `<slug>` thành tên khách viết liền không
-dấu (vd `linh-tung`). Lý do: dữ liệu khách sống trên đĩa ở `customers/<slug>/`, không sống
-trong chat — khung nào cũng đọc lại được, nên không cần dồn hết vào một chỗ.
+dấu (vd `linh-tung`). Dữ liệu khách sống trên đĩa ở `customers/<slug>/`, không sống trong
+chat — khung nào cũng đọc lại được.
 
 ## Bước 2 — Tạo khung sườn
 
@@ -22,101 +88,111 @@ trong chat — khung nào cũng đọc lại được, nên không cần dồn h
 python3 tools/new_customer.py linh-tung
 ```
 
-Sinh ra `customers/linh-tung/{brief.md, config.js, assets/{photos,video,characters}}`.
+Sinh ra `customers/linh-tung/` gồm `brief.md` (checklist tư liệu A + B ở trên),
+`config.js` (bản sao cấu hình, đã đặt sẵn chế độ bản khách) và các thư mục `assets/`.
 
-## Bước 3 — Đổ tư liệu vào
+## Bước 3 — Đổ tư liệu khách vào
 
-Mọi thứ của khách chỉ nằm trong `customers/linh-tung/` — **không sửa file gốc của repo**.
-Mẫu tham khảo đầy đủ: `customers/thaobe/` (khách đầu tiên làm theo quy trình này).
+- Ảnh → `customers/linh-tung/assets/photos/` (script tự thu nhỏ, tự đổi HEIC của iPhone)
+- Video → `assets/video/`. Đuôi `.MOV` thì đổi sang `.mp4` (có sẵn trên macOS), xong xoá `.MOV`:
 
-- Tải ảnh/video từ Drive của khách → bỏ vào `customers/linh-tung/assets/photos/` và `assets/video/`
-  - Video iPhone đuôi `.MOV` → đổi sang `.mp4` cho mọi trình duyệt phát được (có sẵn trên macOS):
-    `avconvert -s video.MOV -p PresetHighestQuality -o video.mp4 --replace`
-- Điền `customers/linh-tung/brief.md` (bảng mốc, lá thư, ghi chú) — dùng để đối chiếu, không
-  ảnh hưởng game
-- Điền `customers/linh-tung/config.js`:
-  - `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME`
-  - `TEXT.letter`, `TEXT.manLine`, `TEXT.meetText`
-  - `TITLE_PHOTO` — ảnh mở đầu (ảnh chụp, hoặc sprite 2 nhân vật nếu có)
-  - `MILESTONES[].date/name/photo` — theo đúng thứ tự ảnh khách gửi. Khách không muốn chữ dưới
-    khung ảnh thì để `date: "", name: ""` (kể cả 3 mốc mưa / hòm thư / quà cuối)
-  - `SHOW_EMPTY_PHOTO_FRAMES = false` — bản khách không treo khung trống
-  - `VIDEO_SRC` — `"assets/video/<tên file>.mp4"` (nhớ có `assets/video/` phía trước)
-  - `MUSIC_SRC` — để mặc định = nhạc nền chung; khách có nhạc riêng thì bỏ vào `assets/audio/`
-  - `GIFTS[].label` / `icon` — tên và hình 5 món quà (giữ nguyên `id`)
-  - `COUPLE_FRAMES` — chỉ có 1 ảnh xe chở đôi thì ghi 1 file; để `[]` = bộ 4 khung mặc định
-- (Tuỳ chọn) ảnh riêng thay ảnh mặc định: bỏ vào đúng thư mục, **đúng tên file** như gốc repo
-  (cùng tên thì thay, tên mới thì thêm):
+  ```bash
+  cd customers/linh-tung/assets/video
+  avconvert -s video.MOV -p PresetHighestQuality -o video.mp4 --replace
+  ```
 
-  | Thư mục của khách | Thay cho | Ví dụ ở bản Thảo Bé |
-  | --- | --- | --- |
-  | `assets/characters/` | nhân vật, xe, icon quà, ảnh minh hoạ | `Man-Walk-Side-01..04`, `Man-Bike-Side-01`, `Couple-Bike-Side-01` |
-  | `assets/elements/` | vật phẩm, khối, UI trong game | — |
-  | `assets/props/` | vật trang trí / điểm thưởng | — |
-  | `assets/scenes/<id>/` | nền parallax (`L1.png` xa → `L3.png` gần) + khai báo `SCENE_LAYERS` | — (nền mới đã thành mặc định) |
+- Điền `brief.md`: bảng mốc (thứ tự ảnh), lá thư, ghi chú — để đối chiếu, không ảnh hưởng game.
 
-  - Ảnh gốc/nháp để trong thư mục con `_source/` — script build bỏ qua, không chép vào bản giao
-  - Sprite nhân vật/xe phải **quay mặt sang phải** (game tự lật khi đi sang trái)
+## Bước 4 — Vẽ sprite (phần B)
 
-## Bước 4 — Build thử
+Làm theo quy trình vẽ riêng, xuất đủ 14 file ở bảng B, bỏ vào `assets/characters/`.
+Kiểm tra từng file trước khi build: quay mặt sang phải, nền trong suốt, đáy ảnh sát chân /
+bánh xe.
+
+## Bước 5 — Điền `config.js`
+
+| Mục | Điền gì |
+| --- | --- |
+| `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` | Tên game / slogan (không có thì giữ mặc định) |
+| `TEXT.letter` | Lá thư (bao ngoài bằng dấu `` ` `` để viết nhiều dòng, như bản Thảo Bé) |
+| `TEXT.manLine`, `TEXT.meetText` | Câu nói khi gặp / dòng chữ màn bầu trời sao (giữ mặc định nếu khách không đổi) |
+| `TITLE_PHOTO` | `"assets/photos/<ảnh mở đầu>"`, hoặc `"assets/characters/Couple-Pose-Happy-01.png"` |
+| `VIDEO_SRC` | `"assets/video/video.mp4"` — nhớ có `assets/video/` phía trước |
+| `MUSIC_SRC` | Giữ mặc định (nhạc chung). Khách có nhạc riêng → bỏ vào `assets/audio/` rồi trỏ tới |
+| `SHOW_EMPTY_PHOTO_FRAMES` | `false` (đã đặt sẵn) |
+| `COUPLE_FRAMES` | `["assets/characters/Couple-Bike-Side-01.png"]` nếu chỉ vẽ 1 ảnh xe chở đôi |
+| `GIFTS` | Giữ nguyên `id`, đổi `label` (tên món quà) và `icon` (đường dẫn icon riêng nếu có) |
+| `MILESTONES` | 1 dòng / ảnh theo thứ tự thời gian: `photo`, `date`, `name` (để `""` nếu không muốn chữ). Ba mốc cuối (mưa / hòm thư / quà) giữ nguyên, chỉ xoá chữ mẫu `DD.MM` / tên mẫu |
+| `SCENE_LAYERS` | Để `{}` = nền mặc định |
+
+**Thay ảnh mặc định cho riêng khách (hiếm khi cần):** bỏ file **cùng tên** với file ở gốc
+repo vào đúng thư mục của khách — cùng tên thì thay, tên mới thì thêm:
+
+| Thư mục của khách | Thay cho |
+| --- | --- |
+| `assets/characters/` | nhân vật, xe, icon, tranh minh hoạ (phần B) |
+| `assets/elements/` | vật phẩm, khối, đường trong game |
+| `assets/props/` | cây cỏ, điểm thưởng |
+| `assets/scenes/<id>/` | nền parallax (`L1.png` xa → `L3.png` gần) + khai báo `SCENE_LAYERS` |
+
+## Bước 6 — Build thử
 
 ```bash
 python3 tools/build_customer.py linh-tung
 ```
 
 Đọc kỹ phần in ra cuối: **ảnh thiếu** (config trỏ tới file không có), **ảnh thừa** (có ảnh
-nhưng config chưa dùng), **video nặng** (>25MB — nên nén lại trước khi giao).
+nhưng config chưa dùng), **video nặng** (>25MB — nên nén lại), danh sách sprite riêng đã
+thay (phải đủ 14 file phần B).
 
-## Bước 5 — Test trước khi giao
+## Bước 7 — Test trước khi giao
 
-Mở `dist/linh-tung/index.html` bằng server cục bộ hoặc double-click
-`dist/linh-tung/Linh Tung.html`. Checklist (cũng có trong `brief.md`):
+Chạy thử bằng server cục bộ (`python3 -m http.server` trong `dist/linh-tung/`), ở khung
+điện thoại ngang (Chrome DevTools / iPhone Simulator) và desktop. Checklist (cũng có trong
+`brief.md`):
 
-- [ ] Màn hình tiêu đề: ảnh, tên game, slogan đúng
-- [ ] Một đoạn solo: nhặt quà, gai, bục chạy được
-- [ ] Đi đôi: khung ảnh đúng thứ tự, chú thích đúng ngày (kể cả dấu tiếng Việt)
+- [ ] Màn mở đầu: ảnh, tên game, slogan đúng; nút Start + "Add to Home Screen" thấy rõ
+- [ ] Đi bộ: 4 khung bước chân mượt, nhặt chìa khoá + mũ, lên xe
+- [ ] Solo: nhặt đủ 5 quà (icon + tên đúng), gai, bục, boss "DOUBT"
+- [ ] Gặp nhau: em đứng chờ → nhảy mừng → màn bầu trời sao
+- [ ] Đi đôi: xe chở đôi có hiệu ứng chạy, ảnh polaroid đúng thứ tự, chữ dưới ảnh đúng ý khách
 - [ ] Đoạn mưa: nhặt được ô, tạnh mưa
-- [ ] Lá thư hiện đủ, không tràn khung
-- [ ] Video chạy được
-- [ ] Màn hình kết thúc
-- [ ] Xe, cây, gai, khối gạch đứng đúng trên vạch kẻ đường (không lơ lửng)
+- [ ] Lá thư hiện đủ chữ (kể cả dấu tiếng Việt), tranh minh hoạ đúng
+- [ ] Video chạy được, nhạc nền tự tắt khi xem video
+- [ ] Màn kết thúc: tranh đúng, 3 nút hiện đủ
+- [ ] Nhân vật, xe, gai, khối gạch đứng đúng trên vạch kẻ đường (không lơ lửng)
 - [ ] Nhạc nền + tiếng nhảy, tắt/mở bằng nút 🔊
-- [ ] Điện thoại cầm dọc: thấy màn mở đầu + hộp "Add to Home Screen"; cầm ngang: chơi được
-- [ ] Thử trên điện thoại nằm ngang + iPad (Chrome DevTools responsive, iPhone Simulator hoặc máy thật)
+- [ ] Điện thoại cầm dọc: thấy màn mở đầu + hộp hướng dẫn; cầm ngang: chơi được
 
-## Bước 6 — Tạo repo & deploy
+## Bước 8 — Tạo repo & deploy
 
 ```bash
-# 1 lần trên github.com: tạo repo TRỐNG, public, tên = slug, vd Klinaluu/linh-tung
+gh repo create Klinaluu/linh-tung --public          # repo trống, tên = slug
 python3 tools/deploy_customer.py linh-tung https://github.com/Klinaluu/linh-tung.git
-```
-
-**Lần đầu tiên của repo đó**, bật GitHub Pages (hoặc làm tay trong Settings → Pages →
-*Deploy from a branch* → **main** / **(root)**):
-
-```bash
 gh api -X POST repos/Klinaluu/linh-tung/pages -f "source[branch]=main" -f "source[path]=/"
 ```
 
-Đợi ~1 phút.
+Lệnh `gh api` (bật GitHub Pages) chỉ chạy **lần đầu** của repo đó. Đợi ~1 phút rồi mở
+`https://klinaluu.github.io/linh-tung/`. Lần sửa sau chỉ cần chạy lại `deploy_customer.py`.
 
-Link cuối: `https://klinaluu.github.io/linh-tung/`
+## Bước 9 — Giao khách
 
-## Bước 7 — Giao khách
+Gửi 2 thứ: tin nhắn dưới đây (đổi slug) và file `dist/linh-tung.zip` (bản offline giữ làm
+kỷ niệm — giải nén rồi mở file `.html`).
 
-Gửi 3 thứ:
+```
+Link game của hai bạn: https://klinaluu.github.io/linh-tung/
+Mở bằng điện thoại và xoay ngang để chơi nhé.
 
-1. **Link**: `https://klinaluu.github.io/linh-tung/`
-2. **File**: `dist/linh-tung.zip` (bản offline giữ làm kỷ niệm, giải nén rồi mở file `.html`)
-3. **Hướng dẫn thêm vào màn hình chính** (game tự hiện khi khách mở bằng điện thoại, nhưng
-   nhắc thêm cho chắc):
-   - iPhone/iPad: mở bằng **Safari** → nút Chia sẻ (iPhone đời mới: nằm trong menu ≡ / •••
-     cạnh thanh địa chỉ) → *Thêm vào MH chính*
-   - Android: mở bằng **Chrome** → menu ⋮ → *Cài ứng dụng*
+Muốn chơi toàn màn hình như một app:
+- iPhone: mở link bằng Safari → bấm nút Chia sẻ (iPhone đời mới: nằm trong menu ≡
+  cạnh thanh địa chỉ) → "Thêm vào MH chính"
+- Android: mở bằng Chrome → menu ⋮ → "Cài đặt ứng dụng" / "Thêm vào màn hình chính"
 
-Nhắc khách: link không cần mật khẩu, ai có link đều xem được.
+Link không cần mật khẩu, ai có link đều xem được.
+```
 
-## Bước 8 — Sau khi giao
+## Bước 10 — Sau khi giao
 
 ```bash
 cd dist/linh-tung
@@ -124,13 +200,18 @@ git tag delivery/linh-tung-2026-10-05
 git push origin delivery/linh-tung-2026-10-05
 ```
 
-Giữ nguyên `customers/linh-tung/` trên máy (không xoá) — khách xin sửa vài tuần/tháng sau
-chỉ cần mở khung chat mới, đọc lại đúng thư mục này là đủ ngữ cảnh, không cần chat cũ.
+Điền mục "Bàn giao" trong `brief.md`. Giữ nguyên `customers/linh-tung/` trên máy (không
+xoá) — khách xin sửa sau này chỉ cần mở khung chat mới, đọc lại đúng thư mục này.
 
 ---
 
+## Khi khách xin sửa
+
+Mở khung chat mới (prompt trong [new-customer-chat.md](new-customer-chat.md)), sửa trong
+`customers/<slug>/`, rồi chạy lại Bước 6 → 8 (build + deploy). Link giữ nguyên.
+
 ## Khi engine có bug hoặc cải tiến chung
 
-Việc đó làm ở **khung chat gốc của repo `madeforus`** (không phải khung khách), vì ảnh
-hưởng mọi khách. Sau khi sửa, các bản đã giao muốn nhận cải tiến thì chạy lại
-Bước 4 + Bước 6 cho từng khách (build lại + deploy lại), không cần làm gì thêm ở phía khách.
+Làm ở **khung chat gốc của repo** (không phải khung khách), vì ảnh hưởng mọi khách. Sau khi
+sửa, bản đã giao muốn nhận cải tiến thì chạy lại Bước 6 + 8 cho từng khách. Nếu cải tiến
+thêm mục mới vào `config.js`, script build tự điền giá trị mặc định cho config khách cũ.

@@ -76,15 +76,17 @@ Ba mốc cuối là kịch bản cố định, không cần ảnh:
 
 ## Trước khi giao — kiểm tra
 
-- [ ] Màn hình tiêu đề (ảnh, tên game, slogan)
-- [ ] Một đoạn solo: nhặt quà, gai, bục
-- [ ] Đoạn đi đôi: các khung ảnh hiện đúng thứ tự, chú thích đúng ngày
+Chi tiết từng mục: docs/workflow.md, Bước 7.
+
+- [ ] Màn mở đầu: ảnh, tên game, slogan, nút Start + "Add to Home Screen"
+- [ ] Đi bộ → lên xe → solo: nhặt đủ 5 quà (icon + tên đúng), boss "DOUBT"
+- [ ] Gặp nhau: em đứng chờ → nhảy mừng → màn bầu trời sao
+- [ ] Đi đôi: ảnh polaroid đúng thứ tự, chữ dưới ảnh đúng ý khách
 - [ ] Đoạn mưa: nhặt được ô, tạnh mưa
-- [ ] Lá thư hiện đủ, không tràn
-- [ ] Video chạy được (thử cả trên điện thoại)
-- [ ] Màn hình kết thúc
-- [ ] Thử trên điện thoại nằm ngang + iPad
-- [ ] Đã gửi: link + file zip + hướng dẫn thêm vào màn hình chính
+- [ ] Lá thư hiện đủ chữ, video chạy được, màn kết thúc đủ 3 nút
+- [ ] Nhân vật / xe đứng đúng trên vạch kẻ đường, nhạc + tiếng nhảy
+- [ ] Điện thoại cầm dọc + ngang, iPad
+- [ ] Đã gửi: link + file zip + tin nhắn hướng dẫn (docs/workflow.md, Bước 9)
 
 ## Bàn giao
 

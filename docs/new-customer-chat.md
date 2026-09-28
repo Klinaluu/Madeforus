@@ -22,14 +22,15 @@ Nên khung chat mới **không cần "nhớ" gì từ khung cũ** — chỉ cầ
 | 3 | Đặt tên phiên | Đổi tên chat thành tên khách, vd "Made for Us — Linh Tùng", để lần sau tìm lại đúng chat khi khách quay lại xin sửa |
 | 4 | Dán prompt mở đầu | Copy khối prompt ở mục dưới, đổi `<slug>`, dán vào ô chat, Enter |
 | 5 | Cho phép chạy lệnh | Claude sẽ chạy `tools/new_customer.py`. Nếu app hỏi "cho phép chạy lệnh này?", bấm cho phép |
-| 6 | Gửi tư liệu khách | Kéo-thả ảnh/video thẳng vào ô chat, hoặc dán link Google Drive để Claude tải xuống; kèm ngày + tên từng mốc, lá thư, tên game/slogan |
+| 6 | Gửi tư liệu khách | Kéo-thả ảnh/video thẳng vào `customers/<slug>/assets/` (hoặc vào ô chat); kèm lá thư, tên 5 món quà, thứ tự ảnh, có muốn chữ dưới ảnh không (danh sách A trong `docs/workflow.md`) |
+| 6b | Gửi sprite đã vẽ | Bỏ 14 file sprite (danh sách B trong `docs/workflow.md`) vào `customers/<slug>/assets/characters/`, ảnh gốc/nháp vào `characters/_source/` |
 | 7 | Yêu cầu điền config | Nói rõ nội dung (không cần biết cú pháp) — Claude tự sửa `customers/<slug>/config.js` |
 | 8 | Yêu cầu build thử | Gõ "build thử cho tôi xem" — Claude chạy `tools/build_customer.py`, đọc phần cảnh báo nó in ra (ảnh thiếu/thừa, video nặng) |
 | 9 | Xem trước kết quả | Gõ "cho xem thử trên trình duyệt" — Claude mở bằng Browser pane hoặc chỉ đường mở file cho bạn |
 | 10 | Duyệt & sửa | Xem checklist ở `docs/workflow.md` Bước 5, phản hồi trực tiếp trong chat (vd "ảnh mốc 3 để mờ quá"), Claude sửa lại và build lại |
-| 11 | Deploy | Gõ "deploy lên `https://github.com/Klinaluu/<slug>.git`" (tạo sẵn repo trống trên GitHub trước) — Claude chạy `tools/deploy_customer.py` |
-| 12 | Bật GitHub Pages (chỉ lần đầu của repo đó) | Claude sẽ nhắc; bạn vào Settings → Pages → Branch main / (root) → Save |
-| 13 | Nhận link & file giao khách | Claude báo link + đường dẫn `dist/<slug>.zip`; gửi cả hai cho khách |
+| 11 | Deploy | Gõ "tạo repo và deploy cho khách <slug>" — Claude chạy `gh repo create`, `tools/deploy_customer.py` và bật GitHub Pages (Bước 8 trong `docs/workflow.md`). Cho phép khi app hỏi |
+| 12 | Kiểm tra link | Claude mở link thật để xác nhận trang đã sống (lần đầu đợi ~1 phút) |
+| 13 | Nhận link & file giao khách | Claude báo link + đường dẫn `dist/<slug>.zip`; gửi khách kèm tin nhắn mẫu ở Bước 9 `docs/workflow.md` |
 | 14 | Kết thúc | Không cần đóng chat thủ công — cứ để đó hoặc archive; dữ liệu đã nằm ở `customers/<slug>/` trên đĩa, không mất khi đóng chat |
 
 ## Prompt mở đầu (copy-paste)
@@ -39,13 +40,15 @@ Dán nguyên văn vào khung chat mới, đổi `<slug>`:
 ```
 Làm bản Made for Us cho khách <slug>.
 
-Đọc trước: README.md, docs/workflow.md.
+Đọc trước: README.md, docs/workflow.md. Bản mẫu để làm theo: customers/thaobe/
+(xem config.js và brief.md của khách đó).
 Đừng đụng js/engine.js, js/main.js, js/assets.js, js/levels.js hay bất cứ file dùng chung
 nào khác trừ khi tôi nói rõ là sửa lỗi chung (việc đó làm ở khung chat gốc, không phải đây).
 
 python3 tools/new_customer.py <slug>   # nếu customers/<slug>/ chưa có
-Tôi sẽ gửi ảnh + thông tin qua chat này. Việc của bạn: điền customers/<slug>/config.js,
-bỏ ảnh vào customers/<slug>/assets/photos, video vào assets/video, rồi:
+Tôi sẽ gửi ảnh, video, sprite + thông tin qua chat này. Việc của bạn: điền
+customers/<slug>/config.js theo Bước 5 của docs/workflow.md, bỏ ảnh vào assets/photos,
+video vào assets/video (đổi .MOV sang .mp4), sprite vào assets/characters, rồi:
 
 python3 tools/build_customer.py <slug>
 
