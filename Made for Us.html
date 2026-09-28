@@ -36,7 +36,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="on-title-screen">
 <div id="app">
 
   <!-- ============ TITLE ============ -->
@@ -48,8 +48,8 @@
         <p id="title-subtitle" class="game-subtitle">Our love journey</p>
         <div id="title-photo-frame" class="title-hero frame">(insert pictures here)</div>
         <button id="btn-start" class="pixel-btn primary">▶ Start the journey</button>
-        <div class="title-tip"><img class="tip-icon" src="assets/characters/Item-Key-Helmet-01.png" alt="">◀ ▶ move · ▲ jump · ▲▲ double jump · F full screen</div>
-        <div class="title-tip">🎮 gamepad: stick / D-pad to move · A to jump</div>
+        <div class="title-tip kb-only"><img class="tip-icon" src="assets/characters/Item-Key-Helmet-01.png" alt="">◀ ▶ move · ▲ jump · ▲▲ double jump · F full screen</div>
+        <div class="title-tip kb-only">🎮 gamepad: stick / D-pad to move · A to jump</div>
         <div id="title-rotate-tip" class="title-tip tip-plain touch-only">⟳ Hold your device sideways to play</div>
         <button id="title-install-tip" class="title-tip tip-link touch-only">+ Add to Home Screen — play full screen</button>
       </div>
@@ -120,12 +120,12 @@
       <div class="win-bar"><span>Completed</span><i class="win-x">✕</i></div>
       <div class="win-body ending-content">
         <img class="ending-couple" src="assets/characters/Scene-Terrace-Bike-Iso-01.png" alt="">
-        <button id="btn-play-again" class="pixel-btn primary">▶ Play again</button>
-        <div class="ending-sub">— or watch again —</div>
         <div class="ending-row">
-          <button id="btn-ending-letter" class="pixel-btn">💌 Love letter</button>
-          <button id="btn-ending-video" class="pixel-btn">🎬 Little movie</button>
+          <button id="btn-ending-letter" class="pixel-btn primary">💌 Love letter</button>
+          <button id="btn-ending-video" class="pixel-btn primary">🎬 Little movie</button>
         </div>
+        <div class="ending-sub">— or ride it again —</div>
+        <button id="btn-play-again" class="pixel-btn">▶ Play again</button>
       </div>
     </div>
   </section>
@@ -135,7 +135,7 @@
 <button id="btn-fullscreen" class="sound-btn fs-btn" aria-label="Full screen">⛶</button>
 <button id="btn-sound" class="sound-btn" aria-label="Sound on">🔊</button>
 
-<!-- nhắc xoay ngang khi cầm iPad dọc -->
+<!-- nhắc xoay ngang khi cầm điện thoại / máy tính bảng dọc (trừ màn mở đầu) -->
 <div id="rotate-overlay">
   <div class="win small">
     <div class="win-bar dark"><span>ROTATE_DEVICE</span><i class="win-x">✕</i></div>
@@ -252,11 +252,19 @@ const TEXT = {
 // Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.
 // Video: đặt file .mp4 vào assets/video/ rồi điền tên vào đây (nên dưới 15MB).
 const VIDEO_SRC = "";
+// Nhạc nền: đặt file .mp3 vào assets/audio/ rồi điền tên vào đây. Để "" thì không có nhạc nền
+// (vẫn còn đủ hiệu ứng nhảy/bấm nút). Tự tắt khi phát video, tự nhỏ lại một chút mỗi lần nhảy.
+const MUSIC_SRC = "assets/audio/bgm.mp3";
 // Ảnh ở màn hình mở đầu (ảnh dọc kiểu photobooth rất hợp). Để "" thì hiện khung trống.
 const TITLE_PHOTO = "";
 // true  = luôn vẽ khung ảnh trống kèm chữ hướng dẫn (dùng cho bản demo)
 // false = mốc nào chưa có ảnh thì không treo khung
 const SHOW_EMPTY_PHOTO_FRAMES = true;
+
+// Ảnh xe chở đôi. Để [] = dùng bộ 4 khung chạy xe mặc định. Chỉ có 1 ảnh thì ghi 1 file —
+// game tự thêm hiệu ứng chạy (rung máy, khói, bụi, vệt gió) nên xe vẫn trông đang chạy.
+//   export const COUPLE_FRAMES = ["assets/characters/Couple-Bike-Side-01.png"];
+const COUPLE_FRAMES = [];
 
 // ---------- 5 món quà của chặng solo ----------
 // icon: để trống ("") thì game tự vẽ hình thay thế.
@@ -297,7 +305,15 @@ const MILESTONES = [
   { date: "DD.MM", name: "Final stop", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
 ];
 
-return { GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES, GIFTS, MILESTONES };
+// ---------- nền parallax riêng (tuỳ chọn) ----------
+// Để trống = dùng bộ nền 3 lớp mặc định (Hồ Gươm ban ngày + hoàng hôn, xem js/assets.js).
+// Muốn nền riêng: bỏ ảnh vào customers/<slug>/assets/scenes/<id>/ rồi khai báo lớp (xa → gần)
+// + tốc độ trôi (0 = đứng yên, 1 = trôi cùng đường). id: "ho-guom" (đi bộ, solo, gặp nhau),
+// "ho-tay" (đi đôi). Ví dụ:
+//   "ho-guom": { layers: ["L1.png", "L2.png", "L3.png"], speeds: [0.05, 0.16, 0.4] },
+const SCENE_LAYERS = {};
+
+return { GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, VIDEO_SRC, MUSIC_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES, COUPLE_FRAMES, GIFTS, MILESTONES, SCENE_LAYERS };
 })();
 
 const __mod_assets = (() => {
@@ -315,6 +331,7 @@ const SCENE = "assets/scenes/";
 // ---------- sprite & giao diện ----------
 const IMG = {
   playerSolo: CHAR + "Man-Bike-Side-01.png",
+  bikeIdle: CHAR + "Bike-Idle-01.png",
   walkFrames: [1, 2, 3, 4].map((n) => `${CHAR}Man-Walk-Side-0${n}.png`),
   key: CHAR + "Item-Key-01.png",
   helmet: CHAR + "Item-Helmet-01.png",
@@ -373,20 +390,25 @@ const PROP_SETS = {
   city: [["grass", 26], ["flowerBlue", 28], ["bushSmall", 34], ["sprout", 26], ["flowers", 28]],
 };
 
-// ---------- nền parallax 2 lớp ----------
-// L1 = trời + cảnh xa (ảnh đục), L2 = cảnh gần (nền trong suốt). Ảnh 3840×1080,
-// mặt đất của cảnh nằm ở y = 380 trong hệ quy chiếu cao 540 → chìm 160px dưới mặt đường.
-const scene = (id) => [`${SCENE}${id}/L1.png`, `${SCENE}${id}/L2.png`];
+// ---------- nền parallax 3 lớp (mặc định cho demo và mọi khách) ----------
+// L1 = trời + cảnh xa (ảnh đục), L2 = cảnh giữa, L3 = cảnh gần (nền trong suốt).
+// Mặt đất của cảnh nằm ở y = 380 trong hệ quy chiếu cao 540 → chìm 160px dưới mặt đường.
+// Khách muốn nền riêng: khai báo SCENE_LAYERS trong config.js (xem ghi chú ở đó).
+const scene = (id) => [1, 2, 3].map((n) => `${SCENE}${id}/L${n}.png`);
 const SCENES = {
-  "ho-guom": scene("ho-guom"), // ban ngày — chặng solo
+  "ho-guom": scene("ho-guom"), // Hồ Gươm ban ngày — đi bộ, solo, gặp nhau
   "ho-tay": scene("ho-tay"), // hoàng hôn — chặng đi đôi
 };
 const SCENE_IDS = Object.keys(SCENES);
-const SCENE_SPEEDS = [0.25, 1.0]; // hệ số trôi của từng lớp so với camera
+// hệ số trôi của từng lớp so với camera (0 = đứng yên, 1 = trôi cùng đường)
+const SCENE_SPEEDS = {
+  "ho-guom": [0.05, 0.16, 0.4],
+  "ho-tay": [0.02, 0.3, 0.02], // lớp gần là vệt nắng — khoá theo mặt trời ở lớp xa
+};
 const SCENE_SINK = Object.fromEntries(SCENE_IDS.map((id) => [id, 160]));
 // Màu mép trên của lớp trời: dùng tô phần trời phía trên ảnh. Ghi sẵn ở đây vì khi
 // chạy trực tiếp từ file:// trình duyệt không cho đọc pixel của ảnh.
-const SCENE_TOP = { "ho-guom": "#bfe0e2", "ho-tay": "#e2620a" };
+const SCENE_TOP = { "ho-guom": "#32bbfa", "ho-tay": "#9264ac" };
 // Cảnh thiên nhiên: bục lơ lửng vẽ bằng bục cỏ, ven đường rải cây cối
 const GRASS_SCENES = ["ho-guom"];
 
@@ -476,8 +498,8 @@ return { MAX_HEARTS, SOLO_SEG_W, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPL
 })();
 
 const __mod_audio = (() => {
-// Hiệu ứng âm thanh chiptune sinh bằng WebAudio — không cần file mp3.
-// SFX: nhảy / nhảy đôi / bấm nút. (Không có nhạc nền theo yêu cầu.)
+// Hiệu ứng âm thanh chiptune sinh bằng WebAudio (nhảy / nhảy đôi / bấm nút / sấm / mưa)
+// — không cần file. Nhạc nền thì phát từ file mp3 riêng (xem MUSIC_SRC ở config.js).
 
 let ctx = null;
 let master = null;
@@ -497,6 +519,13 @@ function initAudio() {
   }
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
+  // iPhone: gạt im lặng tắt tiếng WebAudio (tiếng nhảy) nhưng không tắt nhạc nền mp3 → lệch nhau.
+  // "playback" cho cả hai cùng kêu; muốn tắt thì dùng nút 🔊 trong game.
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = "playback";
+  } catch (e) {
+    /* Safari cũ */
+  }
   ctx = new AC();
   master = ctx.createGain();
   master.gain.value = muted ? 0 : 1;
@@ -515,6 +544,72 @@ function setMuted(m) {
     /* ignore */
   }
   if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.02);
+  fadeMusicTo(targetMusicVolume(), 200);
+}
+
+// ---------- Nhạc nền (file mp3, phát song song với hiệu ứng WebAudio ở trên) ----------
+let musicEl = null;
+let musicDucked = false; // true trong lúc đang phát video, để tự tắt nhạc nền
+const MUSIC_VOLUME = 0.35; // giữ nhỏ hơn hiệu ứng để tiếng nhảy luôn nổi lên trên nhạc
+let musicFadeTimer = null;
+
+function targetMusicVolume() {
+  return muted || musicDucked ? 0 : MUSIC_VOLUME;
+}
+function fadeMusicTo(target, ms) {
+  if (!musicEl) return;
+  clearInterval(musicFadeTimer);
+  const start = musicEl.volume;
+  const t0 = performance.now();
+  musicFadeTimer = setInterval(() => {
+    const k = Math.min(1, (performance.now() - t0) / ms);
+    musicEl.volume = start + (target - start) * k;
+    if (k >= 1) clearInterval(musicFadeTimer);
+  }, 40);
+}
+
+function initMusic(src) {
+  if (musicEl || !src) return;
+  musicEl = new Audio(src);
+  musicEl.loop = true;
+  musicEl.preload = "auto";
+  musicEl.volume = 0;
+}
+
+let musicWanted = false; // đã bấm Start → nhạc nên đang phát (trừ lúc trang bị ẩn)
+
+function playMusic() {
+  if (!musicEl) return;
+  musicWanted = true;
+  musicEl.play().then(() => fadeMusicTo(targetMusicVolume(), 1500)).catch(() => {});
+}
+
+// Chuyển sang app khác / khoá màn hình: Android vẫn phát nhạc tab nền → tạm dừng, quay lại thì phát tiếp
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (musicEl) musicEl.pause();
+    if (ctx && ctx.state === "running") ctx.suspend();
+    return;
+  }
+  if (ctx && ctx.state === "suspended") ctx.resume();
+  if (musicEl && musicWanted) {
+    musicEl.volume = 0;
+    musicEl.play().then(() => fadeMusicTo(targetMusicVolume(), 800)).catch(() => {});
+  }
+});
+
+// gọi khi màn hình video mở (on = true) / đóng hoặc dừng phát (on = false)
+function duckMusicForVideo(on) {
+  musicDucked = on;
+  fadeMusicTo(targetMusicVolume(), 400);
+}
+
+// nhấn nhỏ nhạc nền một nhịp mỗi lần nhảy, để tiếng "nhảy" luôn nghe rõ chứ không bị nhạc lấp
+function duckMusicBriefly() {
+  if (!musicEl || muted || musicDucked) return;
+  clearInterval(musicFadeTimer);
+  musicEl.volume = MUSIC_VOLUME * 0.35;
+  fadeMusicTo(MUSIC_VOLUME, 260);
 }
 
 function tone(type, f0, f1, t0, dur, gain, dest) {
@@ -539,18 +634,81 @@ function sfx(name) {
   switch (name) {
     case "jump":
       tone("square", 320, 720, t, 0.14, 0.12);
+      duckMusicBriefly();
       break;
     case "jump2":
       tone("square", 480, 1100, t, 0.16, 0.12);
       tone("triangle", 240, 520, t, 0.16, 0.08);
+      duckMusicBriefly();
       break;
     case "click":
       tone("square", 880, 880, t, 0.045, 0.1);
       tone("square", 1320, 1320, t + 0.05, 0.07, 0.09);
       break;
+    case "thunder": {
+      // rền trầm kéo dài
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(95, t);
+      o.frequency.exponentialRampToValueAtTime(32, t + 1.1);
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.0001, t);
+      og.gain.exponentialRampToValueAtTime(0.55, t + 0.06);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+      o.connect(og);
+      og.connect(master);
+      o.start(t);
+      o.stop(t + 1.3);
+      // tiếng "rắc" ở đầu tiếng sét
+      const n = ctx.createBufferSource();
+      n.buffer = getNoiseBuffer();
+      const nf = ctx.createBiquadFilter();
+      nf.type = "lowpass";
+      nf.frequency.value = 1000;
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.45, t);
+      ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+      n.connect(nf);
+      nf.connect(ng);
+      ng.connect(master);
+      n.start(t);
+      n.stop(t + 0.35);
+      break;
+    }
     default:
       break;
   }
+}
+
+// ---------- Mưa: tiếng nền liên tục, âm lượng theo cường độ 0..1 từ engine ----------
+let noiseBuffer = null;
+function getNoiseBuffer() {
+  if (noiseBuffer) return noiseBuffer;
+  const len = ctx.sampleRate * 2;
+  noiseBuffer = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  return noiseBuffer;
+}
+let rainGain = null;
+function setRainIntensity(k) {
+  if (!ctx) return;
+  if (!rainGain) {
+    const src = ctx.createBufferSource();
+    src.buffer = getNoiseBuffer();
+    src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 1600;
+    filter.Q.value = 0.5;
+    rainGain = ctx.createGain();
+    rainGain.gain.value = 0;
+    src.connect(filter);
+    filter.connect(rainGain);
+    rainGain.connect(master);
+    src.start();
+  }
+  rainGain.gain.setTargetAtTime(Math.max(0, Math.min(1, k)) * 0.25, ctx.currentTime, 0.4);
 }
 
 // mức tín hiệu hiện tại (RMS) — dùng để kiểm tra nhanh trong console
@@ -569,7 +727,7 @@ function level() {
   return Math.sqrt(s / buf.length);
 }
 
-return { initAudio, isMuted, setMuted, sfx, level };
+return { initAudio, isMuted, setMuted, initMusic, playMusic, duckMusicForVideo, sfx, setRainIntensity, level };
 })();
 
 const __mod_install = (() => {
@@ -584,7 +742,10 @@ const __mod_install = (() => {
 // Máy tính không hiện gì (đã có nút toàn màn hình).
 // ============================================================
 
-const SEEN_KEY = "mfu-install-hint";
+// path riêng cho từng site: GitHub Pages phục vụ mọi bản (demo lẫn từng khách)
+// dưới cùng một origin "klinaluu.github.io", nên nếu chỉ khoá theo tên biến thì
+// hễ đã xem trên 1 bản là mọi bản khác (khác /<slug>/) cũng bị coi là "đã xem".
+const SEEN_KEY = "mfu-install-hint:" + location.pathname;
 const SEEN_DAYS = 7;
 
 // Trình duyệt nhúng trong các app nhắn tin / mạng xã hội
@@ -624,13 +785,19 @@ function remember() {
   }
 }
 
+// Tên nút ghi kèm tiếng Việt trong ngoặc: điện thoại để tiếng Việt thì menu hiện chữ Việt.
+// Safari trên iPhone đời mới để nút Chia sẻ trong menu ≡ / ••• cạnh thanh địa chỉ.
+const IOS_SHARE = "Tap Share □↑ (Chia sẻ) — on newer iPhones it's inside the ≡ or ••• menu next to the address bar";
+const IOS_ADD = "Choose “Add to Home Screen” (Thêm vào MH chính) — scroll down if you don't see it";
+const OPEN_ICON = "Open it from the new icon — full screen, no address bar";
+
 const COPY = {
   "in-app": {
     title: "OPEN_IN_BROWSER",
     heading: "Open in your browser",
     steps: [
-      "Tap the ••• menu in the top corner",
-      "Choose “Open in browser” (Chrome)",
+      "Tap the ⋮ or ••• menu in the top corner",
+      "Choose “Open in browser” (Mở bằng trình duyệt)",
       "Then add it to your Home Screen to play full screen",
     ],
     action: "Copy link",
@@ -639,9 +806,9 @@ const COPY = {
     title: "OPEN_IN_SAFARI",
     heading: "Open it in Safari",
     steps: [
-      "Tap the ••• menu in the corner and choose “Open in Safari”",
+      "Tap the ••• menu in the corner and choose “Open in Safari” (Mở bằng Safari)",
       "No such option? Tap “Copy link” below, open the Safari app and paste it",
-      "In Safari: tap Share, then “Add to Home Screen”",
+      "In Safari: tap Share (Chia sẻ), then “Add to Home Screen” (Thêm vào MH chính)",
     ],
     note: "On iPhone only Safari can add a site to the Home Screen.",
     action: "Copy link",
@@ -649,11 +816,7 @@ const COPY = {
   ios: {
     title: "ADD_TO_HOME",
     heading: "Play it like an app",
-    steps: [
-      "Tap the Share button at the bottom of Safari",
-      "Scroll down and choose “Add to Home Screen”",
-      "Open it from the new icon — full screen, no address bar",
-    ],
+    steps: [IOS_SHARE, IOS_ADD, OPEN_ICON],
     action: "Got it",
   },
   "ios-other": {
@@ -661,8 +824,8 @@ const COPY = {
     heading: "Open it in Safari",
     steps: [
       "Reopen this link in the Safari app — or tap “Copy link” below and paste it into Safari",
-      "In Safari: tap the Share button (square with an arrow)",
-      "Scroll down and choose “Add to Home Screen”",
+      "In Safari: " + IOS_SHARE.charAt(0).toLowerCase() + IOS_SHARE.slice(1),
+      IOS_ADD,
     ],
     note: "On iPhone only Safari can add a site to the Home Screen.",
     action: "Copy link",
@@ -671,11 +834,13 @@ const COPY = {
     title: "ADD_TO_HOME",
     heading: "Play it like an app",
     steps: [
-      "Tap “Install app” below",
-      "Or open the ⋮ menu and choose “Install app”",
-      "Open it from the new icon — full screen, no address bar",
+      "Open the browser menu — ⋮ at the top (Chrome) or ≡ at the bottom (Samsung Internet)",
+      "Choose “Install app” or “Add to Home screen” (Thêm vào màn hình chính)",
+      OPEN_ICON,
     ],
-    action: "Install app",
+    // chỉ hiện "Install app" khi trình duyệt đã cho phép cài trực tiếp (beforeinstallprompt)
+    action: "Got it",
+    installAction: "Install app",
   },
 };
 
@@ -693,10 +858,12 @@ function buildModal(platform, text) {
         <div class="install-heading">${copy.heading}</div>
         <ol class="install-steps">${copy.steps.map((s) => `<li>${s}</li>`).join("")}</ol>
         ${copy.note ? `<p class="install-note">${copy.note}</p>` : ""}
-        <button class="pixel-btn primary" data-action>${copy.action}</button>
-        <input class="install-link hidden" data-link readonly value="${location.href}">
+        <button class="pixel-btn primary" data-action data-install-label="${copy.installAction || ""}">${platform === "android" && deferredPrompt && copy.installAction ? copy.installAction : copy.action}</button>
+        <input class="install-link hidden" data-link readonly>
       </div>
     </div>`;
+  // gán qua thuộc tính, không ghép vào HTML: link có dấu " sẽ không chèn được mã vào trang
+  modal.querySelector("[data-link]").value = location.href;
   return modal;
 }
 
@@ -753,8 +920,11 @@ function initInstallHint(opts = {}) {
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault(); // tự hiện hộp thoại của mình thay vì thanh mặc định
     deferredPrompt = e;
+    // gợi ý đã mở trước khi trình duyệt cho phép cài → đổi nút thành "Install app"
+    const btn = document.querySelector("#modal-install [data-action]");
+    if (btn && btn.dataset.installLabel) btn.textContent = btn.dataset.installLabel;
   });
-  setTimeout(() => maybeShowInstallHint(opts), opts.delay ?? 1400);
+  setTimeout(() => maybeShowInstallHint(opts), opts.delay ?? 0);
 }
 
 return { detectPlatform, isInstalled, maybeShowInstallHint, initInstallHint };
@@ -762,12 +932,13 @@ return { detectPlatform, isInstalled, maybeShowInstallHint, initInstallHint };
 
 const __mod_engine = (() => {
 // ============================================================
-// RIDE TO US — engine (canvas 2D, physics đơn giản, kiểu Mario)
-// Một con đường liền mạch gồm 4 chương:
-//   solo    : nhảy qua chồng gạch, thu thập 5 món quà (có 3 tim)
-//   couple  : xe chở 2 người chạy qua các biển báo địa điểm + polaroid trên trời
-//   chest   : tới chiếc hòm hồng giữa đường, bấm mở
-//   gift    : hòm quà rơi từ trời xuống, bấm mở → thư + video
+// MADE FOR US — engine (canvas 2D, physics đơn giản, kiểu Mario)
+// Một con đường liền mạch, các pha (this.phase):
+//   walk    : đi bộ nhặt chìa khoá + mũ rồi lên xe
+//   solo    : chạy xe một mình, nhảy qua gạch/gai, nhặt 5 món quà (3 tim), boss "DOUBT"
+//   meeting : gặp cô ấy ở cuối chặng solo → màn bầu trời sao
+//   couple  : xe chở 2 người qua các mốc polaroid, đoạn mưa nhặt ô,
+//             hòm hồng (System Message → lá thư) và hòm quà rơi xuống (video)
 // ============================================================
 
 const CW = 960;
@@ -796,6 +967,14 @@ const BOSS_H = 64;
 const BOSS_DODGES = 3;
 
 const INVULN_TIME = 1.3;
+
+// Trong file Road-Straight.png, vạch kẻ trắng nằm sâu bên trong ảnh (không phải ngay mép
+// trên) — nếu vẽ ảnh chạm đúng mép trên vào groundY thì vạch kẻ lại nằm THẤP hơN mặt đất
+// logic một đoạn, khiến nhân vật/cây/gai trông như lơ lửng phía trên vạch kẻ. Nâng cả dải
+// đường lên để vạch kẻ mới là nơi thật sự trùng với groundY (nơi mọi thứ đang neo chân).
+const LANE_LIFT = 29;
+// Cây/hoa ven đường đứng trên dải lề phía trên của ảnh đường (cao hơn vạch kẻ bấy nhiêu px)
+const PROP_KERB = 20;
 
 const LEFT_KEYS = ["ArrowLeft", "a", "A"];
 const RIGHT_KEYS = ["ArrowRight", "d", "D"];
@@ -910,7 +1089,8 @@ class JourneyGame {
         this.rainMs = ms;
         this.extras.push({ id: "umbrella", label: "Umbrella", x: ms.start + ms.itemAt.x, gap: ms.itemAt.y, collected: false, ms });
       }
-      // trứng vàng: điểm thưởng rải dọc đường, vài quả phải nhảy mới tới
+      // điểm thưởng (id "egg", vẽ bằng assets/props/Egg-Gold.png = hình trái tim) rải dọc
+      // đường, vài cái phải nhảy mới tới
       if (ms.event !== "chest" && ms.event !== "gift") {
         [[250, 40], [520, 130], [790, 60]].forEach(([dx, gap]) => {
           const x = ms.start + dx;
@@ -921,19 +1101,35 @@ class JourneyGame {
     });
 
     // cảnh vật ven đường: rải ngẫu nhiên (cố định theo đoạn), tránh gai/khối/quà
+    // VÀ tránh chồng tán lên cây/hoa khác đã đặt trước đó, để không bị dồn cụm.
     this.props = [];
     const sets = content.propSets || {};
+    const propImg = images.props || {};
     const seeded = (n) => { let t = n * 9301 + 49297; return () => { t = (t * 9301 + 49297) % 233280; return t / 233280; }; };
     const avoid = [[180, 480], [520, 720], ...this.solids.map((s) => [s.x - 40, s.x + s.w + 40]), ...this.spikes.map((sp) => [sp.x - 30, sp.x + sp.w + 30]), ...this.items.map((it) => [it.x - 50, it.x + 90]), ...this.extras.map((e) => [e.x - 50, e.x + 90])];
+    // bề ngang thật của prop (theo tỉ lệ ảnh gốc đã tải), dùng để canh khoảng hở —
+    // cây to (tán rộng) cần khoảng cách xa hơn bụi cỏ/hoa nhỏ mới không đè lên nhau
+    const propHalfW = (name, h) => {
+      const im = propImg[name];
+      const ratio = im && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
+      return (h * ratio) / 2;
+    };
+    const PROP_GAP = 18; // khoảng hở tối thiểu thêm giữa 2 tán, ngoài phần bề ngang của chính nó
     const scatter = (start, width, terrain, seed, density) => {
       const set = isGrass(terrain) ? sets.nature : sets.city;
       if (!set || !set.length) return;
       const rnd = seeded(seed);
       for (let i = 0; i < density; i++) {
-        const x = start + 40 + rnd() * (width - 120);
-        if (avoid.some(([a, b]) => x > a && x < b)) continue;
-        const [name, h] = set[Math.floor(rnd() * set.length)];
-        this.props.push({ name, x, h, flip: rnd() < 0.5 });
+        for (let attempt = 0; attempt < 16; attempt++) {
+          const x = start + 40 + rnd() * (width - 120);
+          if (avoid.some(([a, b]) => x > a && x < b)) continue;
+          const [name, h] = set[Math.floor(rnd() * set.length)];
+          const halfW = propHalfW(name, h);
+          const crowded = this.props.some((pr) => Math.abs(pr.x - x) < halfW + propHalfW(pr.name, pr.h) + PROP_GAP);
+          if (crowded) continue;
+          this.props.push({ name, x, h, flip: rnd() < 0.5 });
+          break;
+        }
       }
     };
     scatter(0, WALK_PAD + START_PAD, content.walkTerrain, 7, 5);
@@ -941,6 +1137,7 @@ class JourneyGame {
     scatter(this.arenaStart - 40, this.meetX - this.arenaStart + 300, content.bossTerrain, 31, 4);
     this.milestones.forEach((ms) => scatter(ms.start, SEG_W, ms.terrain, ms.index + 51, 8));
     this.rain = 0; // 0..1 cường độ mưa hiện tại
+    this._rideFx = 0;
 
     // đoạn đi bộ: chìa khoá trên đường, mũ trên 1 viên gạch (tập nhảy), xe trùm bạt ở cuối
     this.gear = [
@@ -953,7 +1150,6 @@ class JourneyGame {
     this.player = { x: 40, y: this.groundY - 74, w: 74, h: 74, vx: 0, vy: 0, onGround: true, facing: 1, animT: 0, jumpsLeft: 2, standingOn: null };
     this.score = 0;
     this.timeSolo = 0; // giây, chỉ đếm trong chương 1
-    this.heartsLost = 0;
     this.boss = { active: false, defeated: false, x: 0, dir: -1, speed: 210, dodges: 0, passed: false, hitThisPass: false, t: 0 };
     this.hearts = content.maxHearts;
     this.invuln = 0;
@@ -973,6 +1169,7 @@ class JourneyGame {
     this._milestoneIndex = -1;
     this._hintShown = false;
     this._wasAirborne = false;
+    this._wasInRain = false;
 
     this._bindInput();
   }
@@ -1118,6 +1315,10 @@ class JourneyGame {
   }
 
   // ---------- hiệu ứng ----------
+  _riding() {
+    const p = this.player;
+    return this.phase !== "walk" && p.onGround && Math.abs(p.vx) > 1 && !this.paused;
+  }
   _burst(x, y, n, colors) {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -1151,7 +1352,6 @@ class JourneyGame {
   _hurt(dir) {
     const p = this.player;
     this.hearts -= 1;
-    this.heartsLost += 1;
     this.invuln = INVULN_TIME;
     this.shake = 0.35;
     this.hitFlash = 0.3;
@@ -1482,6 +1682,20 @@ class JourneyGame {
     p.animT += dt;
     if (this.invuln > 0) this.invuln -= dt;
 
+    // xe đang chạy: khói ống xả + bụi bánh sau — cho xe trông đang chạy kể cả khi chỉ có 1 ảnh
+    if (this._riding()) {
+      this._rideFx -= dt;
+      if (this._rideFx <= 0) {
+        this._rideFx = 0.07;
+        const back = -p.facing;
+        const tail = p.x + p.w / 2 + back * 44;
+        this.particles.push({ x: tail, y: this.groundY - 18 - Math.random() * 4, vx: back * (40 + Math.random() * 40), vy: -18 - Math.random() * 22, life: 0.5, color: "rgba(236,232,242,0.8)", size: 5, gravity: -40 });
+        if (Math.random() < 0.6) {
+          this.particles.push({ x: tail + back * 4, y: this.groundY - 4, vx: back * (70 + Math.random() * 60), vy: -40 - Math.random() * 50, life: 0.3, color: "rgba(206,188,168,0.85)", size: 3, gravity: 320 });
+        }
+      }
+    }
+
     if (this.phase === "couple") {
       const j = this.currentMilestoneIndex();
       if (j !== this._milestoneIndex) {
@@ -1517,8 +1731,11 @@ class JourneyGame {
     {
       const um = this.extras.find((e) => e.id === "umbrella");
       const inRain = this.rainMs && um && !um.collected && p.x + p.w / 2 >= this.rainMs.start - 60 && p.x < this.rainMs.start + SEG_W;
+      if (inRain && !this._wasInRain && this.cb.onThunder) this.cb.onThunder(); // sấm báo hiệu lúc vừa vào mốc mưa
+      this._wasInRain = inRain;
       const target = inRain ? 1 : 0;
       this.rain += (target - this.rain) * Math.min(1, dt * 1.5);
+      if (this.cb.onRain) this.cb.onRain(this.rain);
     }
 
     this.prompt = null;
@@ -1624,7 +1841,7 @@ class JourneyGame {
       drawItem(ctx, img.pickup[it.id], it.id, it.x, this.groundY - it.gap, ITEM_SIZE, this.t, this.groundY);
     }
     if (this.phase === "walk") {
-      drawCoveredBike(ctx, this.bikeX, this.groundY, this.t, this.gearReady());
+      drawCoveredBike(ctx, img.bikeIdle, this.bikeX, this.groundY, this.t, this.gearReady());
       for (const ge of this.gear) {
         if (ge.collected) continue;
         drawItem(ctx, img.gear[ge.id], ge.id, ge.x, this.groundY - ge.gap, ITEM_SIZE, this.t, this.groundY, ge.id === "key" ? 0.6 : 0.9);
@@ -1656,13 +1873,18 @@ class JourneyGame {
       const frames = img.walkFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused && this.player.onGround;
       sprite = frames[moving ? Math.floor(this.player.animT * 7) % frames.length : 0] || frames[0];
-      drawWalker(ctx, this.player, sprite, frames, blink, this.groundY);
     } else if (!solo) {
       const frames = img.coupleFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused;
       sprite = frames[moving ? Math.floor(this.player.animT * 8) % frames.length : 0] || frames[0];
     }
-    if (this.phase !== "walk") drawPlayer(ctx, this.player, sprite, solo ? this.player.w : 0, blink, this.groundY);
+    // Cảnh có xe máy (một mình hoặc đi đôi) vẽ to hơn nhân vật đi bộ, vẫn neo bánh xe xuống đất
+    const bikeScene = this.phase !== "walk";
+    const riding = this._riding();
+    if (riding) drawSpeedLines(ctx, this.player, this.groundY, this.t);
+    // rung máy 1px khi đang chạy
+    const rumble = riding ? Math.floor(this.player.animT * 28) % 2 : 0;
+    drawPlayer(ctx, this.player, sprite, 0, blink, this.groundY, bikeScene ? 100 : undefined, bikeScene ? 2 - rumble : 0);
 
     for (const pt of this.particles) {
       ctx.globalAlpha = Math.max(0, Math.min(1, pt.life / 0.3));
@@ -1761,11 +1983,13 @@ function lerpColor(a, b, t) {
   return `rgb(${r},${g},${bl})`;
 }
 
-// màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên
+// màu pixel ở mép trên của ảnh (đọc 1 lần, cache) — dùng để tô liền phần trời phía trên.
+// Luôn thử đọc màu THẬT từ chính ảnh trước (đúng với mọi bộ nền, kể cả nền riêng của khách);
+// fallback là màu đoán sẵn theo cảnh (chỉ dùng khi chạy qua file:// không đọc được pixel).
 const topColorCache = new WeakMap();
-function topColorOf(image) {
+function topColorOf(image, fallback) {
   if (topColorCache.has(image)) return topColorCache.get(image);
-  let color = "#f6d5a8";
+  let color = fallback || "#f6d5a8";
   try {
     const c = document.createElement("canvas");
     c.width = 1;
@@ -1787,31 +2011,43 @@ function tileMirrored(ctx, image, scrollX, y, targetH, CW) {
   const tileW = image.width * scale;
   const period = tileW * 2;
   const start = -(((scrollX % period) + period) % period);
+  // toạ độ lẻ làm chỗ nối 2 ô hở nửa pixel → lộ vệt dọc màu trời; làm tròn và đè 1px
   for (let dx = start; dx < CW + tileW; dx += tileW) {
     const idx = Math.round((dx - start) / tileW);
+    const x0 = Math.floor(dx);
+    const w = Math.ceil(dx + tileW) - x0 + 1;
     if (idx % 2 === 1) {
       ctx.save();
-      ctx.translate(dx + tileW, y);
+      ctx.translate(x0 + w, y);
       ctx.scale(-1, 1);
-      ctx.drawImage(image, 0, 0, tileW, targetH);
+      ctx.drawImage(image, 0, 0, w, targetH);
       ctx.restore();
     } else {
-      ctx.drawImage(image, dx, y, tileW, targetH);
+      ctx.drawImage(image, x0, y, w, targetH);
     }
   }
 }
 
-// Vẽ cảnh 5 lớp: đáy cảnh chìm dưới mặt đường ~56px để phần đất/đường riêng của
-// cảnh nằm khuất dưới đường nhựa + gạch của game, tránh "hai con đường".
+// Vẽ các lớp parallax của cảnh (xa → gần): đáy cảnh chìm dưới mặt đường (SCENE_SINK) để
+// phần đất/đường riêng của ảnh nền nằm khuất dưới đường nhựa + gạch của game.
 // Cảnh vẽ ở tỉ lệ cố định SCENE_ZOOM (1 px của ảnh 540 cao = SCENE_ZOOM đơn vị thế giới)
-// thay vì kéo cho vừa khung — nền không bị phóng to; phần trời phía trên tô bằng màu mép
-// trên của lớp 1. sink tính theo hệ 540px.
+// thay vì kéo cho vừa khung — nền không bị phóng to trên màn hình thường; phần trời phía
+// trên tô bằng màu mép trên của lớp 1. sink tính theo hệ 540px.
+// Màn hình dọc/cao hơn 540+sink thì phóng lớn thêm vừa đủ để ảnh nền (mây, trời) luôn phủ
+// kín tới mép trên, không lộ mảng màu đặc phía trên nữa.
 const SCENE_ZOOM = 1;
 function drawScene(ctx, layers, speeds, camX, groundY, CW, sinkScenePx, topColor) {
-  const h = 540 * SCENE_ZOOM;
-  const y = groundY + sinkScenePx * SCENE_ZOOM - h;
+  const minH = 540 * SCENE_ZOOM;
+  const sink0 = sinkScenePx * SCENE_ZOOM;
+  // Không bao giờ để hở khoảng trống phía trên: nếu 540 chưa đủ phủ tới mép trên canvas
+  // (màn hình dọc/cao) thì phóng to thêm đúng bằng phần thiếu. sink phải phóng theo cùng tỉ lệ
+  // (luôn = sinkScenePx/540 so với chiều cao đang vẽ), không thì phần bờ/đất của cảnh vốn phải
+  // nằm khuất dưới đường của game sẽ lộ thêm ra, làm nhân vật trông như đứng cao hơn mặt đường.
+  const h = Math.max(minH, (groundY * minH) / (minH - sink0));
+  const sink = sink0 * (h / minH);
+  const y = groundY + sink - h;
   if (y > 0) {
-    ctx.fillStyle = topColor || topColorOf(layers[0]);
+    ctx.fillStyle = topColorOf(layers[0], topColor);
     ctx.fillRect(0, 0, CW, y + 1);
   }
   layers.forEach((layer, i) => {
@@ -1823,10 +2059,12 @@ function drawTerrain(ctx, type, img, camX, groundY, CW) {
   const id = type.startsWith("scene:") ? type.slice(6) : "";
   const layers = id && img.scenes && img.scenes[id];
   if (!layers || !layers.every(ready)) return; // ảnh chưa tải xong: để nguyên nền trời
+  // sceneSpeeds: mảng dùng chung cho mọi cảnh, hoặc bảng theo từng cảnh { id: [tốc độ từng lớp] }
+  const speeds = Array.isArray(img.sceneSpeeds) ? img.sceneSpeeds : (img.sceneSpeeds && img.sceneSpeeds[id]) || [0.25, 1];
   drawScene(
     ctx,
     layers,
-    img.sceneSpeeds || [0.25, 1],
+    speeds,
     camX,
     groundY,
     CW,
@@ -1842,7 +2080,7 @@ function drawTerrain(ctx, type, img, camX, groundY, CW) {
 
 // dải đất dưới mặt đường: tối, có vân ngang
 function drawGroundStrip(ctx, camX, groundY, CW, CH) {
-  const top = groundY + 60;
+  const top = groundY + 60 - LANE_LIFT;
   ctx.fillStyle = "#231b2a";
   ctx.fillRect(0, top, CW, CH - top);
   ctx.fillStyle = "#2f2438";
@@ -1856,7 +2094,7 @@ function drawBrickGround(ctx, rowImg, camX, CW, groundY, ch) {
   if (!ready(rowImg)) return;
   const rowH = BLOCK; // cùng cỡ với gạch chướng ngại
   const rowW = rowH * (rowImg.width / rowImg.height);
-  const top = groundY + 66;
+  const top = groundY + 66 - LANE_LIFT;
   const from = Math.floor(camX / rowW) * rowW;
   for (let y = top; y < ch; y += rowH) {
     for (let x = from; x < camX + CW + rowW; x += rowW) ctx.drawImage(rowImg, x, y, rowW + 1, rowH);
@@ -1873,22 +2111,12 @@ function drawRoad(ctx, roadImg, camX, CW, groundY, ch) {
     const tileW = roadImg.width * scale;
     const from = Math.floor(camX / tileW) * tileW;
     for (let x = from; x < camX + CW + tileW; x += tileW) {
-      ctx.drawImage(roadImg, x, groundY - 8, tileW + 1, targetH);
+      ctx.drawImage(roadImg, x, groundY - 8 - LANE_LIFT, tileW + 1, targetH);
     }
     return;
   }
   ctx.fillStyle = "#3a3a3f";
   ctx.fillRect(camX, groundY, CW, ch - groundY);
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
 }
 
 // Chồng gạch (Block-Brick.png), dự phòng vẽ tay nếu thiếu ảnh
@@ -1913,17 +2141,18 @@ function drawBricks(ctx, brick, x, bottomY, w, h) {
   }
 }
 
-// dãy gai pixel: tam giác bậc thang, thân xám, viền tối, chân đế
+// dãy gai pixel: tam giác bậc thang, thân xám, viền tối, chân đế.
+// Đáy rộng nằm sát mặt đất (baseY), đầu nhọn hướng lên trên.
 function drawSpikes(ctx, x, baseY, w) {
   ctx.save();
   for (let sx = x; sx < x + w; sx += SPIKE_W) {
     const cx = sx + SPIKE_W / 2;
     for (let dy = 0; dy < SPIKE_H; dy += PX) {
-      const half = q(((SPIKE_H - dy) / SPIKE_H) * (SPIKE_W / 2));
+      const half = q(((dy + PX) / SPIKE_H) * (SPIKE_W / 2));
       const y = baseY - SPIKE_H + dy;
       ctx.fillStyle = OUTLINE;
       ctx.fillRect(cx - half - 2, y, half * 2 + 4, PX);
-      ctx.fillStyle = dy < 8 ? "#f4f0f6" : "#b9b3c4";
+      ctx.fillStyle = dy > SPIKE_H - 8 ? "#f4f0f6" : "#b9b3c4";
       if (half > 2) ctx.fillRect(cx - half + 2, y, half * 2 - 4, PX);
     }
   }
@@ -2003,33 +2232,43 @@ function drawBoss(ctx, cloudImg, b, groundY, t) {
 }
 
 // xe máy trùm bạt hồng chờ ở cuối đoạn đi bộ
-function drawCoveredBike(ctx, x, groundY, t, ready_) {
-  const w = 120;
-  const h = 58;
-  const y = groundY - h;
+function drawCoveredBike(ctx, image, x, groundY, t, ready_) {
   ctx.save();
-  ctx.fillStyle = "rgba(43,32,48,0.3)";
-  ctx.fillRect(x + 6, groundY - 6, w - 12, 6);
-  // thân bạt: bậc thang 4px, hai bướu bánh xe
-  ctx.fillStyle = "#ffb6cf";
-  const rows = [[16, 88], [8, 104], [4, 112], [0, 120], [0, 120], [0, 120], [4, 112], [4, 112], [10, 100]];
-  rows.forEach(([ox, ww], i) => ctx.fillRect(x + ox, y + i * 6, ww, 6));
-  ctx.fillRect(x + 4, y + h - 6, 30, 6);
-  ctx.fillRect(x + w - 34, y + h - 6, 30, 6);
-  ctx.strokeStyle = OUTLINE;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x + 1.5, y + 13.5, w - 3, h - 15);
-  // dây buộc + nếp bạt
-  ctx.fillStyle = "#e0538a";
-  ctx.fillRect(x + 30, y + 14, 4, h - 16);
-  ctx.fillRect(x + w - 34, y + 14, 4, h - 16);
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(x + 44, y + 22, 24, 4);
-  // nhãn nhỏ nhấp nháy
-  ctx.font = "8px 'Press Start 2P', monospace";
-  ctx.textAlign = "center";
-  ctx.fillStyle = ready_ && Math.floor(t * 3) % 2 === 0 ? "#f2c94c" : "#fff";
-  ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, y - 8);
+  const label = () => {
+    ctx.font = "8px 'Press Start 2P', monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = ready_ && Math.floor(t * 3) % 2 === 0 ? "#f2c94c" : "#fff";
+  };
+  if (ready(image)) {
+    const h = 74;
+    const w = h * (image.width / image.height);
+    drawShadow(ctx, x + w / 2, groundY, w * 0.85, 0.22);
+    ctx.drawImage(image, x, groundY - h, w, h);
+    label();
+    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, groundY - h - 8);
+  } else {
+    // bạt phủ vẽ tay: dùng khi chưa có ảnh xe riêng của khách
+    const w = 120;
+    const h = 58;
+    const y = groundY - h;
+    ctx.fillStyle = "rgba(43,32,48,0.3)";
+    ctx.fillRect(x + 6, groundY - 6, w - 12, 6);
+    ctx.fillStyle = "#ffb6cf";
+    const rows = [[16, 88], [8, 104], [4, 112], [0, 120], [0, 120], [0, 120], [4, 112], [4, 112], [10, 100]];
+    rows.forEach(([ox, ww], i) => ctx.fillRect(x + ox, y + i * 6, ww, 6));
+    ctx.fillRect(x + 4, y + h - 6, 30, 6);
+    ctx.fillRect(x + w - 34, y + h - 6, 30, 6);
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x + 1.5, y + 13.5, w - 3, h - 15);
+    ctx.fillStyle = "#e0538a";
+    ctx.fillRect(x + 30, y + 14, 4, h - 16);
+    ctx.fillRect(x + w - 34, y + 14, 4, h - 16);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(x + 44, y + 22, 24, 4);
+    label();
+    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, y - 8);
+  }
   ctx.restore();
 }
 
@@ -2052,7 +2291,8 @@ function drawProp(ctx, im, pr, groundY) {
   const h = pr.h;
   const w = h * (im.width / im.height);
   ctx.save();
-  ctx.translate(pr.x, groundY + 2);
+  // cây cỏ mọc ở mép trên con đường (lề), lùi sau làn xe — nhân vật/xe/chướng ngại mới chạy trên vạch kẻ
+  ctx.translate(pr.x, groundY - PROP_KERB);
   if (pr.flip) ctx.scale(-1, 1);
   ctx.drawImage(im, -w / 2, -h, w, h);
   ctx.restore();
@@ -2190,7 +2430,7 @@ function drawWoman(ctx, image, x, groundY, t, cheer) {
 // Khung polaroid: viền pixel, bóng cứng lệch, dây treo
 function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
   // Khung ôm theo tỉ lệ ảnh thật (không crop): ảnh vừa trong hộp MAX×MAX, viền 8, đáy 44 cho chữ
-  const MAX = 150;
+  const MAX = 190;
   const PAD = 8;
   const FOOT = 44;
   let iw = 130;
@@ -2265,22 +2505,6 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
       ctx.fillText("♡", 0, py + ih / 2 + 9);
     }
   }
-  // chú thích: ngày (to) + tên (nhỏ); không có ngày thì tên đứng một mình
-  ctx.textAlign = "center";
-  // Font pixel không có dấu tiếng Việt: chữ nào ngoài bảng ASCII thì dùng font thường.
-  const fontFor = (txt, px) =>
-    /^[\x20-\x7E]*$/.test(txt) ? `${px}px 'Press Start 2P', monospace` : `600 ${px + 4}px 'Be Vietnam Pro', sans-serif`;
-  const lines = [];
-  if (date) lines.push([date, 10, "#6b3f52"]);
-  if (name) lines.push([name, date ? 8 : 10, date ? "#a97a92" : "#6b3f52"]);
-  let ly = h / 2 - (lines.length === 2 ? 22 : 15);
-  for (const [txt, px, color] of lines) {
-    ctx.font = fontFor(txt, px);
-    if (ctx.measureText(txt).width > w - 12) ctx.font = fontFor(txt, px - 2);
-    ctx.fillStyle = color;
-    ctx.fillText(txt, 0, ly);
-    ly += 13;
-  }
   ctx.restore();
 }
 
@@ -2331,6 +2555,22 @@ function drawChest(ctx, x, y, opened, t, gift) {
   ctx.restore();
 }
 
+// vệt gió phía sau xe đang chạy
+function drawSpeedLines(ctx, p, groundY, t) {
+  const back = -p.facing;
+  const tail = p.x + p.w / 2 + back * 50;
+  ctx.save();
+  [[26, 0], [52, 0.33], [76, 0.66]].forEach(([h, phase]) => {
+    const k = (t * 3 + phase) % 1; // 0..1: vệt dài ra rồi mờ đi
+    const len = q(10 + k * 26);
+    const gap = q(4 + k * 18);
+    ctx.fillStyle = `rgba(255,255,255,${(0.75 * (1 - k)).toFixed(2)})`;
+    const x0 = back > 0 ? tail + gap : tail - gap - len;
+    ctx.fillRect(q(x0), q(groundY - h), len, 3);
+  });
+  ctx.restore();
+}
+
 function drawPrompt(ctx, x, y, text, t) {
   const bob = q(Math.sin(t * 5) * 3);
   ctx.save();
@@ -2346,72 +2586,23 @@ function drawPrompt(ctx, x, y, text, t) {
   ctx.restore();
 }
 
-// Đi bộ: bộ ảnh chỉ có MỘT tư thế sải chân, nên dựng chu kỳ bước bằng cách tách
-// sprite thành thân trên + chân. Phần chân được co/giãn ngang theo cos(pha):
-// +1 = sải chân như ảnh gốc, 0 = hai chân khép, -1 = lật thành sải chân bên kia.
-// Thân nhún nhẹ khi chân khép, hơi đổ về trước khi đi.
-const WALK_LEG_SPLIT = 0.715; // tỉ lệ chiều cao ảnh tính từ đỉnh xuống chỗ bắt đầu ống quần
-function drawWalker(ctx, p, sprite, frames, hit, groundY) {
-  const base = frames && ready(frames[0]) ? frames[0] : sprite;
-  if (!ready(base)) return;
-  const scale = p.h / base.height;
-  const w = base.width * scale;
-  const h = base.height * scale;
-  const splitY = Math.round(base.height * WALK_LEG_SPLIT);
-  const legH = base.height - splitY;
-
-  const moving = Math.abs(p.vx) > 1 && p.onGround;
-  const phase = p.animT * 3.6; // ~3.6 bước/giây
-  let sx; // hệ số co ngang của chân
-  let bob = 0;
-  let lean = 0;
-  if (!p.onGround) {
-    sx = 0.75;
-    lean = -p.vy * 0.00025;
-  } else if (moving) {
-    sx = Math.cos(phase * Math.PI * 2);
-    bob = -Math.abs(Math.sin(phase * Math.PI * 2)) * 2.5;
-    lean = 0.05;
-  } else {
-    sx = 0.5;
-  }
-  // không co quá mỏng: chân khép vẫn phải ra hình đôi chân
-  if (Math.abs(sx) < 0.45) sx = sx < 0 ? -0.45 : 0.45;
-
-  drawShadow(ctx, p.x + p.w / 2, groundY, w * (0.7 + Math.abs(sx) * 0.5), p.onGround ? 0.25 : 0.12);
-  ctx.save();
-  ctx.translate(p.x + p.w / 2, p.y + p.h);
-  if (p.facing < 0) ctx.scale(-1, 1);
-  if (hit) ctx.globalAlpha = 0.5;
-
-  // chân: co/giãn quanh trục giữa, neo đáy xuống đất
-  ctx.save();
-  ctx.scale(sx, 1);
-  ctx.drawImage(base, 0, splitY, base.width, legH, -w / 2, -legH * scale, w, legH * scale);
-  ctx.restore();
-
-  // thân trên: nhún + hơi đổ về trước, phủ lên mép trên của chân
-  ctx.save();
-  ctx.translate(0, -legH * scale + 2 + bob);
-  ctx.rotate(lean);
-  ctx.drawImage(base, 0, 0, base.width, splitY + 4, -w / 2, -(splitY + 4) * scale, w, (splitY + 4) * scale);
-  ctx.restore();
-
-  ctx.restore();
-}
-
-// drawW = 0 → giữ đúng tỉ lệ ảnh gốc theo chiều cao (dùng cho các khung animation xe đôi)
-function drawPlayer(ctx, p, playerImg, drawW, hit, groundY) {
-  const w = drawW || (ready(playerImg) ? p.h * (playerImg.width / playerImg.height) : p.w);
+// drawW = 0 → giữ đúng tỉ lệ ảnh gốc theo chiều cao (dùng cho các khung animation xe đôi).
+// drawH  → chiều cao hiển thị (khác hitbox vật lý p.h) khi ảnh cần to hơn, ví dụ cảnh đi xe;
+// luôn neo đáy ảnh xuống đúng mặt đất (p.y + p.h) bất kể drawH lớn hơn hay bằng p.h.
+// yOffset → đẩy ảnh xuống thêm so với mặt đất (p.y + p.h), dùng cho xe máy để bánh xe
+// lún vào mặt đường một chút, trông thật hơn là lơ lửng đúng mép.
+function drawPlayer(ctx, p, playerImg, drawW, hit, groundY, drawH, yOffset) {
+  const h = drawH || p.h;
+  const w = drawW || (ready(playerImg) ? h * (playerImg.width / playerImg.height) : p.w);
   drawShadow(ctx, p.x + p.w / 2, groundY, w * 0.9, p.onGround ? 0.25 : 0.12);
   ctx.save();
   const bob = p.onGround ? Math.sin(p.animT * 5) * 2.2 : 0;
   const lean = p.onGround ? Math.sin(p.animT * 5) * 0.02 : -p.vy * 0.00025;
-  ctx.translate(p.x + p.w / 2, p.y + p.h / 2 + bob);
+  ctx.translate(p.x + p.w / 2, p.y + p.h + bob + (yOffset || 0));
   if (p.facing < 0) ctx.scale(-1, 1);
   ctx.rotate(lean);
   if (hit) ctx.globalAlpha = 0.5;
-  if (ready(playerImg)) ctx.drawImage(playerImg, -w / 2, -p.h / 2, w, p.h);
+  if (ready(playerImg)) ctx.drawImage(playerImg, -w / 2, -h, w, h);
   ctx.restore();
 }
 
@@ -2422,15 +2613,31 @@ const __mod_main = (() => {
 // ============================================================
 // Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
-const {GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,} = __mod_config;
+const {GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, MUSIC_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES, SCENE_LAYERS, COUPLE_FRAMES,} = __mod_config;
 const {IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES} = __mod_assets;
 const {SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,} = __mod_levels;
-const {initAudio, sfx, setMuted, isMuted} = __mod_audio;
+const {initAudio, sfx, setMuted, isMuted, initMusic, playMusic, duckMusicForVideo, setRainIntensity} = __mod_audio;
 const {initInstallHint, maybeShowInstallHint, detectPlatform, isInstalled} = __mod_install;
 const {JourneyGame} = __mod_engine;
 
 // Mốc đi đôi dùng chung một nền; config.js chỉ khai báo phần nội dung.
 const COUPLE_MILESTONES = MILESTONES.map((ms) => ({ ...ms, terrain: COUPLE_TERRAIN }));
+
+// Nền parallax: khách có thể khai báo số lớp + tốc độ riêng từng cảnh trong config.js
+// (SCENE_LAYERS), không khai báo thì dùng bộ 3 lớp mặc định của assets.js.
+const CUSTOM_SCENES = SCENE_LAYERS || {};
+const SCENE_PATHS = Object.fromEntries(
+  Object.keys(SCENES).map((id) => {
+    const custom = CUSTOM_SCENES[id];
+    return [id, custom && custom.layers ? custom.layers.map((f) => `assets/scenes/${id}/${f}`) : SCENES[id]];
+  })
+);
+const SCENE_SPEEDS_BY_ID = Object.fromEntries(
+  Object.keys(SCENES).map((id) => [id, (CUSTOM_SCENES[id] && CUSTOM_SCENES[id].speeds) || SCENE_SPEEDS[id]])
+);
+
+// Khung hình xe chở đôi: khách khai báo riêng (vd chỉ 1 ảnh) hoặc dùng bộ mặc định
+const COUPLE_FRAME_SRCS = COUPLE_FRAMES && COUPLE_FRAMES.length ? COUPLE_FRAMES : IMG.coupleFrames;
 
 let currentGame = null;
 let timeTimer = null;
@@ -2472,7 +2679,7 @@ function normalizeGrain(img, worldHeight) {
   return c;
 }
 async function preloadAll() {
-  const srcs = new Set([...Object.values(IMG).flat(), ...Object.values(SCENES).flat(), ...Object.values(PROPS)]);
+  const srcs = new Set([...Object.values({ ...IMG, coupleFrames: COUPLE_FRAME_SRCS }).flat(), ...Object.values(SCENE_PATHS).flat(), ...Object.values(PROPS)]);
   GIFTS.forEach((g) => g.icon && srcs.add(g.icon));
   COUPLE_MILESTONES.forEach((ms) => {
     if (ms.photo) srcs.add(ms.photo);
@@ -2507,6 +2714,8 @@ const $ = (id) => document.getElementById(id);
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
   $(id).classList.add("active");
+  // màn hình mở đầu không bắt xoay ngang, để nút "Add to Home Screen" luôn bấm được
+  document.body.classList.toggle("on-title-screen", id === "screen-title");
 }
 const showModal = (id) => $(id).classList.remove("hidden");
 const hideModal = (id) => $(id).classList.add("hidden");
@@ -2574,13 +2783,24 @@ function hudSoloMode() {
   renderScore(0);
   $("hud-time").textContent = "0:00";
 }
+// chữ ngày/tên do khách viết: dựng bằng textContent để "<3" hay ký tự đặc biệt không vỡ HTML
+function renderMilestoneLabel(ms) {
+  const el = $("hud-milestone");
+  if (!ms.date && !ms.name) {
+    el.textContent = "Together ♥";
+    return;
+  }
+  const date = document.createElement("b");
+  date.textContent = ms.date;
+  el.replaceChildren(date, document.createTextNode(ms.name));
+}
 function hudCoupleMode() {
   $("hud-hearts").classList.add("hidden");
   $("hud-items").classList.add("hidden");
   $("hud-milestone").classList.remove("hidden");
   $("hud-portrait").classList.remove("hidden");
   $("hud-stats").classList.remove("hidden");
-  $("hud-milestone").innerHTML = "Together ♥";
+  $("hud-milestone").textContent = "Together ♥";
   renderBar(0);
 }
 
@@ -2598,9 +2818,10 @@ function startJourney() {
 
   const images = {
     playerSolo: normalizeGrain(getImg(IMG.playerSolo), 74),
+    bikeIdle: getImg(IMG.bikeIdle),
     walkFrames: IMG.walkFrames.map(getImg),
     gear: { key: getImg(IMG.key), helmet: getImg(IMG.helmet) },
-    coupleFrames: IMG.coupleFrames.map(getImg),
+    coupleFrames: COUPLE_FRAME_SRCS.map(getImg),
     woman: getImg(IMG.woman),
     womanCheer: IMG.womanCheer.map(getImg),
     cloud: getImg(IMG.cloud),
@@ -2610,8 +2831,8 @@ function startJourney() {
     blockSurprise: getImg(IMG.blockSurprise),
     blockUsed: getImg(IMG.blockUsed),
     itemHeart: getImg(IMG.itemHeart),
-    scenes: Object.fromEntries(Object.entries(SCENES).map(([id, layers]) => [id, layers.map(getImg)])),
-    sceneSpeeds: SCENE_SPEEDS,
+    scenes: Object.fromEntries(Object.entries(SCENE_PATHS).map(([id, layers]) => [id, layers.map(getImg)])),
+    sceneSpeeds: SCENE_SPEEDS_BY_ID,
     sceneSink: SCENE_SINK,
     sceneTop: SCENE_TOP,
     grassFloat: getImg(IMG.grassFloat),
@@ -2643,11 +2864,14 @@ function startJourney() {
           renderBar(100);
           return;
         }
-        $("hud-milestone").innerHTML = `<b>${ms.date}</b>${ms.name}`;
+        // mốc không ghi ngày/tên (vd bản khách bỏ chú thích) thì giữ dòng "Together", không để trống ô HUD
+        renderMilestoneLabel(ms);
         renderBar((j / COUPLE_MILESTONES.length) * 100);
-        if (ms.event === "rain") showHint("It's raining! Jump the walls and grab the umbrella ☂", 3600);
+        if (ms.event === "rain") showHint("It's raining! Jump the walls and grab the umbrella", 3600);
       },
       onExtra: (ex) => { if (ex.id === "umbrella") showHint("Rain's over — let's keep going ♥", 2600); },
+      onThunder: () => sfx("thunder"),
+      onRain: (k) => setRainIntensity(k),
       onChest: () => openSystemMessage(),
       onGift: () => openVideo(false),
       onScore: (n) => renderScore(n),
@@ -2665,6 +2889,7 @@ function startJourney() {
   // Cờ gỡ lỗi: mở trang với #debug để truy cập ván chơi từ console (window.__game)
   if (location.hash.includes("debug")) window.__game = currentGame;
   initAudio();
+  playMusic();
   clearInterval(timeTimer);
   timeTimer = setInterval(() => {
     if (currentGame && currentGame.phase === "solo") $("hud-time").textContent = fmtTime(currentGame.timeSolo);
@@ -2685,7 +2910,7 @@ function playMeeting() {
     bubble.classList.add("hidden");
     $("meet-text").textContent = TEXT.meetText;
     $("meet-stats").innerHTML =
-      `MISSION COMPLETE<br>score <b>${g.score}</b> · time <b>${fmtTime(g.timeSolo)}</b> · hearts lost <b>${g.heartsLost}</b>`;
+      `MISSION COMPLETE<br>score <b>${g.score}</b> · time <b>${fmtTime(g.timeSolo)}</b> · gifts <b>${GIFTS.length}/${GIFTS.length}</b>`;
     showScreen("screen-meet");
   }, 1900);
 }
@@ -2729,6 +2954,7 @@ function openVideo(fromEnding) {
 function closeVideo() {
   const video = $("video-player");
   video.pause();
+  duckMusicForVideo(false);
   video.removeAttribute("src");
   video.load();
   hideModal("modal-video");
@@ -2844,7 +3070,7 @@ function wireUI() {
   });
   $("btn-unlock-continue").addEventListener("click", () => {
     showScreen("screen-level");
-    $("hud-milestone").innerHTML = "Level 2 · unlocked ♥";
+    $("hud-milestone").textContent = "Level 2 · unlocked ♥";
     openEnvelope();
   });
 
@@ -2853,16 +3079,20 @@ function wireUI() {
     openLetter(false);
   });
   $("letter-close").addEventListener("click", () => hideModal("modal-letter"));
-  // đọc thư xong (ở Sa Pa) → đi tiếp tới Hoàn Kiếm, hòm video sẽ rơi xuống ở đó
+  // đọc thư xong → đi tiếp tới mốc cuối, hòm video sẽ rơi xuống ở đó
   $("btn-watch-video").addEventListener("click", () => {
     hideModal("modal-letter");
     currentGame && currentGame.resumeJourney();
-    showHint("One more stop — ride on to Hoàn Kiếm ♥", 3000);
+    showHint("One more stop — keep riding ♥", 3000);
   });
   $("video-player").addEventListener("error", () => {
     $("video-player").classList.add("hidden");
     $("video-missing").classList.remove("hidden");
   });
+  // tự tắt nhạc nền lúc video đang chạy, bật lại khi dừng/hết/đóng màn hình video
+  $("video-player").addEventListener("play", () => duckMusicForVideo(true));
+  $("video-player").addEventListener("pause", () => duckMusicForVideo(false));
+  $("video-player").addEventListener("ended", () => duckMusicForVideo(false));
   $("btn-video-done").addEventListener("click", () => {
     const fromEnding = $("btn-video-done").dataset.fromEnding === "1";
     closeVideo();
@@ -2995,9 +3225,11 @@ function applyBranding() {
 }
 
 async function init() {
+  document.body.classList.add("on-title-screen"); // màn hình mặc định khi tải trang là title
   applyBranding();
   wireUI();
   initInstallHint({ text: TEXT.install });
+  initMusic(MUSIC_SRC);
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";
   startBtn.disabled = true;

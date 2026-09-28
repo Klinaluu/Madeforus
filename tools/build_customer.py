@@ -18,6 +18,7 @@ Kết quả: dist/<slug>/ (đưa lên Netlify / GitHub Pages) và dist/<slug>.zi
 import os
 import re
 import shutil
+import subprocess
 import sys
 import zipfile
 
@@ -52,7 +53,8 @@ def copy_photos(src_dir, dst_dir):
             continue
         if ext.lower() == ".heic":  # iPhone: chuyển sang jpg bằng sips của macOS
             tmp = os.path.join(dst_dir, stem + ".tmp.jpg")
-            os.system(f'sips -s format jpeg "{path}" --out "{tmp}" >/dev/null 2>&1')
+            # truyền đối số dạng danh sách: tên file khách có dấu " hay $ cũng không thành lệnh shell
+            subprocess.run(["sips", "-s", "format", "jpeg", path, "--out", tmp], capture_output=True)
             path = tmp
         im = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
         w, h = im.size

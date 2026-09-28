@@ -8,8 +8,8 @@
 Script tự: dựng lại bản build với đúng đường dẫn Pages (để ảnh preview khi gửi link
 hiển thị đúng), khởi tạo git trong dist/<slug>, commit và push lên nhánh main.
 
-Sau khi push, bật Pages một lần trong Settings → Pages → Deploy from a branch →
-main / (root). Lần sau chỉ cần chạy lại script là link tự cập nhật.
+Sau khi push lần đầu, bật Pages một lần (xem docs/workflow.md, Bước 6). Lần sau chỉ cần
+chạy lại script là link tự cập nhật.
 """
 import os
 import re
@@ -86,7 +86,7 @@ def main():
         print("  Source: Deploy from a branch · Branch: main · Thu muc: / (root) · Save")
         print("Doi ~1 phut roi mo lai link.")
     print(f"\nGui khach: link o tren + file dist/{slug}.zip (ban choi offline)")
-    print("Nho kem huong dan: iPhone/iPad mo bang Safari → Chia se → Them vao MH chinh")
+    print("Nho kem huong dan: iPhone/iPad mo bang Safari → Chia se (menu ≡ canh thanh dia chi) → Them vao MH chinh")
 
 
 if __name__ == "__main__":

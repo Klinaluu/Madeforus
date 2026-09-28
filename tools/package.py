@@ -30,7 +30,8 @@ Dieu khien
 
 def main():
     build_standalone.build(ROOT)
-    shutil.rmtree(os.path.join(ROOT, "dist"), ignore_errors=True)
+    # chỉ xoá bản demo cũ — dist/ còn chứa bản build (và repo deploy) của từng khách
+    shutil.rmtree(DIST, ignore_errors=True)
     os.makedirs(DIST)
     for name in INCLUDE:
         src = os.path.join(ROOT, name)

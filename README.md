@@ -44,8 +44,11 @@ Toàn bộ nội dung có thể cá nhân hoá nằm trong file `js/config.js` c
 | Ảnh từng mốc, ngày, tên mốc | `MILESTONES` |
 | Ảnh màn hình mở đầu | `TITLE_PHOTO` |
 | Video | `VIDEO_SRC` |
-| Tên 5 món quà | `GIFTS` |
+| Tên + icon 5 món quà | `GIFTS` |
 | Khung ảnh trống hiện hay ẩn khi mốc chưa có ảnh | `SHOW_EMPTY_PHOTO_FRAMES` |
+| Nhạc nền | `MUSIC_SRC` |
+| Chỉ 1 ảnh xe chở đôi thay cho bộ 4 khung | `COUPLE_FRAMES` |
+| Nền parallax riêng (mặc định: Hồ Gươm + hoàng hôn, 3 lớp) | `SCENE_LAYERS` |
 
 Ở bản demo (repo gốc) file này giữ nguyên placeholder trống — **đây là thứ hiển thị công
 khai ở link demo**, không sửa trực tiếp. Muốn tạo bản có nội dung thật cho một khách, làm
@@ -57,7 +60,8 @@ theo mục dưới.
 **→ [docs/new-customer-chat.md](docs/new-customer-chat.md) — cách mở khung chat mới và thao tác với Claude Code.**
 
 Tóm tắt: không nhân bản code cho mỗi khách, chỉ nhân bản **nội dung**. Mỗi khách là một
-thư mục trong `customers/` (nằm trong `.gitignore`, không lên GitHub). Ba lệnh chính:
+thư mục trong `customers/` (nằm trong `.gitignore`, không lên GitHub). Bản mẫu tham khảo
+cho khách sau: `customers/thaobe/`. Ba lệnh chính:
 
 ```bash
 python3 tools/new_customer.py linh-tung      # tạo customers/linh-tung/{brief.md, config.js, assets/}
@@ -78,8 +82,9 @@ js/assets.js        đường dẫn ảnh dùng chung
 js/levels.js        bố cục màn chơi (gai, bục, gạch, vị trí quà)
 js/engine.js        vòng lặp game: vật lý, va chạm, camera, vẽ canvas
 js/main.js          điều phối màn hình, HUD, điều khiển, cắt cảnh
-js/audio.js         hiệu ứng âm thanh chiptune sinh bằng WebAudio (không cần file)
-assets/             brand (logo, favicon), characters, elements, props, ui, scenes, photos, video
+js/audio.js         hiệu ứng âm thanh WebAudio (không cần file) + nhạc nền mp3
+js/install.js       gợi ý thêm vào màn hình chính trên điện thoại (iPhone / Android / Zalo…)
+assets/             brand (logo, favicon), audio, characters, elements, props, ui, scenes, photos, video
 assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
 tools/new_customer.py     tạo thư mục tư liệu cho một khách mới
 tools/build_customer.py   build bản riêng từ customers/<slug>/
@@ -95,10 +100,10 @@ docs/new-customer-chat.md     cách mở khung chat mới + thao tác với Clau
 ## Kỹ thuật
 
 - Vanilla JS (ES modules) + Canvas 2D, không framework, không bước build khi phát triển.
-- Nền là ảnh parallax 2 lớp 3840×1080; cảnh vẽ ở tỉ lệ cố định, phần trời phía trên tô
-  bằng màu khai báo sẵn trong `assets.js` (chạy từ `file://` không đọc được pixel ảnh).
+- Nền là ảnh parallax 3 lớp (xa → gần) cho mỗi cảnh; cảnh vẽ ở tỉ lệ cố định, phần trời phía
+  trên tô bằng màu khai báo sẵn trong `assets.js` (chạy từ `file://` không đọc được pixel ảnh).
 - Canvas đổi độ phân giải theo tỉ lệ màn hình nên không méo và không cắt nhân vật.
-- Âm thanh sinh bằng WebAudio, không kèm file mp3.
+- Hiệu ứng âm thanh sinh bằng WebAudio; nhạc nền là file mp3 (`MUSIC_SRC` trong config.js).
 - `tools/build_standalone.py` gộp các module thành một file HTML chạy được qua `file://`.
 
 Cờ khi thử nghiệm: mở trang với `#autostart` để vào thẳng màn chơi, `#debug` để lấy ván
