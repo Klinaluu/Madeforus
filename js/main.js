@@ -2,14 +2,14 @@
 // Điều phối màn hình, HUD, âm thanh, điều khiển và các đoạn cắt cảnh.
 // ============================================================
 import {
-  GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
+  GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, MUSIC_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
   SCENE_LAYERS,
 } from "./config.js";
 import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
 import {
   SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,
 } from "./levels.js";
-import { initAudio, sfx, setMuted, isMuted } from "./audio.js";
+import { initAudio, sfx, setMuted, isMuted, initMusic, playMusic, duckMusicForVideo, setRainIntensity } from "./audio.js";
 import { initInstallHint, maybeShowInstallHint, detectPlatform, isInstalled } from "./install.js";
 import { JourneyGame } from "./engine.js";
 
@@ -248,6 +248,8 @@ function startJourney() {
         if (ms.event === "rain") showHint("It's raining! Jump the walls and grab the umbrella ☂", 3600);
       },
       onExtra: (ex) => { if (ex.id === "umbrella") showHint("Rain's over — let's keep going ♥", 2600); },
+      onThunder: () => sfx("thunder"),
+      onRain: (k) => setRainIntensity(k),
       onChest: () => openSystemMessage(),
       onGift: () => openVideo(false),
       onScore: (n) => renderScore(n),
@@ -265,6 +267,7 @@ function startJourney() {
   // Cờ gỡ lỗi: mở trang với #debug để truy cập ván chơi từ console (window.__game)
   if (location.hash.includes("debug")) window.__game = currentGame;
   initAudio();
+  playMusic();
   clearInterval(timeTimer);
   timeTimer = setInterval(() => {
     if (currentGame && currentGame.phase === "solo") $("hud-time").textContent = fmtTime(currentGame.timeSolo);
@@ -329,6 +332,7 @@ function openVideo(fromEnding) {
 function closeVideo() {
   const video = $("video-player");
   video.pause();
+  duckMusicForVideo(false);
   video.removeAttribute("src");
   video.load();
   hideModal("modal-video");
@@ -463,6 +467,10 @@ function wireUI() {
     $("video-player").classList.add("hidden");
     $("video-missing").classList.remove("hidden");
   });
+  // tự tắt nhạc nền lúc video đang chạy, bật lại khi dừng/hết/đóng màn hình video
+  $("video-player").addEventListener("play", () => duckMusicForVideo(true));
+  $("video-player").addEventListener("pause", () => duckMusicForVideo(false));
+  $("video-player").addEventListener("ended", () => duckMusicForVideo(false));
   $("btn-video-done").addEventListener("click", () => {
     const fromEnding = $("btn-video-done").dataset.fromEnding === "1";
     closeVideo();
@@ -599,6 +607,7 @@ async function init() {
   applyBranding();
   wireUI();
   initInstallHint({ text: TEXT.install });
+  initMusic(MUSIC_SRC);
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";
   startBtn.disabled = true;

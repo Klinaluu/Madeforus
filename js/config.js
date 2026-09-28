@@ -38,6 +38,9 @@ export const TEXT = {
 // Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.
 // Video: đặt file .mp4 vào assets/video/ rồi điền tên vào đây (nên dưới 15MB).
 export const VIDEO_SRC = "";
+// Nhạc nền: đặt file .mp3 vào assets/audio/ rồi điền tên vào đây. Để "" thì không có nhạc nền
+// (vẫn còn đủ hiệu ứng nhảy/bấm nút). Tự tắt khi phát video, tự nhỏ lại một chút mỗi lần nhảy.
+export const MUSIC_SRC = "assets/audio/bgm.mp3";
 // Ảnh ở màn hình mở đầu (ảnh dọc kiểu photobooth rất hợp). Để "" thì hiện khung trống.
 export const TITLE_PHOTO = "";
 // true  = luôn vẽ khung ảnh trống kèm chữ hướng dẫn (dùng cho bản demo)
