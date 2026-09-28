@@ -50,9 +50,9 @@ Mẫu tham khảo đầy đủ: `customers/thaobe/` (khách đầu tiên làm th
 
   | Thư mục của khách | Thay cho | Ví dụ ở bản Thảo Bé |
   | --- | --- | --- |
-  | `assets/characters/` | nhân vật, xe, icon quà, chìa khoá, ảnh kết | `Man-Walk-Side-01..04`, `Man-Bike-Side-01`, `Couple-Bike-Side-01`, `Item-Key-01` |
+  | `assets/characters/` | nhân vật, xe, icon quà, ảnh minh hoạ | `Man-Walk-Side-01..04`, `Man-Bike-Side-01`, `Couple-Bike-Side-01` |
   | `assets/elements/` | vật phẩm, khối, UI trong game | — |
-  | `assets/props/` | vật trang trí / điểm thưởng | `Egg-Gold.png` = hình trái tim thay trứng vàng |
+  | `assets/props/` | vật trang trí / điểm thưởng | — |
   | `assets/scenes/<id>/` | nền parallax (`L1.png` xa → `L3.png` gần) + khai báo `SCENE_LAYERS` | — (nền mới đã thành mặc định) |
 
   - Ảnh gốc/nháp để trong thư mục con `_source/` — script build bỏ qua, không chép vào bản giao
