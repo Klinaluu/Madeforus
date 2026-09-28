@@ -94,9 +94,11 @@ def main():
     for f in JS_FILES:
         shutil.copy2(os.path.join(ROOT, "js", f), os.path.join(dist, "js", f))
     config = open(config_path, encoding="utf-8").read()
-    # config của khách làm trước khi có trường này vẫn build được
+    # config của khách làm trước khi có các truong nay van build duoc
     if not re.search(r"^export const SCENE_LAYERS\b", config, flags=re.M):
         config += "\nexport const SCENE_LAYERS = {};\n"
+    if not re.search(r"^export const MUSIC_SRC\b", config, flags=re.M):
+        config += '\nexport const MUSIC_SRC = ""; // de trong = khong co nhac nen (nhu VIDEO_SRC)\n'
     open(os.path.join(dist, "js", "config.js"), "w", encoding="utf-8").write(config)
 
     # ---------- ảnh riêng đè lên bộ mặc định: cùng tên file thì thay, tên khác thì thêm.
