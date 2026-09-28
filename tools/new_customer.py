@@ -28,12 +28,30 @@ Liên hệ:           …
 
 ## Tư liệu cần có
 
+Khách gửi:
+
 - [ ] 8–12 ảnh kỷ niệm (ảnh gốc, không cần cắt) → `assets/photos/`
-- [ ] 1 ảnh cho màn hình mở đầu → `assets/photos/`
-- [ ] Video 30–60 giây, .mp4, dưới ~25MB → `assets/video/`
+- [ ] 1 ảnh cho màn hình mở đầu → `assets/photos/` (hoặc dùng sprite `Couple-Pose-Happy-01`)
+- [ ] Video 15–60 giây, dưới ~25MB → `assets/video/` (.MOV thì đổi sang .mp4, xem docs/workflow.md)
 - [ ] Lá thư (dạng chữ)
-- [ ] Tên game + slogan
-- [ ] Ngày kỷ niệm (dùng cho mốc cuối)
+- [ ] Tên game + slogan (không có thì giữ mặc định)
+- [ ] Tên 5 món quà (+ ảnh món quà nếu muốn icon riêng)
+- [ ] Ảnh chân dung / toàn thân 2 người + ảnh chiếc xe máy → để vẽ sprite
+
+Sprite vẽ riêng cho khách → `assets/characters/`, đúng tên file, nhân vật quay mặt sang PHẢI,
+nền trong suốt (PNG):
+
+- [ ] `Man-Walk-Side-01..04` — anh đi bộ, 4 khung bước chân
+- [ ] `Bike-Idle-01` — xe máy dựng một mình (chưa có người)
+- [ ] `Man-Bike-Side-01` — anh chạy xe một mình
+- [ ] `Woman-Stand-Side-01` — em đứng chờ ở điểm hẹn
+- [ ] `Woman-Cheer-01`, `-02` — em nhảy mừng khi gặp (2 khung)
+- [ ] `Couple-Pose-Happy-01` — 2 người ôm nhau (màn bầu trời sao, có thể làm ảnh mở đầu)
+- [ ] `Couple-Bike-Side-01` — 2 người chở nhau (chỉ 1 ảnh thì khai báo `COUPLE_FRAMES`)
+- [ ] `Portrait-Woman-01` — chân dung em (ô nhỏ trên thanh HUD, gần vuông)
+- [ ] `Scene-Terrace-Sitting-Iso-01` — tranh minh hoạ ở lá thư
+- [ ] `Scene-Terrace-Bike-Iso-01` — tranh minh hoạ màn kết thúc
+- [ ] (tuỳ chọn) icon 5 món quà — tên tuỳ ý, khai báo ở `GIFTS[].icon`
 
 ## Danh sách mốc (điền rồi chép sang config.js)
 
