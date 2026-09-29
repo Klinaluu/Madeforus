@@ -23,11 +23,13 @@ Nên khung chat mới **không cần "nhớ" gì từ khung cũ** — chỉ cầ
 | 4 | Dán prompt mở đầu | Copy khối prompt ở mục dưới, đổi `<slug>`, dán vào ô chat, Enter |
 | 5 | Cho phép chạy lệnh | Claude sẽ chạy `tools/new_customer.py`. Nếu app hỏi "cho phép chạy lệnh này?", bấm cho phép |
 | 6 | Gửi tư liệu khách | Kéo-thả ảnh/video thẳng vào `customers/<slug>/assets/` (hoặc vào ô chat); kèm lá thư, tên 5 món quà, thứ tự ảnh, có muốn chữ dưới ảnh không (danh sách A trong `docs/workflow.md`) |
-| 6b | Gửi sprite đã vẽ | Bỏ 14 file sprite (danh sách B trong `docs/workflow.md`) vào `customers/<slug>/assets/characters/`, ảnh gốc/nháp vào `characters/_source/` |
+| 6a | Đặt đơn vẽ sprite | Mở artifact [Couple Sprite Studio](https://claude.ai/artifact/AtEVsFCuePXKtreWRceo2L), điền tên cặp đôi + ảnh + mô tả nhân vật/xe/props, bấm "Gửi đơn", copy khối "Lệnh gửi Claude" |
+| 6a.2 | Dựng sprite bằng Canva | Mở **khung chat Cowork mới có kết nối Canva** (không phải khung khách này), dán lệnh vừa copy — skill `couple-sprite-canva` dựng design Canva theo mẫu Thaobe |
+| 6b | Gửi sprite đã vẽ | Xuất PNG từng trang từ Canva, đặt đúng tên (danh sách B trong `docs/workflow.md`), bỏ vào `customers/<slug>/assets/characters/`, ảnh gốc/nháp vào `characters/_source/` |
 | 7 | Yêu cầu điền config | Nói rõ nội dung (không cần biết cú pháp) — Claude tự sửa `customers/<slug>/config.js` |
 | 8 | Yêu cầu build thử | Gõ "build thử cho tôi xem" — Claude chạy `tools/build_customer.py`, đọc phần cảnh báo nó in ra (ảnh thiếu/thừa, video nặng) |
 | 9 | Xem trước kết quả | Gõ "cho xem thử trên trình duyệt" — Claude mở bằng Browser pane hoặc chỉ đường mở file cho bạn |
-| 10 | Duyệt & sửa | Xem checklist ở `docs/workflow.md` Bước 5, phản hồi trực tiếp trong chat (vd "ảnh mốc 3 để mờ quá"), Claude sửa lại và build lại |
+| 10 | Duyệt & sửa | Xem checklist ở `docs/workflow.md` Bước 7, phản hồi trực tiếp trong chat (vd "ảnh mốc 3 để mờ quá"), Claude sửa lại và build lại |
 | 11 | Deploy | Gõ "tạo repo và deploy cho khách <slug>" — Claude chạy `gh repo create`, `tools/deploy_customer.py` và bật GitHub Pages (Bước 8 trong `docs/workflow.md`). Cho phép khi app hỏi |
 | 12 | Kiểm tra link | Claude mở link thật để xác nhận trang đã sống (lần đầu đợi ~1 phút) |
 | 13 | Nhận thẻ QR & tin nhắn giao | Gõ "bàn giao" (kèm tên hai người nếu `brief.md` chưa có) — Claude chạy `tools/make_qr_card.py`, lưu `customers/<slug>/qr-card.png` và hiện tin nhắn giao để copy (Bước 9 `docs/workflow.md`). Gửi khách tin nhắn + ảnh thẻ QR; zip offline chỉ gửi khi khách hỏi |

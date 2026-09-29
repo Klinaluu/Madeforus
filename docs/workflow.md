@@ -107,7 +107,19 @@ Sinh ra `customers/linh-tung/` gồm `brief.md` (checklist tư liệu A + B ở 
 
 ## Bước 4 — Vẽ sprite (phần B)
 
-Làm theo quy trình vẽ riêng, xuất đủ 14 file ở bảng B, bỏ vào `assets/characters/`.
+1. Mở artifact [Couple Sprite Studio](https://claude.ai/artifact/AtEVsFCuePXKtreWRceo2L),
+   điền đơn: tên cặp đôi, ảnh cặp đôi (mục 6 phần A khách gửi), mô tả nhân vật, ảnh + mô tả
+   xe máy, props muốn thêm, ghi chú. Bấm **Gửi đơn** — trang tự lưu đơn và hiện sẵn khối
+   **Lệnh gửi Claude**.
+2. Mở một khung chat **Cowork mới, có kết nối Canva** (khác với khung chat khách đang làm
+   ở trên), dán lệnh vừa copy vào đó. Không chạy bước này trong khung chat khách — skill
+   `couple-sprite-canva` cần chạy trong Cowork mới dùng được Canva.
+3. Skill `couple-sprite-canva` dựng một design Canva mới theo mẫu Thaobe (11 trang 1264×1264,
+   8 nếu không có xe), mỗi trang một sprite nền trong suốt, nhân vật/xe quay mặt sang phải.
+4. Xuất từng trang thành PNG, đặt **đúng tên file** theo bảng B, bỏ vào
+   `customers/<slug>/assets/characters/`. Ảnh gốc khách gửi + bản nháp thì để trong
+   `assets/characters/_source/` (build bỏ qua thư mục này).
+
 Kiểm tra từng file trước khi build: quay mặt sang phải, nền trong suốt, đáy ảnh sát chân /
 bánh xe.
 
@@ -200,25 +212,21 @@ Mẫu tin nhắn (script tự điền link; muốn đổi câu chữ thì sửa 
 `tools/make_qr_card.py`):
 
 ```
-Game của hai bạn xong rồi nè 💝
-
+Game của hai bạn đã xong rồi nè 💝
 🎮 Link game: https://klinaluu.github.io/linh-tung/
-Mở bằng điện thoại, xoay ngang để chơi.
+Game chơi được ngay trên trình duyệt, cả laptop lẫn điện thoại. Nếu muốn chơi toàn màn hình như một app trên điện thoại:
 
-💓 Thẻ QR của hai bạn: quét bằng camera là vào game, in ra tặng hay gửi cho người ấy đều xinh.
+* iPhone: mở link bằng Safari → bấm nút Chia sẻ (trên iOS mới nằm trong menu ≡ cạnh thanh địa chỉ) → chọn "Thêm vào Màn hình chính"
+* Android: mở link bằng Chrome → bấm menu ⋮ → chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính"
 
-Chơi toàn màn hình như app:
-📱 iPhone: Safari → nút Chia sẻ (đời mới: trong menu ≡ cạnh thanh địa chỉ) → "Thêm vào MH chính"
-📱 Android: Chrome → menu ⋮ → "Cài đặt ứng dụng" / "Thêm vào màn hình chính"
+💌 Thẻ QR riêng: chỉ cần quét bằng camera là vào thẳng game. Bạn có thể in ra làm quà hoặc gửi trực tiếp cho người ấy đều xinh nha.
+‼️ Một vài lưu ý nhỏ:
 
-‼️ Lưu ý:
+* Link và mã QR không có mật khẩu, ai có link đều mở được, nên bạn cân nhắc trước khi chia sẻ công khai nhé.
+* Nếu muốn lưu file game để giữ lâu dài hoặc chơi khi không có mạng, cứ nhắn mình nha.
+* Bạn có thể gửi yêu cầu chỉnh sửa trong vòng 15 ngày kể từ ngày nhận game ạ.
 
-* Link và mã QR không cần mật khẩu, ai có đều xem được nên bạn cân nhắc trước khi chia sẻ công khai nhé.
-* Nếu cần file để lưu trữ hoặc chơi offline cứ nhắn mình nha.
-* Mình chỉ nhận chỉnh sửa trong tối đa 15 ngày sau khi giao game ạ
-
-
-Chúc hai bạn sẽ có những giây phút thật đáng yêu khi chơi game cùng nhau 💖
+Chúc hai bạn có thật nhiều khoảnh khắc đáng yêu khi chơi cùng nhau 💖
 — Made For Us
 ```
 
