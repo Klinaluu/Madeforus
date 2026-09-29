@@ -64,31 +64,33 @@ export const GIFTS = [
 
 // ---------- các mốc của chặng đi đôi ----------
 // Mỗi mốc là một khung polaroid treo trên nền, theo thứ tự thời gian.
-//   date, name : chú thích in dưới khung ảnh
+//   date, name : chú thích in dưới khung ảnh — để "" thì khung không hiện chữ gì (như ở
+//                đây, bản demo cố tình để trống); điền cả hai thì khung tự hiện caption
 //   photo      : đường dẫn ảnh (để "" nếu chưa có)
 //   sky        : hai màu gradient bầu trời [trên, dưới]
 //   event      : "rain"  → trời mưa, nhảy chướng ngại để nhặt ô rồi mới đi tiếp
 //                "chest" → hòm hồng: System Message → Level Unlocked → lá thư
 //                "gift"  → hòm quà rơi từ trời → video
-// Ba mốc có event là phần kịch bản, nên giữ nguyên thứ tự ở cuối danh sách.
+// Ba mốc có event là phần kịch bản, nên giữ nguyên thứ tự ở cuối danh sách và luôn để
+// date/name trống (không phải ảnh kỷ niệm của khách).
 export const MILESTONES = [
-  { date: "DD.MM", name: "Your milestone 1", sky: ["#dfe9ff", "#f6c7d8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 2", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 3", sky: ["#bcd7ff", "#ffd9e8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 4", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 5", sky: ["#e3d3dc", "#b391a6"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 6", sky: ["#ffe6c9", "#ffd9e8"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 7", sky: ["#cfe6ff", "#ffe6c9"], photo: "" },
-  { date: "DD.MM", name: "Your milestone 8", sky: ["#ffd9c4", "#ffe7ef"], photo: "" },
+  { date: "", name: "", sky: ["#dfe9ff", "#f6c7d8"], photo: "" },
+  { date: "", name: "", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
+  { date: "", name: "", sky: ["#bcd7ff", "#ffd9e8"], photo: "" },
+  { date: "", name: "", sky: ["#3b2a5a", "#b57aa8"], photo: "" },
+  { date: "", name: "", sky: ["#e3d3dc", "#b391a6"], photo: "" },
+  { date: "", name: "", sky: ["#ffe6c9", "#ffd9e8"], photo: "" },
+  { date: "", name: "", sky: ["#cfe6ff", "#ffe6c9"], photo: "" },
+  { date: "", name: "", sky: ["#ffd9c4", "#ffe7ef"], photo: "" },
   {
-    date: "DD.MM", name: "Rainy stop", sky: ["#7fb7d9", "#cfe7f2"], photo: "",
+    date: "", name: "", sky: ["#7fb7d9", "#cfe7f2"], photo: "",
     event: "rain",
     blocks: [{ x: 300 }, { x: 520, h: 2 }],
     platforms: [{ x: 640, w: 2, y: 110 }],
     itemAt: { x: 664, y: 166 },
   },
-  { date: "DD.MM", name: "Letter stop", sky: ["#ffd9c4", "#ffe7ef"], photo: "", event: "chest" },
-  { date: "DD.MM", name: "Final stop", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
+  { date: "", name: "", sky: ["#ffd9c4", "#ffe7ef"], photo: "", event: "chest" },
+  { date: "", name: "", sky: ["#bfe0f2", "#e8f3ee"], photo: "", event: "gift" },
 ];
 
 // ---------- nền parallax riêng (tuỳ chọn) ----------

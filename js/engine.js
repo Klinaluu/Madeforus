@@ -917,11 +917,16 @@ export class JourneyGame {
     if (this.phase === "solo") drawWoman(ctx, img.woman, this.meetX, this.groundY, this.t, false);
     if (this.phase === "meeting") drawWoman(ctx, img.womanCheer[Math.floor(this.t * 4) % 2], this.meetX, this.groundY, this.t, true);
 
+    // Khung polaroid treo gần sát mép trên màn hình (dây ngắn) và to hết mức chiều cao còn
+    // trống phía trên mặt đường cho phép — màn hình càng cao (laptop) khung càng to, màn
+    // thấp (điện thoại nằm ngang) thì tự nhỏ lại, không bao giờ đè lên xe/HUD dưới đường.
+    const polaroidTop = 30;
+    const polaroidMax = Math.max(150, Math.min(280, this.groundY - polaroidTop - 70));
     for (const ms of this.milestones) {
       const photo = img.polaroids[ms.index];
       if (!photo && !this.content.emptyPolaroids) continue; // mốc không có ảnh thì không treo khung
       if (ms.polaroidX < this.camX - 300 || ms.polaroidX > this.camX + this.CW + 300) continue;
-      drawPolaroid(ctx, photo, ms.date, ms.polaroidX, Math.max(60, this.groundY - 360), this.t, ms.index, ms.name, this.content.photoPlaceholder);
+      drawPolaroid(ctx, photo, ms.date, ms.polaroidX, polaroidTop, this.t, ms.index, ms.name, this.content.photoPlaceholder, polaroidMax);
     }
 
     for (const ex of this.extras) {
@@ -1494,12 +1499,29 @@ function drawWoman(ctx, image, x, groundY, t, cheer) {
 }
 
 
-// Khung polaroid: viền pixel, bóng cứng lệch, dây treo
-function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
-  // Khung ôm theo tỉ lệ ảnh thật (không crop): ảnh vừa trong hộp MAX×MAX, viền 8, đáy 44 cho chữ
-  const MAX = 190;
+// Ngắt chữ theo từ, không vượt quá maxWidth (dùng ctx.font đã set sẵn trước khi gọi)
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for (const word of words) {
+    const next = line ? line + " " + word : word;
+    if (ctx.measureText(next).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else line = next;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+// Khung polaroid: viền pixel, bóng cứng lệch, dây treo.
+// maxSize: cạnh dài nhất của ảnh (đơn vị thế giới) — render() tính theo chiều cao màn hình
+// còn trống phía trên mặt đường, nên laptop có khung to hơn điện thoại nằm ngang hẳn.
+function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder, maxSize) {
+  // Khung ôm theo tỉ lệ ảnh thật (không crop): ảnh vừa trong hộp MAX×MAX, viền 8
+  const MAX = maxSize || 190;
   const PAD = 8;
-  const FOOT = 44;
   let iw = 130;
   let ih = 130;
   if (ready(photo)) {
@@ -1508,18 +1530,50 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
     ih = Math.round(photo.height * s);
   }
   const w = iw + PAD * 2;
+
+  // ---------- chú thích: ngày + tên mốc, đủ dấu tiếng Việt (Be Vietnam Pro như dòng điểm
+  // rơi ở trên). Mốc nào date và name đều trống thì không vẽ gì — giữ nguyên khung trắng
+  // như trước, không đổi giao diện các bản khách chủ động để trống (vd bản thaobe). ----------
+  ctx.textAlign = "center";
+  const maxTextW = w - 16;
+  const fitSize = (text, base, min, bold) => {
+    let px = base;
+    ctx.font = `${bold ? 700 : 600} ${px}px 'Be Vietnam Pro', sans-serif`;
+    while (px > min && ctx.measureText(text).width > maxTextW) {
+      px -= 1;
+      ctx.font = `${bold ? 700 : 600} ${px}px 'Be Vietnam Pro', sans-serif`;
+    }
+    return px;
+  };
+  const rows = [];
+  if (date) rows.push({ text: date, px: fitSize(date, 14, 10, true), bold: true, color: "#6b3f52" });
+  if (name) {
+    const namePx = fitSize(name, date ? 12 : 14, 9, false);
+    ctx.font = `600 ${namePx}px 'Be Vietnam Pro', sans-serif`;
+    const nameColor = date ? "#a97a92" : "#6b3f52";
+    if (ctx.measureText(name).width > maxTextW) {
+      // vẫn dài quá dù đã thu nhỏ tối đa: xuống 2 dòng thay vì tràn khỏi khung
+      for (const line of wrapText(ctx, name, maxTextW)) rows.push({ text: line, px: namePx, bold: false, color: nameColor });
+    } else {
+      rows.push({ text: name, px: namePx, bold: false, color: nameColor });
+    }
+  }
+  // FOOT=44 (như cũ) đủ chỗ cho tối đa 2 dòng; tên phải xuống dòng thứ 3 mới cần đáy cao hơn.
+  const FOOT = 44 + Math.max(0, rows.length - 2) * 14;
+
   const h = ih + PAD + FOOT;
   const bob = q(Math.sin(t * 1.4 + i) * 4);
   const rot = ((i % 2 === 0 ? -1 : 1) * 3 * Math.PI) / 180;
   ctx.save();
   ctx.translate(x + w / 2, y + h / 2 + bob);
   ctx.rotate(rot);
-  // dây treo lên trời
+  // dây treo — chỉ đủ dài chạm mép trên màn hình (y = khoảng cách từ đỉnh khung tới đó),
+  // không kéo cố định 400px như trước (thừa trên màn to, có khi hụt trên màn cao)
   ctx.strokeStyle = "rgba(43,32,48,0.5)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, -h / 2);
-  ctx.lineTo(0, -h / 2 - 400);
+  ctx.lineTo(0, -h / 2 - (y + 40));
   ctx.stroke();
   // bóng cứng
   ctx.fillStyle = "rgba(43,32,48,0.28)";
@@ -1551,16 +1605,7 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
       ctx.setLineDash([]);
       ctx.fillStyle = "rgba(224,83,138,0.8)";
       ctx.font = "8px 'Press Start 2P', monospace";
-      const lines = [];
-      let line = "";
-      for (const word of placeholder.split(" ")) {
-        const next = line ? line + " " + word : word;
-        if (ctx.measureText(next).width > iw - 22 && line) {
-          lines.push(line);
-          line = word;
-        } else line = next;
-      }
-      if (line) lines.push(line);
+      const lines = wrapText(ctx, placeholder, iw - 22);
       let ty = py + ih / 2 - (lines.length - 1) * 7;
       for (const l of lines) {
         ctx.fillText(l, 0, ty);
@@ -1570,6 +1615,18 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder) {
       ctx.fillStyle = "rgba(224,83,138,0.35)";
       ctx.font = "26px sans-serif";
       ctx.fillText("♡", 0, py + ih / 2 + 9);
+    }
+  }
+
+  if (rows.length) {
+    ctx.textAlign = "center";
+    const lineH = 14;
+    let ly = h / 2 - 10 - (rows.length - 1) * lineH;
+    for (const row of rows) {
+      ctx.font = `${row.bold ? 700 : 600} ${row.px}px 'Be Vietnam Pro', sans-serif`;
+      ctx.fillStyle = row.color;
+      ctx.fillText(row.text, 0, ly);
+      ly += lineH;
     }
   }
   ctx.restore();
