@@ -31,7 +31,7 @@ PHOTO_QUALITY = 82
 VIDEO_WARN_MB = 25
 CODE_DIRS = ["css", "assets/brand", "assets/characters", "assets/elements", "assets/props", "assets/ui", "assets/scenes", "assets/audio", "assets/fonts"]
 CODE_FILES = ["index.html", "manifest.webmanifest", "assets/preview.png"]
-JS_FILES = ["assets.js", "audio.js", "engine.js", "install.js", "levels.js", "main.js"]
+JS_FILES = ["assets.js", "audio.js", "engine.js", "i18n.js", "install.js", "levels.js", "main.js"]
 
 
 def read_config_value(config, name):

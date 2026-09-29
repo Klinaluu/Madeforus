@@ -10,6 +10,10 @@ export const GAME_SUBTITLE = "Our love journey";
 export const WINDOW_NAME = "MADE_FOR_US.EXE"; // chữ trên thanh tiêu đề cửa sổ
 
 // ---------- lời thoại & văn bản ----------
+// Game có 2 thứ tiếng: mặc định tiếng Anh, nút VIE ở màn hình mở đầu đổi sang tiếng Việt.
+// Các câu dưới đây giữ nguyên câu mẫu tiếng Anh = tự dùng câu mẫu đúng thứ tiếng (js/i18n.js).
+// Khách viết câu riêng: ghi 1 chuỗi (dùng cho cả hai thứ tiếng) hoặc { en: "...", vi: "..." }.
+// Cách ghi { en, vi } dùng được cả cho GIFTS[].label, MILESTONES[].date/name, GAME_SUBTITLE.
 export const TEXT = {
   // câu nhân vật nam nói khi tìm thấy cô ấy
   manLine: "Found you.",
@@ -30,7 +34,7 @@ export const TEXT = {
   rotateText: "This journey is made for a sideways screen.",
   rotateTip: "⟳ Hold your device sideways to play",
   // Hướng dẫn thêm vào màn hình chính (chỉ hiện trên điện thoại / máy tính bảng).
-  // Để trống thì dùng chuỗi mặc định tiếng Anh trong js/install.js.
+  // Để trống thì dùng hướng dẫn mặc định (tiếng Anh / tiếng Việt) trong js/install.js.
   install: {},
 };
 

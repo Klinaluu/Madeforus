@@ -85,6 +85,7 @@ js/engine.js        vòng lặp game: vật lý, va chạm, camera, vẽ canvas
 js/main.js          điều phối màn hình, HUD, điều khiển, cắt cảnh
 js/audio.js         hiệu ứng âm thanh WebAudio (không cần file) + nhạc nền mp3
 js/install.js       gợi ý thêm vào màn hình chính trên điện thoại (iPhone / Android / Zalo…)
+js/i18n.js          chữ giao diện tiếng Anh + tiếng Việt, nút VIE / ENG ở màn hình mở đầu
 assets/             brand (logo, favicon), audio, fonts, characters, elements, props, ui, scenes, photos, video
 assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
 tools/new_customer.py     tạo thư mục tư liệu cho một khách mới
@@ -100,6 +101,13 @@ docs/new-customer-chat.md     cách mở khung chat mới + thao tác với Clau
 ```
 
 ## Kỹ thuật
+
+- Hai thứ tiếng: mặc định tiếng Anh; nút **VIE** góc trên trái màn hình mở đầu đổi sang tiếng
+  Việt ngay tại chỗ (bấm **ENG** để đổi lại), lựa chọn được nhớ cho lần mở sau. Không tự đổi
+  theo ngôn ngữ máy. Link `?lang=vi` mở thẳng tiếng Việt (để thử). Chữ giao diện nằm ở
+  `js/i18n.js`; bản tiếng Việt dùng font pixel VT323 (có dấu) vì Press Start 2P không có dấu.
+  Trang có `notranslate` + `color-scheme: only light` để trình duyệt không tự dịch máy / tự
+  làm tối giao diện.
 
 - Vanilla JS (ES modules) + Canvas 2D, không framework, không bước build khi phát triển.
 - Nền là ảnh parallax 3 lớp (xa → gần) cho mỗi cảnh; cảnh vẽ ở tỉ lệ cố định, phần trời phía

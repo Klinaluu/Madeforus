@@ -63,6 +63,17 @@ function ready(img) {
 const PX = 2;
 const q = (v) => Math.round(v / PX) * PX;
 
+// Chữ vẽ trên canvas + font pixel cho chữ đó — main.js truyền vào theo ngôn ngữ máy
+// (content.strings / content.titleFont), không truyền thì dùng tiếng Anh.
+const STR_EN = {
+  popCollectFirst: "Collect all 5 gifts first!", popForgot: "Forgot your {x}!", popRide: "Let's ride!",
+  popDoubtCleared: "Doubt cleared ✦", popRainOver: "☂ Rain's over", gearKey: "Key", gearHelmet: "Helmet",
+  itemUmbrella: "Umbrella", itemEgg: "Golden egg", promptOpen: "Open", bikeMine: "MY BIKE", bikeGo: "LET'S GO",
+  bossDoubt: "DOUBT",
+};
+let STR = STR_EN;
+let TITLE_FONT = "'Press Start 2P', monospace";
+
 export class JourneyGame {
   constructor(canvas, content, images, callbacks) {
     this.canvas = canvas;
@@ -75,6 +86,8 @@ export class JourneyGame {
     this.images = images;
     this.cb = callbacks;
     this.content = content;
+    STR = { ...STR_EN, ...(content.strings || {}) };
+    if (content.titleFont) TITLE_FONT = content.titleFont;
     this._raf = null;
     this._destroyed = false;
 
@@ -155,7 +168,7 @@ export class JourneyGame {
       });
       if (ms.event === "rain") {
         this.rainMs = ms;
-        this.extras.push({ id: "umbrella", label: "Umbrella", x: ms.start + ms.itemAt.x, gap: ms.itemAt.y, collected: false, ms });
+        this.extras.push({ id: "umbrella", label: STR.itemUmbrella, x: ms.start + ms.itemAt.x, gap: ms.itemAt.y, collected: false, ms });
       }
       // điểm thưởng (id "egg", vẽ bằng assets/props/Egg-Gold.png = hình trái tim) rải dọc
       // đường, vài cái phải nhảy mới tới
@@ -163,7 +176,7 @@ export class JourneyGame {
         [[250, 40], [520, 130], [790, 60]].forEach(([dx, gap]) => {
           const x = ms.start + dx;
           const blocked = (ms.blocks || []).some((b) => Math.abs(ms.start + b.x - x) < 90) || (ms.platforms || []).some((pf) => Math.abs(ms.start + pf.x - x) < 120);
-          if (!blocked) this.extras.push({ id: "egg", label: "Golden egg", x, gap, collected: false, ms });
+          if (!blocked) this.extras.push({ id: "egg", label: STR.itemEgg, x, gap, collected: false, ms });
         });
       }
     });
@@ -209,8 +222,8 @@ export class JourneyGame {
 
     // đoạn đi bộ: chìa khoá trên đường, mũ trên 1 viên gạch (tập nhảy), xe trùm bạt ở cuối
     this.gear = [
-      { id: "key", label: "Key", x: 230, gap: 28, collected: false },
-      { id: "helmet", label: "Helmet", x: 404, gap: 62, collected: false },
+      { id: "key", label: STR.gearKey, x: 230, gap: 28, collected: false },
+      { id: "helmet", label: STR.gearHelmet, x: 404, gap: 62, collected: false },
     ];
     this.solids.push({ x: 400, top: BLOCK, w: BLOCK, h: BLOCK, kind: "brick" });
     this.bikeX = 560;
@@ -537,13 +550,13 @@ export class JourneyGame {
     if (p.x > maxX) {
       if (this.phase === "solo" && !this.allCollected() && !this._hintShown) {
         this._hintShown = true;
-        this.popups.push({ x: p.x + p.w / 2, y: p.y - 10, vy: -30, life: 2.2, text: "Collect all 5 gifts first!", color: "#e0538a" });
+        this.popups.push({ x: p.x + p.w / 2, y: p.y - 10, vy: -30, life: 2.2, text: STR.popCollectFirst, color: "#e0538a" });
         setTimeout(() => (this._hintShown = false), 2500);
       }
       if (this.phase === "walk" && !this._hintShown) {
         this._hintShown = true;
         const missing = this.gear.filter((g) => !g.collected).map((g) => g.label.toLowerCase()).join(" & ");
-        this.popups.push({ x: p.x + p.w / 2, y: p.y - 10, vy: -30, life: 2.2, text: "Forgot your " + missing + "!", color: "#e0538a" });
+        this.popups.push({ x: p.x + p.w / 2, y: p.y - 10, vy: -30, life: 2.2, text: STR.popForgot.replace("{x}", missing), color: "#e0538a" });
         setTimeout(() => (this._hintShown = false), 2500);
       }
       p.x = maxX;
@@ -641,7 +654,7 @@ export class JourneyGame {
           }
           this._dust(p.x + p.w / 2, this.groundY);
           this.shake = 0.15;
-          this.popups.push({ x: p.x + p.w / 2, y: p.y - 16, vy: -35, life: 1.6, text: "Let's ride!", color: "#e0538a" });
+          this.popups.push({ x: p.x + p.w / 2, y: p.y - 16, vy: -35, life: 1.6, text: STR.popRide, color: "#e0538a" });
           this.cb.onMount && this.cb.onMount();
         }
       }
@@ -716,7 +729,7 @@ export class JourneyGame {
             b.defeated = true;
             b.active = false;
             this._burst(b.x + BOSS_W / 2, top + BOSS_H / 2, 30, ["#fff", "#cfc4e6", "#ffb6cf", "#f2c94c"]);
-            this.popups.push({ x: b.x + BOSS_W / 2, y: top - 10, vy: -30, life: 2, text: "Doubt cleared ✦", color: "#fff" });
+            this.popups.push({ x: b.x + BOSS_W / 2, y: top - 10, vy: -30, life: 2, text: STR.popDoubtCleared, color: "#fff" });
             this._addScore(300);
             this.shake = 0.3;
             this.cb.onBoss && this.cb.onBoss("defeated", b);
@@ -783,7 +796,7 @@ export class JourneyGame {
             this._addScore(50, ex.x + ITEM_SIZE / 2, bottom - ITEM_SIZE);
           } else {
             this._burst(ex.x + ITEM_SIZE / 2, bottom - ITEM_SIZE / 2, 16, ["#fff", "#ffd6e4", "#ff6fa0"]);
-            this.popups.push({ x: ex.x + ITEM_SIZE / 2, y: bottom - ITEM_SIZE, vy: -45, life: 1.4, text: "☂ Rain's over", color: "#e0538a" });
+            this.popups.push({ x: ex.x + ITEM_SIZE / 2, y: bottom - ITEM_SIZE, vy: -45, life: 1.4, text: STR.popRainOver, color: "#e0538a" });
             this._addScore(150);
           }
           this.cb.onExtra && this.cb.onExtra(ex);
@@ -809,7 +822,7 @@ export class JourneyGame {
 
     this.prompt = null;
     if (this.phase === "chest" && !this.chest.opened) {
-      if (Math.abs(p.x + p.w - this.chestX) < 60) this.prompt = { x: this.chestX + 32, y: this.groundY - 80, text: "Open" };
+      if (Math.abs(p.x + p.w - this.chestX) < 60) this.prompt = { x: this.chestX + 32, y: this.groundY - 80, text: STR.promptOpen };
     }
     if (this.phase === "gift" && this.gift.active) {
       const g = this.gift;
@@ -825,7 +838,7 @@ export class JourneyGame {
           this._burst(this.giftX + 32, this.groundY - 30, 12, ["#fff", "#ffb6cf"]);
         }
       } else if (!g.opened && Math.abs(p.x + p.w - this.giftX) < 60) {
-        this.prompt = { x: this.giftX + 32, y: this.groundY - 80, text: "Open" };
+        this.prompt = { x: this.giftX + 32, y: this.groundY - 80, text: STR.promptOpen };
       }
     }
 
@@ -1295,10 +1308,10 @@ function drawBoss(ctx, cloudImg, b, groundY, t) {
     ctx.fillRect(lx, y + h + 16, 6, 10);
   }
   // nhãn + số lần né
-  ctx.font = "9px 'Press Start 2P', monospace";
+  ctx.font = `9px ${TITLE_FONT}`;
   ctx.textAlign = "center";
   ctx.fillStyle = "#fff";
-  ctx.fillText("DOUBT", x + w / 2, y - 14);
+  ctx.fillText(STR.bossDoubt, x + w / 2, y - 14);
   for (let i = 0; i < BOSS_DODGES; i++) {
     ctx.fillStyle = i < b.dodges ? "#f2c94c" : "rgba(255,255,255,0.35)";
     ctx.fillRect(q(x + w / 2 - 18 + i * 14), y - 10, 8, 4);
@@ -1310,7 +1323,7 @@ function drawBoss(ctx, cloudImg, b, groundY, t) {
 function drawCoveredBike(ctx, image, x, groundY, t, ready_) {
   ctx.save();
   const label = () => {
-    ctx.font = "8px 'Press Start 2P', monospace";
+    ctx.font = `8px ${TITLE_FONT}`;
     ctx.textAlign = "center";
     ctx.fillStyle = ready_ && Math.floor(t * 3) % 2 === 0 ? "#f2c94c" : "#fff";
   };
@@ -1320,7 +1333,7 @@ function drawCoveredBike(ctx, image, x, groundY, t, ready_) {
     drawShadow(ctx, x + w / 2, groundY, w * 0.85, 0.22);
     ctx.drawImage(image, x, groundY - h, w, h);
     label();
-    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, groundY - h - 8);
+    ctx.fillText(ready_ ? STR.bikeGo : STR.bikeMine, x + w / 2, groundY - h - 8);
   } else {
     // bạt phủ vẽ tay: dùng khi chưa có ảnh xe riêng của khách
     const w = 120;
@@ -1342,7 +1355,7 @@ function drawCoveredBike(ctx, image, x, groundY, t, ready_) {
     ctx.fillStyle = "#fff";
     ctx.fillRect(x + 44, y + 22, 24, 4);
     label();
-    ctx.fillText(ready_ ? "LET'S GO" : "MY BIKE", x + w / 2, y - 8);
+    ctx.fillText(ready_ ? STR.bikeGo : STR.bikeMine, x + w / 2, y - 8);
   }
   ctx.restore();
 }
@@ -1607,7 +1620,7 @@ function drawPolaroid(ctx, photo, date, x, y, t, i, name, placeholder, maxSize) 
       ctx.strokeRect(px + 5, py + 5, iw - 10, ih - 10);
       ctx.setLineDash([]);
       ctx.fillStyle = "rgba(224,83,138,0.8)";
-      ctx.font = "8px 'Press Start 2P', monospace";
+      ctx.font = `8px ${TITLE_FONT}`;
       const lines = wrapText(ctx, placeholder, iw - 22);
       let ty = py + ih / 2 - (lines.length - 1) * 7;
       for (const l of lines) {
@@ -1701,7 +1714,7 @@ function drawSpeedLines(ctx, p, groundY, t) {
 function drawPrompt(ctx, x, y, text, t) {
   const bob = q(Math.sin(t * 5) * 3);
   ctx.save();
-  ctx.font = "10px 'Press Start 2P', monospace";
+  ctx.font = `10px ${TITLE_FONT}`;
   ctx.textAlign = "center";
   const w = q(ctx.measureText(text).width + 44);
   ctx.fillStyle = OUTLINE;

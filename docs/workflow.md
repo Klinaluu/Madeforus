@@ -177,6 +177,7 @@ Chạy thử bằng server cục bộ (`python3 -m http.server` trong `dist/linh
 - [ ] Nhân vật, xe, gai, khối gạch đứng đúng trên vạch kẻ đường (không lơ lửng)
 - [ ] Nhạc nền + tiếng nhảy, tắt/mở bằng nút 🔊
 - [ ] Điện thoại cầm dọc: thấy màn mở đầu + hộp hướng dẫn; cầm ngang: chơi được
+- [ ] Bấm **VIE** ở màn mở đầu: toàn bộ chữ đổi sang tiếng Việt, đủ dấu, không vỡ font; bấm **ENG** đổi lại
 
 ## Bước 8 — Tạo repo & deploy
 
