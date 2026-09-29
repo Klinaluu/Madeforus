@@ -70,6 +70,7 @@ export class JourneyGame {
     this.CW = canvas.width || CW;
     this.CH = canvas.height || CH;
     this.bottomInset = content.bottomInset || 0;
+    this.topInset = content.topInset || 0;
     this.groundY = this.CH - groundMarginFor(this.CH, this.bottomInset);
     this.images = images;
     this.cb = callbacks;
@@ -259,10 +260,11 @@ export class JourneyGame {
     this.keys[name] = false;
   }
 
-  resize(newWidth, newHeight, bottomInset) {
+  resize(newWidth, newHeight, bottomInset, topInset) {
     if (!newWidth || !newHeight) return;
     if (bottomInset != null) this.bottomInset = bottomInset;
-    if (newWidth === this.CW && newHeight === this.CH && bottomInset == null) return;
+    if (topInset != null) this.topInset = topInset;
+    if (newWidth === this.CW && newHeight === this.CH && bottomInset == null && topInset == null) return;
     this.canvas.width = newWidth;
     this.canvas.height = newHeight;
     this.CW = newWidth;
@@ -917,10 +919,11 @@ export class JourneyGame {
     if (this.phase === "solo") drawWoman(ctx, img.woman, this.meetX, this.groundY, this.t, false);
     if (this.phase === "meeting") drawWoman(ctx, img.womanCheer[Math.floor(this.t * 4) % 2], this.meetX, this.groundY, this.t, true);
 
-    // Khung polaroid treo gần sát mép trên màn hình (dây ngắn) và to hết mức chiều cao còn
-    // trống phía trên mặt đường cho phép — màn hình càng cao (laptop) khung càng to, màn
-    // thấp (điện thoại nằm ngang) thì tự nhỏ lại, không bao giờ đè lên xe/HUD dưới đường.
-    const polaroidTop = 30;
+    // Khung polaroid treo ngay dưới thanh HUD (dây đủ dài để không bị thanh đè lên, xem
+    // topInset) và to hết mức chiều cao còn trống phía trên mặt đường cho phép — màn hình
+    // càng cao (laptop) khung càng to, màn thấp (điện thoại nằm ngang) thì tự nhỏ lại,
+    // không bao giờ đè lên xe/HUD dưới đường.
+    const polaroidTop = Math.max(30, this.topInset);
     const polaroidMax = Math.max(150, Math.min(280, this.groundY - polaroidTop - 70));
     for (const ms of this.milestones) {
       const photo = img.polaroids[ms.index];

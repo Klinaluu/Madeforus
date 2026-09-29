@@ -101,6 +101,16 @@ function bottomInsetFor(canvasHeight) {
   const scale = canvasHeight / (window.innerHeight || canvasHeight);
   return Math.round(padPx * scale) + 34; // chừa thêm một khoảng cho thoáng
 }
+// Thanh HUD trên cùng cao bao nhiêu (đổi sang px thế giới) — khung polaroid luôn treo
+// dưới nó, không để dây/khung bị thanh HUD đè lên trông như bị cắt cụt phía trên.
+function topInsetFor(canvasHeight) {
+  const bar = document.querySelector(".hud");
+  if (!bar) return 0;
+  const barPx = bar.getBoundingClientRect().height;
+  if (!barPx) return 0;
+  const scale = canvasHeight / (window.innerHeight || canvasHeight);
+  return Math.round(barPx * scale) + 20; // chừa thêm một khoảng cho thoáng
+}
 
 // ---------------- helpers màn hình ----------------
 const $ = (id) => document.getElementById(id);
@@ -240,7 +250,7 @@ function startJourney() {
   if (currentGame) currentGame.destroy();
   currentGame = new JourneyGame(
     canvas,
-    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: GIFTS, milestones: COUPLE_MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, bottomInset: bottomInsetFor(size.height), emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: TEXT.photoPlaceholder },
+    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: GIFTS, milestones: COUPLE_MILESTONES, maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, bottomInset: bottomInsetFor(size.height), topInset: topInsetFor(size.height), emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: TEXT.photoPlaceholder },
     images,
     {
       onItem: (item, count, total) => {
@@ -529,7 +539,7 @@ function wireUI() {
     resizeTimer = setTimeout(() => {
       if (!currentGame) return;
       const s = canvasSizeForViewport();
-      currentGame.resize(s.width, s.height, bottomInsetFor(s.height));
+      currentGame.resize(s.width, s.height, bottomInsetFor(s.height), topInsetFor(s.height));
     }, 150);
   });
 }
