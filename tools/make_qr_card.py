@@ -32,25 +32,21 @@ CHROME_PATHS = [
     shutil.which("chromium") or "",
 ]
 
-MESSAGE = """Game của hai bạn xong rồi nè 💝
-
+MESSAGE = """Game của hai bạn đã xong rồi nè 💝
 🎮 Link game: {link}
-Mở bằng điện thoại, xoay ngang để chơi.
+Game chơi được ngay trên trình duyệt, cả laptop lẫn điện thoại. Nếu muốn chơi toàn màn hình như một app trên điện thoại:
 
-💓 Thẻ QR của hai bạn: quét bằng camera là vào game, in ra tặng hay gửi cho người ấy đều xinh.
+* iPhone: mở link bằng Safari → bấm nút Chia sẻ (trên iOS mới nằm trong menu ≡ cạnh thanh địa chỉ) → chọn "Thêm vào Màn hình chính"
+* Android: mở link bằng Chrome → bấm menu ⋮ → chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính"
 
-Chơi toàn màn hình như app:
-📱 iPhone: Safari → nút Chia sẻ (đời mới: trong menu ≡ cạnh thanh địa chỉ) → "Thêm vào MH chính"
-📱 Android: Chrome → menu ⋮ → "Cài đặt ứng dụng" / "Thêm vào màn hình chính"
+💌 Thẻ QR riêng: chỉ cần quét bằng camera là vào thẳng game. Bạn có thể in ra làm quà hoặc gửi trực tiếp cho người ấy đều xinh nha.
+‼️ Một vài lưu ý nhỏ:
 
-‼️ Lưu ý:
+* Link và mã QR không có mật khẩu, ai có link đều mở được, nên bạn cân nhắc trước khi chia sẻ công khai nhé.
+* Nếu muốn lưu file game để giữ lâu dài hoặc chơi khi không có mạng, cứ nhắn mình nha.
+* Bạn có thể gửi yêu cầu chỉnh sửa trong vòng 15 ngày kể từ ngày nhận game ạ.
 
-* Link và mã QR không cần mật khẩu, ai có đều xem được nên bạn cân nhắc trước khi chia sẻ công khai nhé.
-* Nếu cần file để lưu trữ hoặc chơi offline cứ nhắn mình nha.
-* Mình chỉ nhận chỉnh sửa trong tối đa 15 ngày sau khi giao game ạ
-
-
-Chúc hai bạn sẽ có những giây phút thật đáng yêu khi chơi game cùng nhau 💖
+Chúc hai bạn có thật nhiều khoảnh khắc đáng yêu khi chơi cùng nhau 💖
 — Made For Us"""
 
 
