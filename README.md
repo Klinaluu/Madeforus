@@ -16,7 +16,7 @@ cho khách** — xem [Làm bản riêng cho từng khách](#làm-bản-riêng-ch
 | Cách | Làm gì |
 | --- | --- |
 | Online | Mở link ở trên |
-| Ngoại tuyến | Double-click `Made for Us.html` (giữ nguyên thư mục `assets/` bên cạnh) |
+| Ngoại tuyến | `python3 tools/package.py` → giải nén `dist/madeforus.zip`, double-click `Made for Us.html` bên trong |
 | Khi phát triển | `python3 -m http.server 8750` rồi mở <http://localhost:8750> |
 
 **Điều khiển** — bàn phím: `◀ ▶` di chuyển, `▲` nhảy, `▲▲` nhảy đôi, `F` toàn màn hình,
@@ -88,6 +88,7 @@ js/install.js       gợi ý thêm vào màn hình chính trên điện thoại 
 js/i18n.js          chữ giao diện tiếng Anh + tiếng Việt, nút VIE / ENG ở màn hình mở đầu
 assets/             brand (logo, favicon), audio, fonts, characters, elements, props, ui, scenes, photos, video
 assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
+design/brand/       file gốc bộ nhận diện (logo, icon 1024, tim .svg) — không chép vào bản build
 tools/new_customer.py     tạo thư mục tư liệu cho một khách mới
 tools/build_customer.py   build bản riêng từ customers/<slug>/
 tools/deploy_customer.py  push bản riêng lên GitHub Pages

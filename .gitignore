@@ -3,3 +3,5 @@ dist/
 *.zip
 customers/
 .claude/
+# bản một file offline — sinh lại bằng: python3 tools/package.py (không commit, tránh bản cũ lỗi thời)
+Made for Us.html

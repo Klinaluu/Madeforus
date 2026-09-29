@@ -15,6 +15,8 @@ Các bước script tự làm:
 
 Kết quả: dist/<slug>/ (đưa lên Netlify / GitHub Pages) và dist/<slug>.zip (gửi khách).
 """
+import html
+import json
 import os
 import re
 import shutil
@@ -161,21 +163,27 @@ def main():
     pretty = title.title() if title.isupper() else title
     man_path = os.path.join(dist, "manifest.webmanifest")
     man = open(man_path, encoding="utf-8").read()
-    man = man.replace('"name": "Made for Us"', f'"name": "{pretty}"').replace('"short_name": "Made for Us"', f'"short_name": "{pretty}"')
+    # tên do khách đặt có thể chứa " hay \ → json.dumps để manifest vẫn là JSON hợp lệ (hỏng là mất nút cài app)
+    man = man.replace('"name": "Made for Us"', f'"name": {json.dumps(pretty, ensure_ascii=False)}')
+    man = man.replace('"short_name": "Made for Us"', f'"short_name": {json.dumps(pretty, ensure_ascii=False)}')
     open(man_path, "w", encoding="utf-8").write(man)
 
     html_path = os.path.join(dist, "index.html")
-    html = open(html_path, encoding="utf-8").read()
-    html = html.replace("<title>Made for Us</title>", f"<title>{pretty}</title>")
-    html = html.replace('content="Made for Us — Our love journey"', f'content="{pretty} — {subtitle}"')
-    html = html.replace('content="Made for Us"', f'content="{pretty}"')
+    page = open(html_path, encoding="utf-8").read()
+    # escape: tên / slogan có < hay " không được thành thẻ HTML hay cắt ngang thuộc tính
+    safe_title, safe_sub = html.escape(pretty), html.escape(subtitle)
+    page = page.replace("<title>Made for Us</title>", f"<title>{safe_title}</title>")
+    page = page.replace('content="Made for Us — Our love journey"', f'content="{safe_title} — {safe_sub}"')
+    page = page.replace('content="Made for Us"', f'content="{safe_title}"')
     if site_url:
-        html = re.sub(r'(property="og:url" content=")[^"]*"', r"\g<1>" + site_url + '"', html)
-        html = re.sub(r'((?:property|name)="(?:og:image|twitter:image)" content=")[^"]*"', r"\g<1>" + site_url + 'assets/preview.png"', html)
-    open(html_path, "w", encoding="utf-8").write(html)
+        page = re.sub(r'(property="og:url" content=")[^"]*"', r"\g<1>" + site_url + '"', page)
+        page = re.sub(r'((?:property|name)="(?:og:image|twitter:image)" content=")[^"]*"', r"\g<1>" + site_url + 'assets/preview.png"', page)
+    open(html_path, "w", encoding="utf-8").write(page)
 
     # ---------- bản một file + zip ----------
-    build_standalone.build(dist, f"{pretty}.html")
+    # tên file lấy theo tên game: bỏ ký tự cấm trong tên file (/ thì còn ghi được ra ngoài dist)
+    file_title = re.sub(r'[\\/:*?"<>|]', "", pretty).strip(" .") or "Made for Us"
+    build_standalone.build(dist, f"{file_title}.html")
     zip_path = os.path.join(ROOT, "dist", f"{slug}.zip")
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         for dirpath, dirs, files in os.walk(dist):
