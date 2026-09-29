@@ -623,6 +623,12 @@ async function init() {
   wireUI();
   initInstallHint({ text: TEXT.install });
   initMusic(MUSIC_SRC);
+  // Tải trước font Waterfall (cả 2 file latin + vietnamese) từ lúc mở trang — chuyện mở lá
+  // thư có thể xảy ra rất lâu sau (giữa game), nên tải sớm để lúc đó không bị "nhảy" từ
+  // font dự phòng sang Waterfall giữa chừng khi trình duyệt vừa tải xong.
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load("16px Waterfall", "chữ có dấu ệ ố ớ ữ ộ ẫ ẳ Đ").catch(() => {});
+  }
   const startBtn = $("btn-start");
   startBtn.textContent = "Loading…";
   startBtn.disabled = true;

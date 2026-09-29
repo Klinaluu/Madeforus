@@ -84,7 +84,7 @@ js/engine.js        vòng lặp game: vật lý, va chạm, camera, vẽ canvas
 js/main.js          điều phối màn hình, HUD, điều khiển, cắt cảnh
 js/audio.js         hiệu ứng âm thanh WebAudio (không cần file) + nhạc nền mp3
 js/install.js       gợi ý thêm vào màn hình chính trên điện thoại (iPhone / Android / Zalo…)
-assets/             brand (logo, favicon), audio, characters, elements, props, ui, scenes, photos, video
+assets/             brand (logo, favicon), audio, fonts, characters, elements, props, ui, scenes, photos, video
 assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/make_preview.py
 tools/new_customer.py     tạo thư mục tư liệu cho một khách mới
 tools/build_customer.py   build bản riêng từ customers/<slug>/
@@ -105,6 +105,12 @@ docs/new-customer-chat.md     cách mở khung chat mới + thao tác với Clau
 - Canvas đổi độ phân giải theo tỉ lệ màn hình nên không méo và không cắt nhân vật.
 - Hiệu ứng âm thanh sinh bằng WebAudio; nhạc nền là file mp3 (`MUSIC_SRC` trong config.js).
 - `tools/build_standalone.py` gộp các module thành một file HTML chạy được qua `file://`.
+- Font đóng gói sẵn trong `assets/fonts/` (`.woff2`, không dùng `@import` Google Fonts) để
+  chạy được offline và không bị "nhảy font": mỗi family/weight có 2 file, subset latin +
+  vietnamese, nạp cùng lúc từ cùng server thay vì tách 2 domain như Google Fonts. Cần đổi
+  weight hoặc thêm font mới thì tải file `.woff2` (subset latin + vietnamese) từ
+  <https://fonts.google.com>, bỏ vào `assets/fonts/`, khai báo `@font-face` trong
+  `css/style.css` — xem khối đầu file để theo đúng mẫu.
 
 Cờ khi thử nghiệm: mở trang với `#autostart` để vào thẳng màn chơi, `#debug` để lấy ván
 chơi hiện tại qua `window.__game` trong console.
