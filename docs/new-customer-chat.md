@@ -30,7 +30,7 @@ Nên khung chat mới **không cần "nhớ" gì từ khung cũ** — chỉ cầ
 | 10 | Duyệt & sửa | Xem checklist ở `docs/workflow.md` Bước 5, phản hồi trực tiếp trong chat (vd "ảnh mốc 3 để mờ quá"), Claude sửa lại và build lại |
 | 11 | Deploy | Gõ "tạo repo và deploy cho khách <slug>" — Claude chạy `gh repo create`, `tools/deploy_customer.py` và bật GitHub Pages (Bước 8 trong `docs/workflow.md`). Cho phép khi app hỏi |
 | 12 | Kiểm tra link | Claude mở link thật để xác nhận trang đã sống (lần đầu đợi ~1 phút) |
-| 13 | Nhận link & file giao khách | Claude báo link + đường dẫn `dist/<slug>.zip`; gửi khách kèm tin nhắn mẫu ở Bước 9 `docs/workflow.md` |
+| 13 | Nhận thẻ QR & tin nhắn giao | Gõ "bàn giao" (kèm tên hai người nếu `brief.md` chưa có) — Claude chạy `tools/make_qr_card.py`, lưu `customers/<slug>/qr-card.png` và hiện tin nhắn giao để copy (Bước 9 `docs/workflow.md`). Gửi khách tin nhắn + ảnh thẻ QR; zip offline chỉ gửi khi khách hỏi |
 | 14 | Kết thúc | Không cần đóng chat thủ công — cứ để đó hoặc archive; dữ liệu đã nằm ở `customers/<slug>/` trên đĩa, không mất khi đóng chat |
 
 ## Prompt mở đầu (copy-paste)

@@ -25,6 +25,7 @@ Nguyên tắc: **không sửa file gốc của repo cho một khách.** Mọi th
 | 6 | Ảnh 2 người + ảnh chiếc xe máy | Chân dung + toàn thân, trang phục muốn vẽ | làm mẫu vẽ sprite |
 | 7 | Tên game + slogan (tuỳ chọn) | Không có → giữ "MADE FOR US / Our love journey" | `GAME_TITLE`, `GAME_SUBTITLE` |
 | 8 | Có muốn chữ dưới khung ảnh không | Có → ngày + tên từng mốc. Không → để trống như bản Thảo Bé | `MILESTONES[].date/name` |
+| 9 | Tên hai người | Tên/biệt danh muốn in trên thẻ QR bàn giao | `brief.md` → dòng `Tên cặp đôi:` |
 
 ### B. Bạn tạo (vẽ theo mặt khách)
 
@@ -71,7 +72,8 @@ vào 1 folder Google Drive:
 4. Tên 5 món quà nhân vật sẽ nhặt trong game (vd: cà phê, máy ảnh, con mèo…).
    Có ảnh món quà thì gửi kèm.
 5. Vài ảnh chân dung + toàn thân của hai bạn, và ảnh chiếc xe máy — để mình vẽ nhân vật.
-6. (Tuỳ chọn) 1 ảnh dọc cho màn hình mở đầu, tên game/câu slogan riêng,
+6. Tên (hoặc biệt danh) của hai bạn — để in lên thẻ QR khi giao game.
+7. (Tuỳ chọn) 1 ảnh dọc cho màn hình mở đầu, tên game/câu slogan riêng,
    và ngày + tên cho từng ảnh nếu muốn hiện chữ dưới khung ảnh.
 ```
 
@@ -177,19 +179,47 @@ Lệnh `gh api` (bật GitHub Pages) chỉ chạy **lần đầu** của repo đ
 
 ## Bước 9 — Giao khách
 
-Gửi 2 thứ: tin nhắn dưới đây (đổi slug) và file `dist/linh-tung.zip` (bản offline giữ làm
-kỷ niệm — giải nén rồi mở file `.html`).
+Điền dòng `Tên cặp đôi:` trong `brief.md` (vd `Tên cặp đôi:      Linh & Tùng`), rồi:
+
+```bash
+python3 tools/make_qr_card.py linh-tung
+```
+
+Script tạo **thẻ QR bàn giao** `customers/linh-tung/qr-card.png` (1080×1350, cùng thiết kế
+với artifact [Thẻ QR bàn giao](https://claude.ai/artifact/2atFTscTv31k681V99D3kc), mã QR trỏ
+tới `https://klinaluu.github.io/linh-tung/`) và in ra **tin nhắn giao game** (lưu kèm ở
+`customers/linh-tung/tin-nhan-giao.txt`). Cần mạng và Google Chrome (chạy ẩn, không mở cửa
+sổ). Chưa điền tên trong brief thì truyền thẳng: `--names "Linh" "Tùng"`. Muốn sửa tay
+(đổi dòng chữ dưới mã…) thì mở artifact ở trên.
+
+Gửi khách: tin nhắn in ra + ảnh `qr-card.png` (đính kèm ngay sau dòng "Thẻ QR của hai
+bạn"). File `dist/linh-tung.zip` (bản offline) **không gửi mặc định** — chỉ gửi khi khách
+hỏi, như tin nhắn đã ghi.
+
+Mẫu tin nhắn (script tự điền link; muốn đổi câu chữ thì sửa `MESSAGE` trong
+`tools/make_qr_card.py`):
 
 ```
-Link game của hai bạn: https://klinaluu.github.io/linh-tung/
-Mở bằng điện thoại và xoay ngang để chơi nhé.
+Game của hai bạn xong rồi nè 💝
 
-Muốn chơi toàn màn hình như một app:
-- iPhone: mở link bằng Safari → bấm nút Chia sẻ (iPhone đời mới: nằm trong menu ≡
-  cạnh thanh địa chỉ) → "Thêm vào MH chính"
-- Android: mở bằng Chrome → menu ⋮ → "Cài đặt ứng dụng" / "Thêm vào màn hình chính"
+🎮 Link game: https://klinaluu.github.io/linh-tung/
+Mở bằng điện thoại, xoay ngang để chơi.
 
-Link không cần mật khẩu, ai có link đều xem được.
+💓 Thẻ QR của hai bạn: quét bằng camera là vào game, in ra tặng hay gửi cho người ấy đều xinh.
+
+Chơi toàn màn hình như app:
+📱 iPhone: Safari → nút Chia sẻ (đời mới: trong menu ≡ cạnh thanh địa chỉ) → "Thêm vào MH chính"
+📱 Android: Chrome → menu ⋮ → "Cài đặt ứng dụng" / "Thêm vào màn hình chính"
+
+‼️ Lưu ý:
+
+* Link và mã QR không cần mật khẩu, ai có đều xem được nên bạn cân nhắc trước khi chia sẻ công khai nhé.
+* Nếu cần file để lưu trữ hoặc chơi offline cứ nhắn mình nha.
+* Mình chỉ nhận chỉnh sửa trong tối đa 15 ngày sau khi giao game ạ
+
+
+Chúc hai bạn sẽ có những giây phút thật đáng yêu khi chơi game cùng nhau 💖
+— Made For Us
 ```
 
 ## Bước 10 — Sau khi giao
@@ -200,7 +230,8 @@ git tag delivery/linh-tung-2026-10-05
 git push origin delivery/linh-tung-2026-10-05
 ```
 
-Điền mục "Bàn giao" trong `brief.md`. Giữ nguyên `customers/linh-tung/` trên máy (không
+Điền mục "Bàn giao" trong `brief.md` (link, ngày giao, tag; hạn nhận sửa = ngày giao + 15
+ngày). Giữ nguyên `customers/linh-tung/` trên máy (không
 xoá) — khách xin sửa sau này chỉ cần mở khung chat mới, đọc lại đúng thư mục này.
 
 ---

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>QR card renderer</title>
+<!--
+  Trang vẽ thẻ QR bàn giao — dùng bởi tools/make_qr_card.py (Chrome headless).
+  Code vẽ chép từ artifact "Made For Us — Thẻ QR bàn giao"
+  (https://claude.ai/artifact/2atFTscTv31k681V99D3kc). Đổi thiết kế thẻ thì sửa cả hai chỗ.
+  Tham số trên URL: #n1=...&n2=...&link=...&msg=...
+  Vẽ xong ghi data URL PNG vào thẻ pre#out (hoặc "ERR: ..." nếu lỗi).
+-->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>body { margin: 0; }</style>
+</head>
+<body>
+<pre id="out"></pre>
+<script>
+(() => {
+  const W = 1080, H = 1350;
+  const C = {
+    pink: "#ff6fa0", pinkDeep: "#e8558a", plum: "#3b1d35", cream: "#fffaf6",
+    bg: "#ffd3e3", dot: "#ffc0d6", white: "#ffffff", muted: "#8a5a78", butter: "#ffd66b"
+  };
+  const P = new URLSearchParams(location.hash.slice(1));
+  const n1 = (P.get("n1") || "").trim() || "Người 1";
+  const n2 = (P.get("n2") || "").trim() || "Người 2";
+  const link = (P.get("link") || "").trim();
+  const msg = P.has("msg") ? P.get("msg").trim() : "Quét mã để bắt đầu hành trình";
+  const out = document.getElementById("out");
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  const HEART = [
+    ".XX.XX.",
+    "XXXXXXX",
+    "XXXXXXX",
+    ".XXXXX.",
+    "..XXX..",
+    "...X..."
+  ];
+
+  function rect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+
+  function pxBox(x, y, w, h, u, fill, stroke) {
+    rect(x + u, y, w - 2 * u, u, stroke);
+    rect(x + u, y + h - u, w - 2 * u, u, stroke);
+    rect(x, y + u, u, h - 2 * u, stroke);
+    rect(x + w - u, y + u, u, h - 2 * u, stroke);
+    rect(x + u, y + u, w - 2 * u, h - 2 * u, fill);
+  }
+
+  function heart(cx, cy, s, c) {
+    const w = HEART[0].length * s, h = HEART.length * s;
+    const x0 = cx - w / 2, y0 = cy - h / 2;
+    HEART.forEach((row, r) => [...row].forEach((ch, k) => { if (ch === "X") rect(x0 + k * s, y0 + r * s, s, s, c); }));
+  }
+
+  function sparkle(cx, cy, s, c) {
+    rect(cx - s / 2, cy - s * 2.5, s, s * 5, c);
+    rect(cx - s * 2.5, cy - s / 2, s * 5, s, c);
+  }
+
+  function text(str, x, y, font, color, align = "center") {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
+    ctx.fillText(str, x, y);
+  }
+
+  function fitSize(str, family, start, maxW) {
+    let s = start;
+    ctx.font = `${s}px ${family}`;
+    while (ctx.measureText(str).width > maxW && s > 20) { s -= 2; ctx.font = `${s}px ${family}`; }
+    return s;
+  }
+
+  function drawQR(bx, by, size) {
+    pxBox(bx + 12, by + 12, size, size, 6, C.pink, C.pink);
+    pxBox(bx, by, size, size, 6, C.white, C.plum);
+    const inner = size - 12;
+    const qr = qrcode(0, "H");
+    qr.addData(link);
+    qr.make();
+    const n = qr.getModuleCount();
+    const quiet = 3;
+    const m = Math.floor(inner / (n + quiet * 2));
+    const qrPx = m * n;
+    const ox = Math.round(bx + (size - qrPx) / 2), oy = Math.round(by + (size - qrPx) / 2);
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) rect(ox + c * m, oy + r * m, m, m, C.plum);
+    const badge = m * 9;
+    const cx = ox + qrPx / 2, cy = oy + qrPx / 2;
+    rect(cx - badge / 2, cy - badge / 2, badge, badge, C.white);
+    heart(cx, cy, Math.max(4, Math.floor(badge / 9)), C.pink);
+  }
+
+  function render() {
+    rect(0, 0, W, H, C.bg);
+    for (let y = 18; y < H; y += 36) for (let x = (y / 36) % 2 ? 18 : 36; x < W; x += 36) rect(x, y, 4, 4, C.dot);
+    heart(70, 70, 6, C.pink); heart(1010, 1290, 6, C.pink);
+    heart(1022, 60, 4, C.white); heart(56, 1240, 4, C.white);
+    sparkle(160, 1300, 6, C.butter); sparkle(930, 48, 6, C.butter);
+
+    const wx = 84, wy = 108, ww = 912, wh = 1080;
+    pxBox(wx + 18, wy + 18, ww, wh, 6, C.plum, C.plum);
+    pxBox(wx, wy, ww, wh, 6, C.cream, C.plum);
+    rect(wx + 6, wy + 6, ww - 12, 78, C.pink);
+    rect(wx + 6, wy + 84, ww - 12, 6, C.plum);
+    text("MADE_FOR_US.EXE", wx + 34, wy + 60, `24px "Press Start 2P", monospace`, C.white, "left");
+    const bxX = wx + ww - 72, bxY = wy + 20;
+    pxBox(bxX, bxY, 50, 50, 5, C.cream, C.plum);
+    for (let i = 0; i < 5; i++) {
+      rect(bxX + 13 + i * 5, bxY + 13 + i * 5, 5, 5, C.plum);
+      rect(bxX + 33 - i * 5, bxY + 13 + i * 5, 5, 5, C.plum);
+    }
+
+    text("MADE FOR US", W / 2, wy + 196, `56px "Press Start 2P", monospace`, C.plum);
+    text("Our love journey", W / 2, wy + 246, `42px VT323, monospace`, C.pinkDeep);
+
+    const gap = 70;
+    const fs = fitSize(n1 + n2, "VT323, monospace", 84, ww - 140 - gap);
+    ctx.font = `${fs}px VT323, monospace`;
+    const w1 = ctx.measureText(n1).width, w2 = ctx.measureText(n2).width;
+    const total = w1 + gap + w2;
+    const sx = W / 2 - total / 2, ny = wy + 348;
+    text(n1, sx, ny, `${fs}px VT323, monospace`, C.plum, "left");
+    heart(sx + w1 + gap / 2, ny - fs * 0.3, Math.max(5, Math.round(fs / 12)), C.pink);
+    text(n2, sx + w1 + gap, ny, `${fs}px VT323, monospace`, C.plum, "left");
+
+    const qs = 500;
+    drawQR(W / 2 - qs / 2 - 6, wy + 398, qs);
+
+    if (msg) {
+      const ms = fitSize(msg, "VT323, monospace", 50, ww - 120);
+      text(msg, W / 2, wy + 986, `${ms}px VT323, monospace`, C.plum);
+    }
+    text("Mở bằng điện thoại và xoay ngang để chơi", W / 2, wy + 1036, `36px VT323, monospace`, C.muted);
+
+    heart(W / 2 - 196, H - 88, 4, C.pink);
+    text("madeforus.love", W / 2 + 14, H - 74, `26px "Press Start 2P", monospace`, C.plum);
+  }
+
+  async function run() {
+    try {
+      if (!/^https?:\/\//.test(link)) throw new Error("link phai bat dau bang https://");
+      if (typeof qrcode !== "function") throw new Error("khong tai duoc thu vien QR (can mang)");
+      await Promise.all([
+        document.fonts.load('56px "Press Start 2P"'),
+        document.fonts.load("40px VT323", "Người ắễộ " + n1 + n2 + msg),
+      ]);
+      if (!document.fonts.check('56px "Press Start 2P"') || !document.fonts.check("40px VT323")) {
+        throw new Error("khong tai duoc font Press Start 2P / VT323 (can mang)");
+      }
+      render();
+      out.textContent = canvas.toDataURL("image/png");
+    } catch (e) {
+      out.textContent = "ERR: " + e.message;
+    }
+  }
+  if (document.readyState === "complete") run(); else window.addEventListener("load", run);
+})();
+</script>
+</body>
+</html>

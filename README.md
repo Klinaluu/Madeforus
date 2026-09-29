@@ -61,12 +61,13 @@ theo mục dưới.
 
 Tóm tắt: không nhân bản code cho mỗi khách, chỉ nhân bản **nội dung**. Mỗi khách là một
 thư mục trong `customers/` (nằm trong `.gitignore`, không lên GitHub). Bản mẫu tham khảo
-cho khách sau: `customers/thaobe/`. Ba lệnh chính:
+cho khách sau: `customers/thaobe/`. Bốn lệnh chính:
 
 ```bash
 python3 tools/new_customer.py linh-tung      # tạo customers/linh-tung/{brief.md, config.js, assets/}
 python3 tools/build_customer.py linh-tung    # thu nhỏ ảnh, build, đóng gói, cảnh báo thiếu/thừa
 python3 tools/deploy_customer.py linh-tung https://github.com/Klinaluu/linh-tung.git
+python3 tools/make_qr_card.py linh-tung     # thẻ QR bàn giao + tin nhắn giao game
 ```
 
 Khi build, script lấy code mới nhất trong repo + nội dung riêng của khách, nên mọi cải
@@ -89,6 +90,7 @@ assets/preview.png  ảnh hiện khi gửi link — dựng lại bằng tools/ma
 tools/new_customer.py     tạo thư mục tư liệu cho một khách mới
 tools/build_customer.py   build bản riêng từ customers/<slug>/
 tools/deploy_customer.py  push bản riêng lên GitHub Pages
+tools/make_qr_card.py     thẻ QR bàn giao (qr_card.html, Chrome headless) + tin nhắn giao game
 tools/build_standalone.py gộp các module JS thành một file HTML chạy qua file://
 tools/package.py          đóng gói LẠI bản demo hiện tại (không phải bản khách) thành zip
 tools/make_preview.py     dựng lại assets/preview.png khi đổi nội dung ảnh preview
