@@ -33,13 +33,15 @@ Khách gửi:
 
 - [ ] 10 ảnh polaroid (8–12 đều được, mỗi ảnh = 1 mốc, theo thứ tự thời gian; ảnh gốc, dọc
       hay ngang đều được) → `assets/photos/`
-- [ ] 1 ảnh màn hình mở đầu, nên ảnh dọc kiểu photobooth → `assets/photos/`
+- [ ] 1 ảnh màn hình mở đầu: photobooth hoặc ảnh đôi, nên ảnh dọc → `assets/photos/`
       (không có thì dùng sprite `Couple-Pose-Happy-01`)
 - [ ] 1 video 15–60 giây, dưới ~25MB → `assets/video/` (.MOV thì đổi sang .mp4, xem docs/workflow.md)
 - [ ] Lá thư (dạng chữ)
 - [ ] Tên game + slogan (không có thì giữ mặc định)
 - [ ] Tên 5 món quà (+ ảnh món quà nếu muốn icon riêng)
 - [ ] Ảnh chân dung / toàn thân 2 người + ảnh chiếc xe máy → để vẽ sprite
+- [ ] (tuỳ chọn) Câu thoại lúc gặp nhau: 1 câu nam nói và/hoặc 1 câu nữ đáp
+      → `TEXT.manLine` / `TEXT.womanLine` (không gửi thì để "" = không hiện bong bóng)
 
 Sprite vẽ riêng cho khách → `assets/characters/`, đúng tên file, nhân vật quay mặt sang PHẢI,
 nền trong suốt (PNG):
@@ -66,6 +68,11 @@ nền trong suốt (PNG):
 
 Ba mốc cuối là kịch bản cố định, không cần ảnh:
 đoạn mưa nhặt ô · hòm thư · hộp quà video.
+
+## Câu thoại lúc gặp nhau (tuỳ chọn)
+
+- Nam nói:  …
+- Nữ đáp:   …
 
 ## Lá thư
 

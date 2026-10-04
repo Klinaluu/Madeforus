@@ -18,14 +18,15 @@ Nguyên tắc: **không sửa file gốc của repo cho một khách.** Mọi th
 | # | Thứ | Quy cách | Vào đâu |
 | - | --- | --- | --- |
 | 1 | 10 ảnh polaroid (8–12 cũng được) | Ảnh gốc, dọc hay ngang đều được, xếp theo thứ tự thời gian | `assets/photos/` |
-| 2 | 1 ảnh màn hình mở đầu (tuỳ chọn) | Nên ảnh dọc kiểu photobooth. Không có → dùng sprite 2 người ôm nhau | `assets/photos/` |
-| 3 | 1 video | 15–60 giây, dưới ~25MB, nên quay ngang. `.MOV` cũng được (đổi sang `.mp4` ở Bước 3) | `assets/video/` |
+| 2 | 1 ảnh màn hình mở đầu | Photobooth hoặc ảnh đôi (nên ảnh dọc). Khách quên gửi → tạm dùng sprite 2 người ôm nhau | `assets/photos/` |
+| 3 | 1 video | 30–60 giây, ưu tiên quay ngang. Nặng quá ~25MB thì nén lại trước khi build. `.MOV` cũng được (đổi sang `.mp4` ở Bước 3) | `assets/video/` |
 | 4 | Lá thư | Dạng chữ, giữ nguyên văn khách viết | `TEXT.letter` |
 | 5 | Tên 5 món quà | + ảnh món quà nếu muốn icon riêng | `GIFTS` |
 | 6 | Ảnh 2 người + ảnh chiếc xe máy | Chân dung + toàn thân, trang phục muốn vẽ | làm mẫu vẽ sprite |
 | 7 | Tên game + slogan (tuỳ chọn) | Không có → giữ "MADE FOR US / Our love journey" | `GAME_TITLE`, `GAME_SUBTITLE` |
 | 8 | Có muốn chữ dưới khung ảnh không | Có → ngày + tên từng mốc. Không → để trống như bản Thảo Bé | `MILESTONES[].date/name` |
 | 9 | Tên hai người | Tên/biệt danh muốn in trên thẻ QR bàn giao | `brief.md` → dòng `Tên cặp đôi:` |
+| 10 | Câu thoại lúc gặp nhau (tuỳ chọn) | 1 câu chàng trai nói và/hoặc 1 câu cô gái đáp, ngắn (nên dưới ~30 ký tự). Không gửi câu nào → nhân vật đó không nói | `TEXT.manLine`, `TEXT.womanLine` |
 
 ### B. Bạn tạo (vẽ theo mặt khách)
 
@@ -67,14 +68,17 @@ vào 1 folder Google Drive:
 
 1. 10 ảnh kỷ niệm của hai bạn (8–12 ảnh cũng được), xếp theo thứ tự thời gian.
    Ảnh gốc là được, không cần chỉnh.
-2. 1 video 15–60 giây (dưới 25MB), nên quay ngang.
+   Kèm 1 ảnh mở đầu game: ảnh photobooth hoặc ảnh đôi.
+2. 1 video 30–60 giây, ưu tiên quay ngang.
 3. Lá thư muốn gửi (gõ chữ là được).
 4. Tên 5 món quà nhân vật sẽ nhặt trong game (vd: cà phê, máy ảnh, con mèo…).
    Có ảnh món quà thì gửi kèm.
 5. Vài ảnh chân dung + toàn thân của hai bạn, và ảnh chiếc xe máy — để mình vẽ nhân vật.
 6. Tên (hoặc biệt danh) của hai bạn — để in lên thẻ QR khi giao game.
-7. (Tuỳ chọn) 1 ảnh dọc cho màn hình mở đầu, tên game/câu slogan riêng,
-   và ngày + tên cho từng ảnh nếu muốn hiện chữ dưới khung ảnh.
+7. (Tuỳ chọn) 1 câu nhân vật nam nói và/hoặc 1 câu nhân vật nữ đáp lại lúc hai
+   người gặp nhau trong game (vd: "Tìm thấy em rồi." / "Hi babi"). Câu ngắn thôi nhé.
+8. (Tuỳ chọn) Tên game/câu slogan riêng, và ngày + tên cho từng ảnh nếu muốn
+   hiện chữ dưới khung ảnh.
 ```
 
 ## Bước 1 — Mở khung chat MỚI cho khách này
@@ -129,7 +133,7 @@ bánh xe.
 | --- | --- |
 | `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` | Tên game / slogan (không có thì giữ mặc định) |
 | `TEXT.letter` | Lá thư (bao ngoài bằng dấu `` ` `` để viết nhiều dòng, như bản Thảo Bé) |
-| `TEXT.manLine`, `TEXT.womanLine` | Câu chàng trai nói / cô gái đáp lúc gặp nhau — câu riêng của khách (khách gửi ở khung chat của mình). Không gửi thì để `""` (đã để trống sẵn) → không hiện bong bóng |
+| `TEXT.manLine`, `TEXT.womanLine` | Câu chàng trai nói / cô gái đáp lúc gặp nhau — câu riêng của khách (mục 10 phần A, gửi ở khung chat của khách đó). Không gửi thì để `""` (đã để trống sẵn) → không hiện bong bóng |
 | `TEXT.meetText` | Dòng chữ màn bầu trời sao (giữ mặc định nếu khách không đổi) |
 | `MEET_BUBBLE_MS` | Số mili giây mỗi bong bóng thoại hiện: `{ man: 2500, woman: 2500 }` (câu dài thì tăng lên) |
 | `TITLE_PHOTO` | `"assets/photos/<ảnh mở đầu>"`, hoặc `"assets/characters/Couple-Pose-Happy-01.png"` |
