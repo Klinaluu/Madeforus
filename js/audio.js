@@ -14,7 +14,7 @@ try {
 
 export function initAudio() {
   if (ctx) {
-    if (ctx.state === "suspended") ctx.resume();
+    if (ctx.state !== "running") ctx.resume().catch(() => {});
     return;
   }
   const AC = window.AudioContext || window.webkitAudioContext;
@@ -76,27 +76,49 @@ export function initMusic(src) {
   musicEl.volume = 0;
 }
 
-let musicWanted = false; // đã bấm Start → nhạc nên đang phát (trừ lúc trang bị ẩn)
+let musicWanted = false; // đã bấm Start → nhạc nên đang phát (trừ lúc người chơi không nhìn game)
 
-export function playMusic() {
-  if (!musicEl) return;
-  musicWanted = true;
-  musicEl.play().then(() => fadeMusicTo(targetMusicVolume(), 1500)).catch(() => {});
+// Người chơi có đang nhìn game không: tab đang hiện VÀ cửa sổ đang có focus. Đổi tab, chuyển app,
+// khoá màn hình, bấm sang cửa sổ khác → coi như rời đi: dừng nhạc nền + WebAudio, quay lại thì phát tiếp.
+const pageActive = () => !document.hidden && document.hasFocus();
+let away = !pageActive();
+const awayListeners = [];
+
+/** Gọi fn mỗi lần người chơi rời game (main.js dùng để dừng video đang chiếu). */
+export function onPageAway(fn) {
+  awayListeners.push(fn);
 }
 
-// Chuyển sang app khác / khoá màn hình: Android vẫn phát nhạc tab nền → tạm dừng, quay lại thì phát tiếp
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    if (musicEl) musicEl.pause();
-    if (ctx && ctx.state === "running") ctx.suspend();
-    return;
-  }
-  if (ctx && ctx.state === "suspended") ctx.resume();
+function resumeSound() {
+  // iPhone sau khi khoá màn hình để AudioContext ở "interrupted" chứ không phải "suspended"
+  if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
   if (musicEl && musicWanted) {
     musicEl.volume = 0;
     musicEl.play().then(() => fadeMusicTo(targetMusicVolume(), 800)).catch(() => {});
   }
-});
+}
+
+function syncPageActivity() {
+  const nowAway = !pageActive();
+  if (nowAway === away) return;
+  away = nowAway;
+  if (!away) return resumeSound();
+  if (musicEl) musicEl.pause();
+  if (ctx && ctx.state === "running") ctx.suspend();
+  awayListeners.forEach((fn) => fn());
+}
+document.addEventListener("visibilitychange", syncPageActivity);
+window.addEventListener("blur", syncPageActivity);
+window.addEventListener("focus", syncPageActivity);
+window.addEventListener("pageshow", syncPageActivity); // quay lại trang từ bộ nhớ đệm / mở lại app
+
+export function playMusic() {
+  if (!musicEl) return;
+  musicWanted = true;
+  // trang đang ẩn / không có focus: chỉ ghi nhận, nhạc sẽ phát khi người chơi quay lại (syncPageActivity)
+  if (!pageActive()) return;
+  musicEl.play().then(() => fadeMusicTo(targetMusicVolume(), 1500)).catch(() => {});
+}
 
 // gọi khi màn hình video mở (on = true) / đóng hoặc dừng phát (on = false)
 export function duckMusicForVideo(on) {

@@ -9,7 +9,7 @@ import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRA
 import {
   SOLO_SEGMENTS, SOLO_SEG_W, MAX_HEARTS, WALK_TERRAIN, BOSS_TERRAIN, MEET_TERRAIN, COUPLE_TERRAIN,
 } from "./levels.js";
-import { initAudio, sfx, setMuted, isMuted, initMusic, playMusic, duckMusicForVideo, setRainIntensity } from "./audio.js";
+import { initAudio, sfx, setMuted, isMuted, initMusic, playMusic, duckMusicForVideo, setRainIntensity, onPageAway } from "./audio.js";
 import { initInstallHint, maybeShowInstallHint, detectPlatform, isInstalled } from "./install.js";
 import { getLang, setLang, t, pick, giftLabel, hasAccents } from "./i18n.js";
 import { JourneyGame } from "./engine.js";
@@ -565,8 +565,24 @@ function wireUI() {
   });
   // tự tắt nhạc nền lúc video đang chạy, bật lại khi dừng/hết/đóng màn hình video
   $("video-player").addEventListener("play", () => duckMusicForVideo(true));
-  $("video-player").addEventListener("pause", () => duckMusicForVideo(false));
+  $("video-player").addEventListener("pause", () => {
+    // dừng do người chơi rời game: nhạc nền giữ nguyên trạng thái hạ nhỏ lúc đang mở video
+    if (videoPausedByAway) {
+      videoPausedByAway = false;
+      return;
+    }
+    duckMusicForVideo(false);
+  });
   $("video-player").addEventListener("ended", () => duckMusicForVideo(false));
+  // Rời game (đổi tab, chuyển app, khoá màn hình) lúc video đang chạy → dừng video luôn; quay lại
+  // không tự phát tiếp, người chơi bấm ▶ khi sẵn sàng.
+  let videoPausedByAway = false;
+  onPageAway(() => {
+    const video = $("video-player");
+    if (video.paused || video.webkitDisplayingFullscreen) return; // xem toàn màn hình kiểu iPhone: không phải rời game
+    videoPausedByAway = true;
+    video.pause();
+  });
   $("btn-video-done").addEventListener("click", () => {
     const fromEnding = $("btn-video-done").dataset.fromEnding === "1";
     closeVideo();
