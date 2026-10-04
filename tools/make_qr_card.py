@@ -36,15 +36,15 @@ MESSAGE = """Game của hai bạn đã xong rồi nè 💝
 🎮 Link game: {link}
 Game chơi được ngay trên trình duyệt, cả laptop lẫn điện thoại. Nếu muốn chơi toàn màn hình như một app trên điện thoại:
 
-* iPhone: mở link bằng Safari → bấm nút Chia sẻ (trên iOS mới nằm trong menu ≡ cạnh thanh địa chỉ) → chọn "Thêm vào Màn hình chính"
-* Android: mở link bằng Chrome → bấm menu ⋮ → chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính"
+- iPhone: mở link bằng Safari → bấm nút Chia sẻ (trên iOS mới nằm trong menu ≡ cạnh thanh địa chỉ) → chọn "Thêm vào Màn hình chính"
+- Android: mở link bằng Chrome → bấm menu ⋮ → chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính"
 
 💌 Thẻ QR riêng: chỉ cần quét bằng camera là vào thẳng game. Bạn có thể in ra làm quà hoặc gửi trực tiếp cho người ấy đều xinh nha.
 ‼️ Một vài lưu ý nhỏ:
 
-* Link và mã QR không có mật khẩu, ai có link đều mở được, nên bạn cân nhắc trước khi chia sẻ công khai nhé.
-* Nếu muốn lưu file game để giữ lâu dài hoặc chơi khi không có mạng, cứ nhắn mình nha.
-* Bạn có thể gửi yêu cầu chỉnh sửa trong vòng 15 ngày kể từ ngày nhận game ạ.
+- Link và mã QR không có mật khẩu, ai có link đều mở được, nên bạn cân nhắc trước khi chia sẻ công khai nhé.
+- Nếu muốn lưu file game để giữ lâu dài hoặc chơi khi không có mạng, cứ nhắn mình nha.
+- Bạn có thể gửi yêu cầu chỉnh sửa trong vòng 15 ngày kể từ ngày nhận game ạ.
 
 Chúc hai bạn có thật nhiều khoảnh khắc đáng yêu khi chơi cùng nhau 💖
 — Made For Us"""
