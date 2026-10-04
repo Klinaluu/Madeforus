@@ -40,7 +40,8 @@ Toàn bộ nội dung có thể cá nhân hoá nằm trong file `js/config.js` c
 | Sửa gì | Ở đâu trong `config.js` |
 | --- | --- |
 | Tên game, slogan | `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` |
-| Lời thoại, lá thư, các dòng chữ | `TEXT` |
+| Lời thoại, lá thư, các dòng chữ | `TEXT` (`womanLine` để trống = cô gái không nói) |
+| Thời gian hiện bong bóng thoại lúc gặp nhau | `MEET_BUBBLE_MS` |
 | Ảnh từng mốc, ngày, tên mốc | `MILESTONES` |
 | Ảnh màn hình mở đầu | `TITLE_PHOTO` |
 | Video | `VIDEO_SRC` |

@@ -3,7 +3,7 @@
 // ============================================================
 import {
   GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, MUSIC_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
-  SCENE_LAYERS, COUPLE_FRAMES,
+  SCENE_LAYERS, COUPLE_FRAMES, MEET_BUBBLE_MS,
 } from "./config.js";
 import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
 import {
@@ -334,22 +334,44 @@ function startJourney() {
   setTimeout(() => showHint(t("hintGear"), 3600), 600);
 }
 
-// --- chương 2: gặp nhau ---
+// --- chương 2: gặp nhau: chàng trai nói → cô gái đáp (nếu có TEXT.womanLine) → màn bầu trời sao ---
+// đặt bong bóng ngay trên đầu nhân vật (toạ độ canvas → % màn hình). Nhân vật đứng yên nhưng
+// camera vẫn trôi nốt một đoạn sau khi dừng, nên bám theo từng khung hình đến khi ẩn bong bóng.
+function showBubble(el, line, worldX, worldTopY) {
+  setTitleText(el, line);
+  el.classList.remove("hidden");
+  const follow = () => {
+    const g = currentGame;
+    if (!g || el.classList.contains("hidden")) return;
+    el.style.left = ((worldX - g.camX) / g.CW) * 100 + "%";
+    el.style.top = (worldTopY / g.CH) * 100 + "%";
+    requestAnimationFrame(follow);
+  };
+  follow();
+}
 function playMeeting() {
-  const bubble = $("bubble-man");
-  setTitleText(bubble, text("manLine"));
-  // đặt bong bóng ngay trên đầu nhân vật (đổi toạ độ canvas → % màn hình)
   const g = currentGame;
-  bubble.style.left = ((g.player.x + g.player.w * 0.5 - g.camX) / g.CW) * 100 + "%";
-  bubble.style.top = ((g.player.y - 12) / g.CH) * 100 + "%";
-  bubble.classList.remove("hidden");
-  setTimeout(() => {
-    bubble.classList.add("hidden");
+  const ms = { man: 2500, woman: 2500, ...MEET_BUBBLE_MS };
+  const manBubble = $("bubble-man");
+  const womanBubble = $("bubble-woman");
+  const womanLine = pick(TEXT.womanLine);
+  const toStars = () => {
     setTitleText($("meet-text"), text("meetText"));
     $("meet-stats").innerHTML =
       t("missionStats", { score: g.score, time: fmtTime(g.timeSolo), gifts: `${GIFTS.length}/${GIFTS.length}` });
     showScreen("screen-meet");
-  }, 1900);
+  };
+  showBubble(manBubble, text("manLine"), g.player.x + g.player.w * 0.5, g.player.y - 12);
+  setTimeout(() => {
+    manBubble.classList.add("hidden");
+    if (!womanLine) return toStars();
+    // cô gái reo hò cao ~84 đơn vị, đứng giữa tại meetX
+    showBubble(womanBubble, womanLine, g.meetX, g.groundY - 96);
+    setTimeout(() => {
+      womanBubble.classList.add("hidden");
+      toStars();
+    }, ms.woman);
+  }, ms.man);
 }
 
 // --- chương 4: hòm hồng → System Message ---

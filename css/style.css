@@ -385,6 +385,8 @@ button { font-family: var(--font-body); cursor: pointer; }
   border: 7px solid transparent;
   border-top-color: var(--ink);
 }
+/* bong bóng cô gái đáp lại: đuôi lệch phải cho cân với bong bóng bên chàng trai */
+.speech-bubble.her::after { left: auto; right: 28%; }
 @keyframes pop { from { transform: translate(-50%, -100%) scale(0.6); opacity: 0; } to { transform: translate(-50%, -100%) scale(1); opacity: 1; } }
 
 .level-bottom-ui {

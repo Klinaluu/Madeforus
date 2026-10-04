@@ -105,6 +105,8 @@ def main():
         config += '\nexport const MUSIC_SRC = ""; // de trong = khong co nhac nen (nhu VIDEO_SRC)\n'
     if not re.search(r"^export const COUPLE_FRAMES\b", config, flags=re.M):
         config += "\nexport const COUPLE_FRAMES = [];\n"
+    if not re.search(r"^export const MEET_BUBBLE_MS\b", config, flags=re.M):
+        config += "\nexport const MEET_BUBBLE_MS = { man: 2500, woman: 2500 };\n"
     open(os.path.join(dist, "js", "config.js"), "w", encoding="utf-8").write(config)
 
     # ---------- ảnh riêng đè lên bộ mặc định: cùng tên file thì thay, tên khác thì thêm.

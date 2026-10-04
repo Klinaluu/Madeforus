@@ -17,6 +17,8 @@ export const WINDOW_NAME = "MADE_FOR_US.EXE"; // chữ trên thanh tiêu đề c
 export const TEXT = {
   // câu nhân vật nam nói khi tìm thấy cô ấy
   manLine: "Found you.",
+  // câu cô ấy đáp lại ngay sau đó (bong bóng thứ hai); để "" thì không hiện
+  womanLine: "Hi babi",
   // dòng chữ trên màn hình bầu trời sao sau khi gặp nhau
   meetText: "I'm on my solo mission but the stars guide me to you",
   // hộp thoại "System Message" ở chiếc hòm hồng
@@ -39,6 +41,10 @@ export const TEXT = {
 };
 
 // ---------- ảnh & video của khách ----------
+// Thời gian hiện bong bóng thoại ở đoạn gặp nhau (mili giây, 1000 = 1 giây): chàng trai nói
+// trước, cô gái đáp sau (chỉ khi TEXT.womanLine có chữ), hết thì sang màn bầu trời sao.
+export const MEET_BUBBLE_MS = { man: 2500, woman: 2500 };
+
 // Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.
 // Video: đặt file .mp4 vào assets/video/ rồi điền tên vào đây (nên dưới 15MB).
 export const VIDEO_SRC = "";
