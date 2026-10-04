@@ -694,7 +694,9 @@ function wireGamepad() {
 function applyBranding() {
   document.title = pick(GAME_TITLE);
   setTitleText($("title-heading"), pick(GAME_TITLE));
-  $("title-subtitle").textContent = pick(GAME_SUBTITLE);
+  // slogan còn y câu mẫu tiếng Anh thì đổi theo ngôn ngữ như các câu mẫu khác
+  const subtitle = pick(GAME_SUBTITLE);
+  $("title-subtitle").textContent = subtitle === t("subtitle", null, "en") ? t("subtitle") : subtitle;
   setTitleText($("title-window-name"), pick(WINDOW_NAME));
   const frame = $("title-photo-frame");
   if (TITLE_PHOTO) {

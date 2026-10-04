@@ -43,7 +43,8 @@ export function setLang(next) {
 
 const STRINGS = {
   en: {
-    // ---- mặc định cho các mục TEXT trong config.js ----
+    // ---- mặc định cho các mục TEXT trong config.js (+ GAME_SUBTITLE) ----
+    subtitle: "Our love journey",
     manLine: "Found you.",
     meetText: "I'm on my solo mission but the stars guide me to you",
     systemMessage: "The next level is not unlocked yet.\nWould you like to continue the journey?",
@@ -124,6 +125,7 @@ const STRINGS = {
   },
 
   vi: {
+    subtitle: "Hành trình yêu thương",
     manLine: "Tìm thấy em rồi.",
     meetText: "Anh đang trên hành trình một mình, nhưng những vì sao đã dẫn anh đến bên em",
     systemMessage: "Màn tiếp theo vẫn chưa được mở khoá.\nBạn có muốn đi tiếp hành trình không?",

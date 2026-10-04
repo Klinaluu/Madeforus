@@ -17,7 +17,8 @@ const SEEN_KEY = "mfu-install-hint:" + location.pathname;
 const SEEN_DAYS = 7;
 
 // Trình duyệt nhúng trong các app nhắn tin / mạng xã hội
-const IN_APP = /FBAN|FBAV|FB_IAB|Messenger|Instagram|Zalo|Line\/|MicroMessenger|TikTok|Twitter/i;
+// (trình duyệt trong TikTok tự xưng musical_ly / BytedanceWebview chứ ít khi ghi "TikTok")
+const IN_APP = /FBAN|FBAV|FB_IAB|Messenger|Instagram|Zalo|Line\/|MicroMessenger|TikTok|musical_ly|Bytedance|Twitter/i;
 // Chrome (CriOS), Firefox (FxiOS), Edge (EdgiOS), Opera (OPiOS) trên iOS
 const OTHER_IOS_BROWSER = /CriOS|FxiOS|EdgiOS|OPiOS/i;
 
