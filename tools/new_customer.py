@@ -126,6 +126,9 @@ def main():
         "export const SHOW_EMPTY_PHOTO_FRAMES = true;",
         "export const SHOW_EMPTY_PHOTO_FRAMES = false; // bản khách: mốc chưa có ảnh thì không treo khung",
     )
+    # câu thoại lúc gặp nhau là của riêng từng khách: để trống, khách gửi câu nào thì điền câu đó
+    for key, demo_line in (("manLine", "Found you."), ("womanLine", "Hi babi")):
+        config = config.replace(f'  {key}: "{demo_line}",', f'  {key}: "",')
     open(os.path.join(base, "config.js"), "w", encoding="utf-8").write(HEADER.format(slug=slug) + "\n" + config)
     open(os.path.join(base, "brief.md"), "w", encoding="utf-8").write(BRIEF.format(slug=slug))
 

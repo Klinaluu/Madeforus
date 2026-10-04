@@ -129,8 +129,8 @@ bánh xe.
 | --- | --- |
 | `GAME_TITLE`, `GAME_SUBTITLE`, `WINDOW_NAME` | Tên game / slogan (không có thì giữ mặc định) |
 | `TEXT.letter` | Lá thư (bao ngoài bằng dấu `` ` `` để viết nhiều dòng, như bản Thảo Bé) |
-| `TEXT.manLine`, `TEXT.meetText` | Câu nói khi gặp / dòng chữ màn bầu trời sao (giữ mặc định nếu khách không đổi) |
-| `TEXT.womanLine` | Câu cô gái đáp lại ngay sau câu của chàng trai (mặc định "Hi babi"); để `""` thì không hiện |
+| `TEXT.manLine`, `TEXT.womanLine` | Câu chàng trai nói / cô gái đáp lúc gặp nhau — câu riêng của khách (khách gửi ở khung chat của mình). Không gửi thì để `""` (đã để trống sẵn) → không hiện bong bóng |
+| `TEXT.meetText` | Dòng chữ màn bầu trời sao (giữ mặc định nếu khách không đổi) |
 | `MEET_BUBBLE_MS` | Số mili giây mỗi bong bóng thoại hiện: `{ man: 2500, woman: 2500 }` (câu dài thì tăng lên) |
 | `TITLE_PHOTO` | `"assets/photos/<ảnh mở đầu>"`, hoặc `"assets/characters/Couple-Pose-Happy-01.png"` |
 | `VIDEO_SRC` | `"assets/video/video.mp4"` — nhớ có `assets/video/` phía trước |

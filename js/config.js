@@ -15,9 +15,10 @@ export const WINDOW_NAME = "MADE_FOR_US.EXE"; // chữ trên thanh tiêu đề c
 // Khách viết câu riêng: ghi 1 chuỗi (dùng cho cả hai thứ tiếng) hoặc { en: "...", vi: "..." }.
 // Cách ghi { en, vi } dùng được cả cho GIFTS[].label, MILESTONES[].date/name, GAME_SUBTITLE.
 export const TEXT = {
-  // câu nhân vật nam nói khi tìm thấy cô ấy
+  // đoạn gặp nhau: câu chàng trai nói, rồi câu cô gái đáp lại (2 bong bóng thoại).
+  // Câu riêng của từng khách (gửi ở khung chat của khách đó); để "" thì bong bóng đó không hiện.
+  // Bản demo dùng câu mẫu bên dưới; khách mới tạo bằng tools/new_customer.py thì để trống sẵn.
   manLine: "Found you.",
-  // câu cô ấy đáp lại ngay sau đó (bong bóng thứ hai); để "" thì không hiện
   womanLine: "Hi babi",
   // dòng chữ trên màn hình bầu trời sao sau khi gặp nhau
   meetText: "I'm on my solo mission but the stars guide me to you",
@@ -42,7 +43,7 @@ export const TEXT = {
 
 // ---------- ảnh & video của khách ----------
 // Thời gian hiện bong bóng thoại ở đoạn gặp nhau (mili giây, 1000 = 1 giây): chàng trai nói
-// trước, cô gái đáp sau (chỉ khi TEXT.womanLine có chữ), hết thì sang màn bầu trời sao.
+// trước, cô gái đáp sau (mỗi bên chỉ hiện khi câu có chữ), hết thì sang màn bầu trời sao.
 export const MEET_BUBBLE_MS = { man: 2500, woman: 2500 };
 
 // Ảnh polaroid: đặt file vào assets/photos/ rồi điền đường dẫn vào từng mốc bên dưới.

@@ -352,26 +352,32 @@ function showBubble(el, line, worldX, worldTopY) {
 function playMeeting() {
   const g = currentGame;
   const ms = { man: 2500, woman: 2500, ...MEET_BUBBLE_MS };
-  const manBubble = $("bubble-man");
-  const womanBubble = $("bubble-woman");
+  // câu thoại riêng của khách: để "" thì bong bóng đó không hiện (text() chỉ để dịch câu mẫu cũ)
+  const manLine = pick(TEXT.manLine) ? text("manLine") : "";
   const womanLine = pick(TEXT.womanLine);
+  const steps = [
+    manLine && { el: $("bubble-man"), line: manLine, x: g.player.x + g.player.w * 0.5, y: g.player.y - 12, ms: ms.man },
+    // cô gái reo hò cao ~84 đơn vị, đứng giữa tại meetX
+    womanLine && { el: $("bubble-woman"), line: womanLine, x: g.meetX, y: g.groundY - 96, ms: ms.woman },
+  ].filter(Boolean);
   const toStars = () => {
     setTitleText($("meet-text"), text("meetText"));
     $("meet-stats").innerHTML =
       t("missionStats", { score: g.score, time: fmtTime(g.timeSolo), gifts: `${GIFTS.length}/${GIFTS.length}` });
     showScreen("screen-meet");
   };
-  showBubble(manBubble, text("manLine"), g.player.x + g.player.w * 0.5, g.player.y - 12);
-  setTimeout(() => {
-    manBubble.classList.add("hidden");
-    if (!womanLine) return toStars();
-    // cô gái reo hò cao ~84 đơn vị, đứng giữa tại meetX
-    showBubble(womanBubble, womanLine, g.meetX, g.groundY - 96);
+  const next = (i) => {
+    // không ai nói: vẫn dừng một nhịp cho thấy cảnh gặp nhau rồi mới sang màn bầu trời sao
+    if (!steps.length) return setTimeout(toStars, 1500);
+    if (i >= steps.length) return toStars();
+    const s = steps[i];
+    showBubble(s.el, s.line, s.x, s.y);
     setTimeout(() => {
-      womanBubble.classList.add("hidden");
-      toStars();
-    }, ms.woman);
-  }, ms.man);
+      s.el.classList.add("hidden");
+      next(i + 1);
+    }, s.ms);
+  };
+  next(0);
 }
 
 // --- chương 4: hòm hồng → System Message ---
