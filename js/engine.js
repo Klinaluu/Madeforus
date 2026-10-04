@@ -957,10 +957,13 @@ export class JourneyGame {
     const solo = this.phase === "solo" || this.phase === "meeting";
     const blink = this.invuln > 0 && Math.floor(this.t * 12) % 2 === 0;
     let sprite = img.playerSolo;
+    let walkH; // các khung đi bộ vẽ cùng một tỉ lệ (khung cao nhất = cao nhân vật) để không phập phồng
     if (this.phase === "walk") {
       const frames = img.walkFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused && this.player.onGround;
       sprite = frames[moving ? Math.floor(this.player.animT * 7) % frames.length : 0] || frames[0];
+      const maxH = Math.max(...frames.filter(ready).map((f) => f.height));
+      if (ready(sprite) && maxH > 0) walkH = this.player.h * (sprite.height / maxH);
     } else if (!solo) {
       const frames = img.coupleFrames || [];
       const moving = Math.abs(this.player.vx) > 1 && !this.paused;
@@ -972,7 +975,7 @@ export class JourneyGame {
     if (riding) drawSpeedLines(ctx, this.player, this.groundY, this.t);
     // rung máy 1px khi đang chạy
     const rumble = riding ? Math.floor(this.player.animT * 28) % 2 : 0;
-    drawPlayer(ctx, this.player, sprite, 0, blink, this.groundY, bikeScene ? 100 : undefined, bikeScene ? 2 - rumble : 0);
+    drawPlayer(ctx, this.player, sprite, 0, blink, this.groundY, bikeScene ? 100 : walkH, bikeScene ? 2 - rumble : 0);
 
     for (const pt of this.particles) {
       ctx.globalAlpha = Math.max(0, Math.min(1, pt.life / 0.3));
