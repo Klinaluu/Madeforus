@@ -206,13 +206,13 @@ python3 tools/make_qr_card.py linh-tung
 
 Script tạo **thẻ QR bàn giao** `customers/linh-tung/qr-card.png` (1080×1350, cùng thiết kế
 với artifact [Thẻ QR bàn giao](https://claude.ai/artifact/2atFTscTv31k681V99D3kc), mã QR trỏ
-tới `https://klinaluu.github.io/linh-tung/`) và in ra **tin nhắn giao game** (lưu kèm ở
+tới `https://klinaluu.github.io/linh-tung/`), **thẻ hướng dẫn chơi** `customers/linh-tung/guide-card.png`
+(máy tính: chơi trên website · điện thoại: tải về như app — vẽ bằng `tools/guide_card.html`) và in ra **tin nhắn giao game** (lưu kèm ở
 `customers/linh-tung/tin-nhan-giao.txt`). Cần mạng và Google Chrome (chạy ẩn, không mở cửa
 sổ). Chưa điền tên trong brief thì truyền thẳng: `--names "Linh" "Tùng"`. Muốn sửa tay
 (đổi dòng chữ dưới mã…) thì mở artifact ở trên.
 
-Gửi khách: tin nhắn in ra + ảnh `qr-card.png` (đính kèm ngay sau dòng "Thẻ QR của hai
-bạn"). File `dist/linh-tung.zip` (bản offline) **không gửi mặc định** — chỉ gửi khi khách
+Gửi khách: tin nhắn in ra + ảnh `qr-card.png` + ảnh `guide-card.png`. File `dist/linh-tung.zip` (bản offline) **không gửi mặc định** — chỉ gửi khi khách
 hỏi, như tin nhắn đã ghi.
 
 Mẫu tin nhắn (script tự điền link; muốn đổi câu chữ thì sửa `MESSAGE` trong

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Guide card renderer</title>
+<!--
+  Trang vẽ thẻ HƯỚNG DẪN CHƠI gửi kèm thẻ QR — dùng bởi tools/make_qr_card.py (Chrome headless).
+  Cùng khung + màu + font với tools/qr_card.html. Đổi thiết kế chung thì sửa cả hai file.
+  Tham số trên URL: #link=...
+  Vẽ xong ghi data URL PNG vào thẻ pre#out (hoặc "ERR: ..." nếu lỗi).
+-->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>body { margin: 0; }</style>
+</head>
+<body>
+<pre id="out"></pre>
+<script>
+(() => {
+  const W = 1080, H = 1350;
+  const C = {
+    pink: "#ff6fa0", pinkDeep: "#e8558a", plum: "#3b1d35", cream: "#fffaf6",
+    bg: "#ffd3e3", dot: "#ffc0d6", white: "#ffffff", muted: "#8a5a78", butter: "#ffd66b", blush: "#ffe6ef"
+  };
+  const P = new URLSearchParams(location.hash.slice(1));
+  const link = (P.get("link") || "").trim();
+  const out = document.getElementById("out");
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  const BODY = "VT323, monospace";
+  const HEART = [".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.", "..XXX..", "...X..."];
+  // icon pixel 12×10 / 8×12 (X = viền, o = màn hình)
+  const LAPTOP = [
+    "..XXXXXXXX..",
+    "..XooooooX..",
+    "..XooooooX..",
+    "..XooooooX..",
+    "..XooooooX..",
+    "..XXXXXXXX..",
+    ".XXXXXXXXXX.",
+    "XXXXXXXXXXXX",
+  ];
+  const PHONE = [
+    "XXXXXXXX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XooooooX",
+    "XXXXXXXX",
+    "XXX..XXX",
+    "XXXXXXXX",
+  ];
+
+  function rect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+  function pxBox(x, y, w, h, u, fill, stroke) {
+    rect(x + u, y, w - 2 * u, u, stroke);
+    rect(x + u, y + h - u, w - 2 * u, u, stroke);
+    rect(x, y + u, u, h - 2 * u, stroke);
+    rect(x + w - u, y + u, u, h - 2 * u, stroke);
+    rect(x + u, y + u, w - 2 * u, h - 2 * u, fill);
+  }
+  function grid(rows, x0, y0, s, map) {
+    rows.forEach((row, r) => [...row].forEach((ch, k) => { if (map[ch]) rect(x0 + k * s, y0 + r * s, s, s, map[ch]); }));
+  }
+  function heart(cx, cy, s, c) {
+    grid(HEART, cx - HEART[0].length * s / 2, cy - HEART.length * s / 2, s, { X: c });
+  }
+  function sparkle(cx, cy, s, c) {
+    rect(cx - s / 2, cy - s * 2.5, s, s * 5, c);
+    rect(cx - s * 2.5, cy - s / 2, s * 5, s, c);
+  }
+  function text(str, x, y, font, color, align = "center") {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
+    ctx.fillText(str, x, y);
+  }
+  function wrap(str, maxW) {
+    const words = str.split(" "), lines = [];
+    let line = "";
+    for (const w of words) {
+      const next = line ? line + " " + w : w;
+      if (ctx.measureText(next).width > maxW && line) { lines.push(line); line = w; } else line = next;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  // một mục: icon + tiêu đề + các dòng có số thứ tự; trả về y kết thúc
+  function section(x, y, w, icon, iconMap, title, steps) {
+    const pad = 28, iconBox = 104;
+    const lineH = 40, size = 38, textX = x + pad + 52, textW = w - pad * 2 - 52;
+    ctx.font = `${size}px ${BODY}`;
+    const wrapped = steps.map((s) => wrap(s, textW));
+    const bodyH = wrapped.reduce((n, l) => n + l.length * lineH + 12, 0);
+    const h = pad + iconBox + 24 + bodyH + pad - 12;
+    pxBox(x + 10, y + 10, w, h, 5, C.pink, C.pink);
+    pxBox(x, y, w, h, 5, C.white, C.plum);
+    // icon trong ô vuông hồng nhạt
+    pxBox(x + pad, y + pad, iconBox, iconBox, 5, C.blush, C.plum);
+    const s = Math.floor(72 / Math.max(icon.length, icon[0].length));
+    grid(icon, x + pad + (iconBox - icon[0].length * s) / 2, y + pad + (iconBox - icon.length * s) / 2, s, iconMap);
+    // tiêu đề 2 dòng cạnh icon
+    text(title[0], x + pad + iconBox + 26, y + pad + 48, `54px ${BODY}`, C.pinkDeep, "left");
+    text(title[1], x + pad + iconBox + 26, y + pad + 90, `38px ${BODY}`, C.muted, "left");
+    // các bước
+    let ly = y + pad + iconBox + 24 + 30;
+    wrapped.forEach((lines, i) => {
+      rect(x + pad + 4, ly - 28, 34, 34, C.plum);
+      text(String(i + 1), x + pad + 21, ly - 2, `30px ${BODY}`, C.white);
+      lines.forEach((l) => { text(l, textX, ly, `${size}px ${BODY}`, C.plum, "left"); ly += lineH; });
+      ly += 12;
+    });
+    return y + h;
+  }
+
+  function render() {
+    rect(0, 0, W, H, C.bg);
+    for (let y = 18; y < H; y += 36) for (let x = (y / 36) % 2 ? 18 : 36; x < W; x += 36) rect(x, y, 4, 4, C.dot);
+    heart(70, 70, 6, C.pink); heart(1010, 1290, 6, C.pink);
+    heart(1022, 60, 4, C.white); heart(56, 1240, 4, C.white);
+    sparkle(160, 1300, 6, C.butter); sparkle(930, 48, 6, C.butter);
+
+    const wx = 84, wy = 108, ww = 912, wh = 1080;
+    pxBox(wx + 18, wy + 18, ww, wh, 6, C.plum, C.plum);
+    pxBox(wx, wy, ww, wh, 6, C.cream, C.plum);
+    rect(wx + 6, wy + 6, ww - 12, 78, C.pink);
+    rect(wx + 6, wy + 84, ww - 12, 6, C.plum);
+    text("HOW_TO_PLAY.EXE", wx + 34, wy + 60, `24px "Press Start 2P", monospace`, C.white, "left");
+    const bxX = wx + ww - 72, bxY = wy + 20;
+    pxBox(bxX, bxY, 50, 50, 5, C.cream, C.plum);
+    for (let i = 0; i < 5; i++) {
+      rect(bxX + 13 + i * 5, bxY + 13 + i * 5, 5, 5, C.plum);
+      rect(bxX + 33 - i * 5, bxY + 13 + i * 5, 5, 5, C.plum);
+    }
+
+    text("HOW TO PLAY", W / 2, wy + 176, `48px "Press Start 2P", monospace`, C.plum);
+    text("Hướng dẫn chơi game", W / 2, wy + 228, `46px ${BODY}`, C.pinkDeep);
+
+    const sx = wx + 44, sw = ww - 98;
+    const iconMap = { X: C.plum, o: C.pink };
+    let y = section(sx, wy + 260, sw, LAPTOP, iconMap, ["MÁY TÍNH", "chơi ngay trên website"], [
+      "Mở link bằng Chrome, Safari hoặc Edge.",
+      "← → để đi, ↑ để nhảy, ↑↑ để nhảy đôi.",
+      "F: toàn màn hình · M: tắt / bật nhạc.",
+    ]);
+    y = section(sx, y + 28, sw, PHONE, iconMap, ["ĐIỆN THOẠI", "tải về như một app"], [
+      "iPhone: Safari → Chia sẻ → Thêm vào MH chính.",
+      "Android: Chrome → menu ⋮ → Cài đặt ứng dụng.",
+      "Mở từ biểu tượng mới, xoay ngang để chơi.",
+    ]);
+
+    if (link) {
+      const short = link.replace(/^https?:\/\//, "").replace(/\/$/, "");
+      text("Link game: " + short, W / 2, wy + wh - 34, `38px ${BODY}`, C.plum);
+    }
+
+    heart(W / 2 - 196, H - 88, 4, C.pink);
+    text("madeforus.love", W / 2 + 14, H - 74, `26px "Press Start 2P", monospace`, C.plum);
+    return y;
+  }
+
+  async function run() {
+    try {
+      await Promise.all([
+        document.fonts.load('48px "Press Start 2P"'),
+        document.fonts.load("40px VT323", "Hướng dẫn ĐIỆN THOẠI MÁY TÍNH ắễộ →“”⋮≡ " + link),
+      ]);
+      if (!document.fonts.check('48px "Press Start 2P"') || !document.fonts.check("40px VT323")) {
+        throw new Error("khong tai duoc font Press Start 2P / VT323 (can mang)");
+      }
+      const bottom = render();
+      // nội dung tràn xuống dòng link → báo lỗi thay vì ra thẻ chữ đè chữ
+      if (bottom > 108 + 1080 - 70) throw new Error("noi dung tran khung (" + Math.round(bottom) + "px)");
+      out.textContent = canvas.toDataURL("image/png");
+    } catch (e) {
+      out.textContent = "ERR: " + e.message;
+    }
+  }
+  if (document.readyState === "complete") run(); else window.addEventListener("load", run);
+})();
+</script>
+</body>
+</html>
