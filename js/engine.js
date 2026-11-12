@@ -171,9 +171,11 @@ export class JourneyGame {
         this.extras.push({ id: "umbrella", label: STR.itemUmbrella, x: ms.start + ms.itemAt.x, gap: ms.itemAt.y, collected: false, ms });
       }
       // điểm thưởng (id "egg", vẽ bằng assets/props/Egg-Gold.png = hình trái tim) rải dọc
-      // đường, vài cái phải nhảy mới tới
+      // đường, vài cái phải nhảy mới tới. Không đặt tim nào trong bề ngang khung polaroid
+      // (từ dx 470 tới ~780 khi khung to nhất trên laptop, tính cả nghiêng + bóng): trên màn
+      // cao khung kéo xuống gần mặt đường, tim lơ lửng ở đó sẽ đè lên dòng ngày/tên dưới ảnh.
       if (ms.event !== "chest" && ms.event !== "gift") {
-        [[250, 40], [520, 130], [790, 60]].forEach(([dx, gap]) => {
+        [[180, 40], [370, 130], [820, 60]].forEach(([dx, gap]) => {
           const x = ms.start + dx;
           const blocked = (ms.blocks || []).some((b) => Math.abs(ms.start + b.x - x) < 90) || (ms.platforms || []).some((pf) => Math.abs(ms.start + pf.x - x) < 120);
           if (!blocked) this.extras.push({ id: "egg", label: STR.itemEgg, x, gap, collected: false, ms });
