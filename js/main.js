@@ -3,7 +3,7 @@
 // ============================================================
 import {
   GAME_TITLE, GAME_SUBTITLE, WINDOW_NAME, TEXT, GIFTS, MILESTONES, VIDEO_SRC, MUSIC_SRC, TITLE_PHOTO, SHOW_EMPTY_PHOTO_FRAMES,
-  SCENE_LAYERS, COUPLE_FRAMES, MEET_BUBBLE_MS,
+  SCENE_LAYERS, COUPLE_FRAMES, MEET_BUBBLE_MS, WOMAN_SCALE,
 } from "./config.js";
 import { IMG, PROPS, PROP_SETS, SCENES, SCENE_SPEEDS, SCENE_SINK, SCENE_TOP, GRASS_SCENES } from "./assets.js";
 import {
@@ -284,7 +284,7 @@ function startJourney() {
   if (currentGame) currentGame.destroy();
   currentGame = new JourneyGame(
     canvas,
-    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: giftItems(), milestones: coupleMilestones(), maxHearts: MAX_HEARTS, grassScenes: GRASS_SCENES, propSets: PROP_SETS, bottomInset: bottomInsetFor(size.height), topInset: topInsetFor(size.height), emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: text("photoPlaceholder"), strings: engineStrings(), titleFont: titleFont() },
+    { soloSegments: SOLO_SEGMENTS, soloSegW: SOLO_SEG_W, walkTerrain: WALK_TERRAIN, bossTerrain: BOSS_TERRAIN, meetTerrain: MEET_TERRAIN, items: giftItems(), milestones: coupleMilestones(), maxHearts: MAX_HEARTS, womanScale: WOMAN_SCALE || 1, grassScenes: GRASS_SCENES, propSets: PROP_SETS, bottomInset: bottomInsetFor(size.height), topInset: topInsetFor(size.height), emptyPolaroids: SHOW_EMPTY_PHOTO_FRAMES, photoPlaceholder: text("photoPlaceholder"), strings: engineStrings(), titleFont: titleFont() },
     images,
     {
       onItem: (item, count, total) => {
@@ -357,8 +357,8 @@ function playMeeting() {
   const womanLine = pick(TEXT.womanLine);
   const steps = [
     manLine && { el: $("bubble-man"), line: manLine, x: g.player.x + g.player.w * 0.5, y: g.player.y - 12, ms: ms.man },
-    // cô gái reo hò cao ~84 đơn vị, đứng giữa tại meetX
-    womanLine && { el: $("bubble-woman"), line: womanLine, x: g.meetX, y: g.groundY - 96, ms: ms.woman },
+    // cô gái reo hò cao ~84 đơn vị (× WOMAN_SCALE), đứng giữa tại meetX
+    womanLine && { el: $("bubble-woman"), line: womanLine, x: g.meetX, y: g.groundY - 84 * (WOMAN_SCALE || 1) - 12, ms: ms.woman },
   ].filter(Boolean);
   const toStars = () => {
     setTitleText($("meet-text"), text("meetText"));
@@ -405,7 +405,9 @@ function openVideo(fromEnding) {
   if (VIDEO_SRC) {
     missing.classList.add("hidden");
     video.classList.remove("hidden");
-    video.src = VIDEO_SRC;
+    // "#t=0.001": Safari trên iPhone (preload="metadata", không có poster) để ô đen tới khi bấm
+    // phát; có mốc thời gian thì nó vẽ sẵn khung hình đầu. Khách tự ghi "#..." thì giữ nguyên.
+    video.src = VIDEO_SRC.includes("#") ? VIDEO_SRC : VIDEO_SRC + "#t=0.001";
     video.load();
   } else {
     // bản demo: chưa có video của bạn

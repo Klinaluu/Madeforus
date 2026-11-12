@@ -63,8 +63,14 @@ export const SHOW_EMPTY_PHOTO_FRAMES = true;
 //   export const COUPLE_FRAMES = ["assets/characters/Couple-Bike-Side-01.png"];
 export const COUPLE_FRAMES = [];
 
+// Cỡ cô gái lúc đứng chờ + nhảy mừng (1 = mặc định). Sprite khách vẽ kiểu chibi đầu to mà
+// cô gái trông nhỏ hơn chàng trai trên xe thì tăng lên, vd 1.3.
+export const WOMAN_SCALE = 1;
+
 // ---------- 5 món quà của chặng solo ----------
 // icon: để trống ("") thì game tự vẽ hình thay thế.
+// scale (tuỳ chọn, mặc định 1): mọi icon vẽ cùng chiều cao, nên icon dáng cao/mảnh (vd guitar)
+// trông nhỏ → ghi scale: 1.5. Icon bè ngang trông to thì cho ảnh thêm khoảng trống phía trên.
 export const GIFTS = [
   { id: "matcha", label: "Matcha", icon: "assets/elements/Item-MatchaCup.png" },
   { id: "chocolate", label: "Chocolate", icon: "assets/elements/Item-Chocolate.png" },

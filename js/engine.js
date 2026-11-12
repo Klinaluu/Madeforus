@@ -922,7 +922,8 @@ export class JourneyGame {
     }
     for (const it of this.items) {
       if (it.collected) continue;
-      drawItem(ctx, img.pickup[it.id], it.id, it.x, this.groundY - it.gap, ITEM_SIZE, this.t, this.groundY);
+      // GIFTS[].scale (config): icon dáng cao/mảnh trông nhỏ vì mọi icon cùng chiều cao → cho phóng to riêng
+      drawItem(ctx, img.pickup[it.id], it.id, it.x, this.groundY - it.gap, ITEM_SIZE, this.t, this.groundY, it.scale || 1);
     }
     if (this.phase === "walk") {
       drawCoveredBike(ctx, img.bikeIdle, this.bikeX, this.groundY, this.t, this.gearReady());
@@ -931,8 +932,9 @@ export class JourneyGame {
         drawItem(ctx, img.gear[ge.id], ge.id, ge.x, this.groundY - ge.gap, ITEM_SIZE, this.t, this.groundY, ge.id === "key" ? 0.6 : 0.9);
       }
     }
-    if (this.phase === "solo") drawWoman(ctx, img.woman, this.meetX, this.groundY, this.t, false);
-    if (this.phase === "meeting") drawWoman(ctx, img.womanCheer[Math.floor(this.t * 4) % 2], this.meetX, this.groundY, this.t, true);
+    const womanScale = this.content.womanScale || 1;
+    if (this.phase === "solo") drawWoman(ctx, img.woman, this.meetX, this.groundY, this.t, false, womanScale);
+    if (this.phase === "meeting") drawWoman(ctx, img.womanCheer[Math.floor(this.t * 4) % 2], this.meetX, this.groundY, this.t, true, womanScale);
 
     // Khung polaroid treo ngay dưới thanh HUD (dây đủ dài để không bị thanh đè lên, xem
     // topInset) và to hết mức chiều cao còn trống phía trên mặt đường cho phép — màn hình
@@ -1494,9 +1496,10 @@ function drawLipstick(ctx, cx, bottomY, size) {
 }
 
 // cheer = khung vẫy tay (nhìn thẳng, không lật); mặc định là đứng nghiêng, lật lại để nhìn về phía chàng trai
-function drawWoman(ctx, image, x, groundY, t, cheer) {
-  // cỡ theo nhân vật nam trên xe (74): đứng ≈ 68, reo hò giơ tay ≈ 84
-  const h = cheer ? 84 : 68;
+function drawWoman(ctx, image, x, groundY, t, cheer, scale = 1) {
+  // cỡ theo nhân vật nam trên xe (74): đứng ≈ 68, reo hò giơ tay ≈ 84.
+  // scale = WOMAN_SCALE (config): sprite khách vẽ kiểu chibi đầu to thì cô gái trông nhỏ hơn anh → phóng to
+  const h = (cheer ? 84 : 68) * scale;
   const bob = cheer ? Math.abs(Math.sin(t * 6)) * -6 : Math.sin(t * 2.2) * 1.5;
   drawShadow(ctx, x, groundY, 44, 0.22);
   if (!ready(image)) {
